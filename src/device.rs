@@ -332,6 +332,7 @@ impl Device {
                 nchannels: channels.len(),
                 flags: 0,
                 time_ns: 0,
+                active: false,
                 phantom: PhantomData,
             })
         }
@@ -353,6 +354,7 @@ impl Device {
                 handle: stream,
                 nchannels: channels.len(),
                 flags: 0,
+                active: false,
                 phantom: PhantomData,
             })
         }
@@ -753,6 +755,7 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
     /// # Arguments:
     ///   * `time_ns` -- optional activation time in nanoseconds
     pub fn activate(&mut self, time_ns: Option<i64>) -> Result<(), Error> {
+        if self.active { return Err(Error { code: ErrorCode::Other, message: "Stream is already active".into() }); }
         unsafe {
             let flags = if time_ns.is_some() { SOAPY_SDR_HAS_TIME as i32 } else { 0 };
             check_ret_error(SoapySDRDevice_activateStream(self.device.ptr, self.handle, flags, time_ns.unwrap_or(0), 0))?;
@@ -769,6 +772,7 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
     /// # Arguments:
     ///   * `time_ns` -- optional deactivation time in nanoseconds
     pub fn deactivate(&mut self, time_ns: Option<i64>) -> Result<(), Error> {
+        if !self.active { return Err(Error { code: ErrorCode::Other, message: "Stream is not active".into() }); }
         unsafe {
             let flags = if time_ns.is_some() { SOAPY_SDR_HAS_TIME as i32 } else { 0 };
             check_ret_error(SoapySDRDevice_deactivateStream(self.device.ptr, self.handle, flags, time_ns.unwrap_or(0)))?;
@@ -809,17 +813,21 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
 
 }
 
-pub struct TxStream<'a, E> {
+pub struct TxStream<'a, E: StreamSample> {
     device: &'a Device,
     handle: *mut SoapySDRStream,
     nchannels: usize,
     flags: i32,
+    active: bool,
     phantom: PhantomData<fn(&[E])>,
 }
 
-impl<'a, E> Drop for TxStream<'a, E> {
+impl<'a, E: StreamSample> Drop for TxStream<'a, E> {
     fn drop(&mut self) {
         unsafe {
+            if self.active {
+                self.deactivate(None).ok();
+            }
             SoapySDRDevice_closeStream(self.device.ptr, self.handle);
         }
     }
@@ -845,9 +853,12 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
     /// # Arguments:
     ///   * `time_ns` -- optional activation time in nanoseconds
     pub fn activate(&mut self, time_ns: Option<i64>) -> Result<(), Error> {
+        if self.active { return Err(Error { code: ErrorCode::Other, message: "Stream is already active".into() }); }
         unsafe {
             let flags = if time_ns.is_some() { SOAPY_SDR_HAS_TIME as i32 } else { 0 };
-            check_ret_error(SoapySDRDevice_activateStream(self.device.ptr, self.handle, flags, time_ns.unwrap_or(0), 0))
+            check_ret_error(SoapySDRDevice_activateStream(self.device.ptr, self.handle, flags, time_ns.unwrap_or(0), 0))?;
+            self.active = true;
+            Ok(())
         }
     }
 
@@ -859,9 +870,12 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
     /// # Arguments:
     ///   * `time_ns` -- optional deactivation time in nanoseconds
     pub fn deactivate(&mut self, time_ns: Option<i64>) -> Result<(), Error> {
+        if !self.active { return Err(Error { code: ErrorCode::Other, message: "Stream is not active".into() }); }
         unsafe {
             let flags = if time_ns.is_some() { SOAPY_SDR_HAS_TIME as i32 } else { 0 };
-            check_ret_error(SoapySDRDevice_deactivateStream(self.device.ptr, self.handle, flags, time_ns.unwrap_or(0)))
+            check_ret_error(SoapySDRDevice_deactivateStream(self.device.ptr, self.handle, flags, time_ns.unwrap_or(0)))?;
+            self.active = false;
+            Ok(())
         }
     }
 
