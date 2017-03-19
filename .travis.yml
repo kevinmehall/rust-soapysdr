@@ -1,0 +1,22 @@
+language: rust
+rust:
+  - stable
+  - beta
+
+dist: trusty
+sudo: required
+
+addons:
+  apt:
+    sources:
+      - sourceline: ppa:myriadrf/drivers
+    packages:
+      - libsoapysdr-dev
+      - llvm-3.5-dev
+      - libclang-3.5-dev
+
+before_script:
+  - dpkg -l libsoapysdr-dev
+  - dpkg -L libsoapysdr-dev
+
+cache: cargo

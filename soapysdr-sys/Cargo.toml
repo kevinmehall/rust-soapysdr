@@ -17,4 +17,4 @@ build = "build.rs"
 [dependencies]
 
 [build-dependencies]
-bindgen = "0.20.0"
+bindgen = "0.22.0"
