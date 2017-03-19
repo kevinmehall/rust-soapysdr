@@ -1,3 +1,8 @@
+//! [SoapySDR](https://github.com/pothosware/SoapySDR/wiki) provides a hardware abstraction layer
+//! for transmitting and receiving with many software defined radio devices.
+//!
+//!
+
 extern crate soapysdr_sys;
 extern crate libc;
 extern crate num_complex;
@@ -9,5 +14,4 @@ mod arginfo;
 pub use arginfo::ArgInfo;
 
 mod device;
-pub use device::{enumerate, Device, RxStream, TxStream, Error, ErrorCode, Direction, Range};
-pub use self::Direction::{Tx, Rx};
+pub use device::{enumerate, Device, RxStream, TxStream, Error, ErrorCode, Direction, Range, Format, StreamSample};

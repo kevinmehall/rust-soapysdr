@@ -162,6 +162,7 @@ impl fmt::Display for Args {
     }
 }
 
+/// An iterator over the `(&key, &value)` pairs in an `Args` list.
 pub struct ArgsIterator<'a> {
     args: &'a Args,
     pos: usize,

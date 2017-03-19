@@ -12,6 +12,7 @@ use std::marker::PhantomData;
 use super::{ Args, ArgInfo };
 use arginfo::arg_info_list_from_c;
 
+/// An error code from SoapySDR
 #[repr(i32)]
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
 pub enum ErrorCode {
@@ -63,16 +64,33 @@ impl ErrorCode {
     }
 }
 
+/// An error type combining an error code and a string message
 #[derive(Clone, Debug, Hash)]
 pub struct Error {
     pub code: ErrorCode,
     pub message: String,
 }
 
+impl ::std::fmt::Display for Error {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        write!(f, "{:?}: {}", self.code, self.message)
+    }
+}
+
+impl ::std::error::Error for Error {
+    fn description(&self) -> &str {
+        &self.message[..]
+    }
+}
+
+/// Transmit or Receive
 #[repr(u32)]
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
 pub enum Direction {
+    /// Transmit direction
     Tx = SOAPY_SDR_TX,
+
+    /// Receive direction
     Rx = SOAPY_SDR_RX
 }
 
@@ -714,6 +732,12 @@ impl Device {
 
 }
 
+/// A stream open for receiving.
+///
+/// To obtain a RxStream, call `Device::rx_stream`. The type parameter `E` represents the type
+/// of this stream's samples.
+///
+/// Streams may involve multiple channels.
 pub struct RxStream<'a, E: StreamSample> {
     device: &'a Device,
     handle: *mut SoapySDRStream,
@@ -749,8 +773,7 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
 
     /// Activate a stream.
     ///
-    /// Call activate to prepare a stream before using read/write().
-    /// The implementation will control switches or stimulate data flow.
+    /// Call `activate` to enable a stream before using `read()`
     ///
     /// # Arguments:
     ///   * `time_ns` -- optional activation time in nanoseconds
@@ -783,6 +806,8 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
 
     /// Read samples from the stream into the provided buffers.
     ///
+    /// `buffers` contains one destination slice for each channel of this stream.
+    ///
     /// Returns the number of samples read, which may be smaller than the size of the passed arrays.
     ///
     /// # Panics
@@ -813,6 +838,12 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
 
 }
 
+/// A stream open for transmitting.
+///
+/// To obtain a TxStream, call `Device::tx_stream`. The type parameter `E` represents the type
+/// of this stream's samples.
+///
+/// Streams may involve multiple channels.
 pub struct TxStream<'a, E: StreamSample> {
     device: &'a Device,
     handle: *mut SoapySDRStream,
@@ -847,8 +878,7 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
 
     /// Activate a stream.
     ///
-    /// Call activate to prepare a stream before using read/write().
-    /// The implementation will control switches or stimulate data flow.
+    /// Call activate to enable a stream before using `write()`
     ///
     /// # Arguments:
     ///   * `time_ns` -- optional activation time in nanoseconds
@@ -880,6 +910,8 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
     }
 
     /// Write samples to the device from the provided buffer.
+    ///
+    /// `buffers` contains one source slice for each channel of the stream.
     ///
     /// Returns the number of samples written, which may be smaller than the size of the passed arrays.
     ///
@@ -917,6 +949,31 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
 
 }
 
+/// A string representing the format of samples.
+///
+///  The first character selects the number type:
+///    - "C" means complex (followed by one of the types below)
+///    - "F" means floating point
+///    - "S" means signed integer
+///    - "U" means unsigned integer
+///
+///  The type character is followed by the number of bits per number (complex is 2x this size per sample)
+///
+///   Example format strings:
+///    - "CF32" -  complex float32 (8 bytes per element)
+///    - "CS16" -  complex int16 (4 bytes per element)
+///    - "CS12" -  complex int12 (3 bytes per element)
+///    - "CS4" -  complex int4 (1 byte per element)
+///    - "S32" -  int32 (4 bytes per element)
+///    - "U8" -  uint8 (1 byte per element)
+///
+/// Use `str::parse()` to construct a Format from one of these strings:
+///
+/// ```
+/// # use soapysdr::Format;
+/// let format: Format = "CF32".parse().unwrap();
+/// assert_eq!(format.to_string(), "CF32");
+/// ```
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Format(CString);
 
@@ -945,12 +1002,19 @@ impl ::std::str::FromStr for Format {
     }
 }
 
+impl ::std::fmt::Display for Format {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        write!(f, "{}", self.0.to_str().unwrap())
+    }
+}
+
 impl Format {
     fn as_ptr(&self) -> *const c_char {
         self.0.as_ptr()
     }
 }
 
+/// Trait for sample formats used by a TxStream or RxStream
 pub trait StreamSample {
     fn stream_format() -> Format;
 }

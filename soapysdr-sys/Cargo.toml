@@ -13,6 +13,7 @@ software defined radio hardware abstraction layer."
 """
 license = "BSL-1.0/Apache-2.0"
 build = "build.rs"
+documentation = "https://kevinmehall.net/rustdoc/soapysdr/soapysdr_sys/"
 
 [dependencies]
 
