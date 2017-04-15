@@ -918,7 +918,7 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
     /// # Panics
     ///  * If `buffers` is not the same length as the `channels` array passed to `Device::rx_stream`.
     ///  * If all the buffers in `buffers` are not the same length.
-    pub fn write(&mut self, buffers: &[&[u8]], timeout_us: i64) -> Result<usize, Error> {
+    pub fn write(&mut self, buffers: &[&[E]], timeout_us: i64) -> Result<usize, Error> {
         unsafe {
             assert!(buffers.len() == self.nchannels, "Number of buffers must equal number of channels on stream");
 
