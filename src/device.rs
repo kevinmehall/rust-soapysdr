@@ -952,6 +952,7 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
 /// A string representing the format of samples.
 ///
 ///  The first character selects the number type:
+///
 ///    - "C" means complex (followed by one of the types below)
 ///    - "F" means floating point
 ///    - "S" means signed integer
@@ -960,6 +961,7 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
 ///  The type character is followed by the number of bits per number (complex is 2x this size per sample)
 ///
 ///   Example format strings:
+///
 ///    - "CF32" -  complex float32 (8 bytes per element)
 ///    - "CS16" -  complex int16 (4 bytes per element)
 ///    - "CS12" -  complex int12 (3 bytes per element)
@@ -1015,21 +1017,24 @@ impl Format {
 }
 
 /// Trait for sample formats used by a TxStream or RxStream
-pub trait StreamSample {
+///
+/// Implementing this trait requires that the type have the same size, alignment, and compatible
+/// memory representation with the SoapySDR type selected by `stream_format`
+pub unsafe trait StreamSample {
     fn stream_format() -> Format;
 }
 
-impl StreamSample for u8           { fn stream_format() -> Format { "U8".parse().unwrap() }}
-impl StreamSample for u16          { fn stream_format() -> Format { "U16".parse().unwrap() }}
-impl StreamSample for u32          { fn stream_format() -> Format { "U32".parse().unwrap() }}
-impl StreamSample for i8           { fn stream_format() -> Format { "S8".parse().unwrap() }}
-impl StreamSample for i16          { fn stream_format() -> Format { "S16".parse().unwrap() }}
-impl StreamSample for i32          { fn stream_format() -> Format { "S32".parse().unwrap() }}
-impl StreamSample for f32          { fn stream_format() -> Format { "F32".parse().unwrap() }}
-impl StreamSample for Complex<u8>  { fn stream_format() -> Format { "CU8".parse().unwrap() }}
-impl StreamSample for Complex<u16> { fn stream_format() -> Format { "CU16".parse().unwrap() }}
-impl StreamSample for Complex<u32> { fn stream_format() -> Format { "CU32".parse().unwrap() }}
-impl StreamSample for Complex<i8>  { fn stream_format() -> Format { "CS8".parse().unwrap() }}
-impl StreamSample for Complex<i16> { fn stream_format() -> Format { "CS16".parse().unwrap() }}
-impl StreamSample for Complex<i32> { fn stream_format() -> Format { "CS32".parse().unwrap() }}
-impl StreamSample for Complex<f32> { fn stream_format() -> Format { "CF32".parse().unwrap() }}
+unsafe impl StreamSample for u8           { fn stream_format() -> Format { "U8".parse().unwrap() }}
+unsafe impl StreamSample for u16          { fn stream_format() -> Format { "U16".parse().unwrap() }}
+unsafe impl StreamSample for u32          { fn stream_format() -> Format { "U32".parse().unwrap() }}
+unsafe impl StreamSample for i8           { fn stream_format() -> Format { "S8".parse().unwrap() }}
+unsafe impl StreamSample for i16          { fn stream_format() -> Format { "S16".parse().unwrap() }}
+unsafe impl StreamSample for i32          { fn stream_format() -> Format { "S32".parse().unwrap() }}
+unsafe impl StreamSample for f32          { fn stream_format() -> Format { "F32".parse().unwrap() }}
+unsafe impl StreamSample for Complex<u8>  { fn stream_format() -> Format { "CU8".parse().unwrap() }}
+unsafe impl StreamSample for Complex<u16> { fn stream_format() -> Format { "CU16".parse().unwrap() }}
+unsafe impl StreamSample for Complex<u32> { fn stream_format() -> Format { "CU32".parse().unwrap() }}
+unsafe impl StreamSample for Complex<i8>  { fn stream_format() -> Format { "CS8".parse().unwrap() }}
+unsafe impl StreamSample for Complex<i16> { fn stream_format() -> Format { "CS16".parse().unwrap() }}
+unsafe impl StreamSample for Complex<i32> { fn stream_format() -> Format { "CS32".parse().unwrap() }}
+unsafe impl StreamSample for Complex<f32> { fn stream_format() -> Format { "CF32".parse().unwrap() }}
