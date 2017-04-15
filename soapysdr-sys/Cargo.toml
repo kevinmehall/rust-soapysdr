@@ -9,7 +9,7 @@ categories = ["external-ffi-bindings"]
 keywords = ["ffi", "sdr"]
 description = """
 Bindings for the C API of SoapySDR, the vendor-neutral
-software defined radio hardware abstraction layer."
+software defined radio hardware abstraction layer.
 """
 license = "BSL-1.0/Apache-2.0"
 build = "build.rs"

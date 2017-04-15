@@ -1,10 +1,14 @@
 # Rust bindings for SoapySDR
 
-[SoapySDR](https://github.com/pothosware/SoapySDR/wiki) provides a hardware abstraction layer for transmitting and receiving with many software defined radio devices.
+[SoapySDR](https://github.com/pothosware/SoapySDR/wiki) provides a hardware abstraction layer for many software defined radio devices.
+
+## Documentation
+
+[Rustdoc](https://kevinmehall.net/rustdoc/soapysdr/soapysdr/)
 
 ## Dependencies
 
-This library requires libsoapysdr (0.5.4) and libclang to be installed manually.
+This library requires libsoapysdr 0.5.4 and libclang 3.5+ (for bindgen) to be installed manually.
 
 ### Ubuntu
 
@@ -13,7 +17,7 @@ This library requires libsoapysdr (0.5.4) and libclang to be installed manually.
 ```console
 sudo add-apt-repository ppa:myriadrf/drivers
 sudo apt update
-sudo apt install libsoapysdr-dev libclang-dev
+sudo apt install libsoapysdr-dev llvm-3.9-dev libclang-3.9-dev
 
 # Choose the appropriate drivers for your hardware:
 sudo apt install soapysdr-module-rtlsdr soapysdr-module-hackrf soapysdr-module-uhd soapysdr-module-lms7
