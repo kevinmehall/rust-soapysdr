@@ -13,4 +13,4 @@ repository = "https://github.com/kevinmehall/rust-soapysdr"
 [dependencies]
 soapysdr-sys = { version = "0.5.0", path = "./soapysdr-sys" }
 libc = "0.2.20"
-num-complex = "0.1"
+num-complex = "0.1.37"
