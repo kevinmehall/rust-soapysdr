@@ -1,10 +1,13 @@
 extern crate bindgen;
+extern crate pkg_config;
 
 use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    println!("cargo:rustc-link-lib=SoapySDR");
+    if let Err(e) = pkg_config::Config::new().atleast_version("0.6.0").probe("SoapySDR") {
+        panic!("Couldn't find SoapySDR: {}", e);
+    }
 
     let bindings = bindgen::Builder::default()
         .no_unstable_rust()

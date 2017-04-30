@@ -3,7 +3,7 @@ name = "soapysdr-sys"
 
 # Note: Major and minor will track SoapySDR version, patch is
 # specific to this library
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Kevin Mehall <km@kevinmehall.net>"]
 categories = ["external-ffi-bindings"]
 keywords = ["ffi", "sdr"]
@@ -20,3 +20,4 @@ repository = "https://github.com/kevinmehall/rust-soapysdr"
 
 [build-dependencies]
 bindgen = "0.22.0"
+pkg-config = "0.3.9"
