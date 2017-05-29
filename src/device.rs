@@ -684,9 +684,9 @@ impl Device {
     }
 
     /// Get the range of possible baseband sample rates.
-    pub fn list_sample_rates(&self, direction: Direction, channel: usize) -> Result<Vec<f64>, Error> {
+    pub fn get_sample_rate_range(&self, direction: Direction, channel: usize) -> Result<Vec<Range>, Error> {
         unsafe {
-            list_result(|len_ptr| SoapySDRDevice_listSampleRates(self.ptr, direction.into(), channel, len_ptr))
+            list_result(|len_ptr| SoapySDRDevice_getSampleRateRange(self.ptr, direction.into(), channel, len_ptr))
         }
     }
 

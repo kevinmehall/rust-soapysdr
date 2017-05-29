@@ -1,6 +1,7 @@
 use std::env;
 extern crate soapysdr;
-pub use soapysdr::Direction::{Rx, Tx};
+use soapysdr::Direction::{Rx, Tx};
+use std::fmt;
 
 fn main() {
     let filter = env::args().nth(1).unwrap_or(String::new());
@@ -20,15 +21,31 @@ fn main() {
     }
 }
 
+struct DisplayRange(Vec<soapysdr::Range>);
+
+impl fmt::Display for DisplayRange {
+    fn fmt(&self, w: &mut fmt::Formatter) -> fmt::Result {
+        for (i, range) in self.0.iter().enumerate() {
+            if i != 0 { write!(w, ", ")? }
+            if range.minimum == range.maximum {
+                write!(w, "{} MHz", range.maximum / 1e6)?
+            } else {
+                write!(w, "{} to {} MHz", range.minimum / 1e6, range.maximum / 1e6)?
+            }
+        }
+        Ok(())
+    }
+}
+
 fn print_channel_info(dev: &soapysdr::Device, dir: soapysdr::Direction, channel: usize) -> Result<(), soapysdr::Error> {
     let dir_s = match dir { Rx => "RX", Tx => "Tx"};
     println!("\t{} Channel {}", dir_s, channel);
 
-    let freq_range = dev.frequency_range(dir, channel)?[0];
-    println!("\t\tFreq range: {} to {} MHz", freq_range.minimum / 1e6, freq_range.maximum / 1e6);
+    let freq_range = dev.frequency_range(dir, channel)?;
+    println!("\t\tFreq range: {}", DisplayRange(freq_range));
 
-    let sample_rates = dev.list_sample_rates(dir, channel)?;
-    println!("\t\tSample rates: {:?}", sample_rates);
+    let sample_rates = dev.get_sample_rate_range(dir, channel)?;
+    println!("\t\tSample rates: {}", DisplayRange(sample_rates));
 
     println!("\t\tAntennas: ");
     for antenna in dev.antennas(dir, channel)? {
