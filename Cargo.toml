@@ -15,3 +15,7 @@ readme = "README.md"
 soapysdr-sys = { version = "0.6.0", path = "./soapysdr-sys" }
 libc = "0.2.20"
 num-complex = "0.1.37"
+log = { version = "0.3", optional = true }
+
+[features]
+default = ["log"]

@@ -6,6 +6,7 @@
 extern crate soapysdr_sys;
 extern crate libc;
 extern crate num_complex;
+#[cfg(feature="log")] #[macro_use] extern crate log;
 
 mod args;
 pub use args::{Args, ArgsIterator};
@@ -15,3 +16,35 @@ pub use arginfo::ArgInfo;
 
 mod device;
 pub use device::{enumerate, Device, RxStream, TxStream, Error, ErrorCode, Direction, Range, Format, StreamSample};
+
+/// Configures SoapySDR to log to the Rust `log` facility.
+///
+/// With `env_logger`, use e.g `RUST_LOG=soapysdr=info` to control the log level.
+#[cfg(feature="log")]
+pub fn configure_logging() {
+    use log::LogLevel;
+    use soapysdr_sys::{SoapySDRLogLevel, SoapySDR_registerLogHandler};
+    use libc::c_char;
+    use std::ffi::CStr;
+
+    extern "C" fn soapy_log(level: SoapySDRLogLevel, message: *const c_char) {
+        let level = match level {
+                SoapySDRLogLevel::SOAPY_SDR_FATAL    => LogLevel::Error,
+                SoapySDRLogLevel::SOAPY_SDR_CRITICAL => LogLevel::Error,
+                SoapySDRLogLevel::SOAPY_SDR_ERROR    => LogLevel::Error,
+                SoapySDRLogLevel::SOAPY_SDR_WARNING  => LogLevel::Warn,
+                SoapySDRLogLevel::SOAPY_SDR_NOTICE   => LogLevel::Info,
+                SoapySDRLogLevel::SOAPY_SDR_INFO     => LogLevel::Info,
+                SoapySDRLogLevel::SOAPY_SDR_DEBUG    => LogLevel::Debug,
+                SoapySDRLogLevel::SOAPY_SDR_TRACE    => LogLevel::Trace,
+                SoapySDRLogLevel::SOAPY_SDR_SSI      => LogLevel::Info, // Streaming status indicators such as "U" (underflow) and "O" (overflow).
+        };
+
+        let msg = unsafe { CStr::from_ptr(message) };
+        log!(level, "{}", msg.to_string_lossy().trim_left_matches(&['\r', '\n'][..]));
+    }
+
+    unsafe {
+        SoapySDR_registerLogHandler(Some(soapy_log));
+    }
+}
