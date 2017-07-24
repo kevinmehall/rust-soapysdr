@@ -1031,10 +1031,16 @@ unsafe impl StreamSample for i8           { fn stream_format() -> Format { "S8".
 unsafe impl StreamSample for i16          { fn stream_format() -> Format { "S16".parse().unwrap() }}
 unsafe impl StreamSample for i32          { fn stream_format() -> Format { "S32".parse().unwrap() }}
 unsafe impl StreamSample for f32          { fn stream_format() -> Format { "F32".parse().unwrap() }}
+unsafe impl StreamSample for f64          { fn stream_format() -> Format { "F64".parse().unwrap() }}
+//unsupported CU4
 unsafe impl StreamSample for Complex<u8>  { fn stream_format() -> Format { "CU8".parse().unwrap() }}
+//unsupported CU12
 unsafe impl StreamSample for Complex<u16> { fn stream_format() -> Format { "CU16".parse().unwrap() }}
 unsafe impl StreamSample for Complex<u32> { fn stream_format() -> Format { "CU32".parse().unwrap() }}
+//unsupported CS4
 unsafe impl StreamSample for Complex<i8>  { fn stream_format() -> Format { "CS8".parse().unwrap() }}
+//unsupported CS12
 unsafe impl StreamSample for Complex<i16> { fn stream_format() -> Format { "CS16".parse().unwrap() }}
 unsafe impl StreamSample for Complex<i32> { fn stream_format() -> Format { "CS32".parse().unwrap() }}
 unsafe impl StreamSample for Complex<f32> { fn stream_format() -> Format { "CF32".parse().unwrap() }}
+unsafe impl StreamSample for Complex<f64> { fn stream_format() -> Format { "CF64".parse().unwrap() }}
