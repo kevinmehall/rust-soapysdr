@@ -990,7 +990,7 @@ impl ::std::str::FromStr for Format {
         }
 
         match c {
-            Some('F') | Some('U') | Some('I') => (),
+            Some('F') | Some('U') | Some('S') => (),
             _ => return Err(())
         }
 
