@@ -990,7 +990,7 @@ impl ::std::str::FromStr for Format {
         }
 
         match c {
-            Some('F') | Some('U') | Some('I') => (),
+            Some('F') | Some('U') | Some('S') => (),
             _ => return Err(())
         }
 
@@ -1024,6 +1024,52 @@ pub unsafe trait StreamSample {
     fn stream_format() -> Format;
 }
 
+#[test]
+fn stream_format_parsable() {
+    u8::stream_format();
+    u16::stream_format();
+    u32::stream_format();
+
+    i8::stream_format();
+    i16::stream_format();
+    i32::stream_format();
+
+    f32::stream_format();
+    f64::stream_format();
+
+    assert!("CU4".parse::<Format>().is_ok());
+    Complex::<u8>::stream_format();
+    assert!("CU12".parse::<Format>().is_ok());
+    Complex::<u16>::stream_format();
+    Complex::<u32>::stream_format();
+
+    assert!("CS4".parse::<Format>().is_ok());
+    Complex::<i8>::stream_format();
+    assert!("CS12".parse::<Format>().is_ok());
+    Complex::<i16>::stream_format();
+    Complex::<i32>::stream_format();
+
+    Complex::<f32>::stream_format();
+    Complex::<f64>::stream_format();
+}
+
+#[test]
+fn stream_format_not_parsable() {
+    assert!("".parse::<Format>().is_err());
+    assert!("32".parse::<Format>().is_err());
+    assert!("Z".parse::<Format>().is_err());
+    assert!("Z32".parse::<Format>().is_err());
+    assert!("CZ".parse::<Format>().is_err());
+
+    assert!("U".parse::<Format>().is_err());
+    assert!("S".parse::<Format>().is_err());
+    assert!("F".parse::<Format>().is_err());
+
+    assert!("CU".parse::<Format>().is_err());
+    assert!("CS".parse::<Format>().is_err());
+    assert!("CF".parse::<Format>().is_err());
+}
+
 unsafe impl StreamSample for u8           { fn stream_format() -> Format { "U8".parse().unwrap() }}
 unsafe impl StreamSample for u16          { fn stream_format() -> Format { "U16".parse().unwrap() }}
 unsafe impl StreamSample for u32          { fn stream_format() -> Format { "U32".parse().unwrap() }}
@@ -1031,10 +1077,16 @@ unsafe impl StreamSample for i8           { fn stream_format() -> Format { "S8".
 unsafe impl StreamSample for i16          { fn stream_format() -> Format { "S16".parse().unwrap() }}
 unsafe impl StreamSample for i32          { fn stream_format() -> Format { "S32".parse().unwrap() }}
 unsafe impl StreamSample for f32          { fn stream_format() -> Format { "F32".parse().unwrap() }}
+unsafe impl StreamSample for f64          { fn stream_format() -> Format { "F64".parse().unwrap() }}
+//unsupported CU4
 unsafe impl StreamSample for Complex<u8>  { fn stream_format() -> Format { "CU8".parse().unwrap() }}
+//unsupported CU12
 unsafe impl StreamSample for Complex<u16> { fn stream_format() -> Format { "CU16".parse().unwrap() }}
 unsafe impl StreamSample for Complex<u32> { fn stream_format() -> Format { "CU32".parse().unwrap() }}
+//unsupported CS4
 unsafe impl StreamSample for Complex<i8>  { fn stream_format() -> Format { "CS8".parse().unwrap() }}
+//unsupported CS12
 unsafe impl StreamSample for Complex<i16> { fn stream_format() -> Format { "CS16".parse().unwrap() }}
 unsafe impl StreamSample for Complex<i32> { fn stream_format() -> Format { "CS32".parse().unwrap() }}
 unsafe impl StreamSample for Complex<f32> { fn stream_format() -> Format { "CF32".parse().unwrap() }}
+unsafe impl StreamSample for Complex<f64> { fn stream_format() -> Format { "CF64".parse().unwrap() }}
