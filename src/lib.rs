@@ -23,21 +23,23 @@ pub use device::{enumerate, Device, RxStream, TxStream, Error, ErrorCode, Direct
 #[cfg(feature="log")]
 pub fn configure_logging() {
     use log::LogLevel;
-    use soapysdr_sys::{SoapySDRLogLevel, SoapySDR_registerLogHandler};
+    use soapysdr_sys::*;
     use libc::c_char;
     use std::ffi::CStr;
 
     extern "C" fn soapy_log(level: SoapySDRLogLevel, message: *const c_char) {
+        #![allow(non_upper_case_globals)]
         let level = match level {
-                SoapySDRLogLevel::SOAPY_SDR_FATAL    => LogLevel::Error,
-                SoapySDRLogLevel::SOAPY_SDR_CRITICAL => LogLevel::Error,
-                SoapySDRLogLevel::SOAPY_SDR_ERROR    => LogLevel::Error,
-                SoapySDRLogLevel::SOAPY_SDR_WARNING  => LogLevel::Warn,
-                SoapySDRLogLevel::SOAPY_SDR_NOTICE   => LogLevel::Info,
-                SoapySDRLogLevel::SOAPY_SDR_INFO     => LogLevel::Info,
-                SoapySDRLogLevel::SOAPY_SDR_DEBUG    => LogLevel::Debug,
-                SoapySDRLogLevel::SOAPY_SDR_TRACE    => LogLevel::Trace,
-                SoapySDRLogLevel::SOAPY_SDR_SSI      => LogLevel::Info, // Streaming status indicators such as "U" (underflow) and "O" (overflow).
+                SoapySDRLogLevel_SOAPY_SDR_FATAL    => LogLevel::Error,
+                SoapySDRLogLevel_SOAPY_SDR_CRITICAL => LogLevel::Error,
+                SoapySDRLogLevel_SOAPY_SDR_ERROR    => LogLevel::Error,
+                SoapySDRLogLevel_SOAPY_SDR_WARNING  => LogLevel::Warn,
+                SoapySDRLogLevel_SOAPY_SDR_NOTICE   => LogLevel::Info,
+                SoapySDRLogLevel_SOAPY_SDR_INFO     => LogLevel::Info,
+                SoapySDRLogLevel_SOAPY_SDR_DEBUG    => LogLevel::Debug,
+                SoapySDRLogLevel_SOAPY_SDR_TRACE    => LogLevel::Trace,
+                SoapySDRLogLevel_SOAPY_SDR_SSI      => LogLevel::Info, // Streaming status indicators such as "U" (underflow) and "O" (overflow).
+                _ => LogLevel::Error,
         };
 
         let msg = unsafe { CStr::from_ptr(message) };
