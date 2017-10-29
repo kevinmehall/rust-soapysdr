@@ -190,19 +190,19 @@ unsafe fn list_result<T: Copy, F: FnOnce(*mut usize) -> *mut T>(f: F) -> Result<
 ///
 /// `args`: a set of arguments to filter the devices returned.
 ///
-/// # Example
+/// # Example (list all devices)
 /// ```
-/// for dev in soapysdr::enumerate(&soapysdr::Args::new()).unwrap() {
+/// for dev in soapysdr::enumerate("").unwrap() {
 ///     println!("{}", dev);
 /// }
 /// ```
 ///
 /// This function returns a list of argument lists that can be passed to `Device::new()` to
 /// open the device.
-pub fn enumerate(args: &Args) -> Result<Vec<Args>, Error> {
+pub fn enumerate<A: Into<Args>>(args: A) -> Result<Vec<Args>, Error> {
     unsafe {
         let mut len: usize = 0;
-        let devs = check_error(SoapySDRDevice_enumerate(args.as_raw_const(), &mut len as *mut _))?;
+        let devs = check_error(SoapySDRDevice_enumerate(args.into().as_raw_const(), &mut len as *mut _))?;
         let args = slice::from_raw_parts(devs, len).iter().map(|&arg| Args::from_raw(arg)).collect();
         libc::free(devs as *mut c_void);
         Ok(args)
@@ -214,18 +214,18 @@ impl Device {
     ///
     /// # Example
     /// ```
-    /// let mut d = soapysdr::Device::new(&"type=null".into()).unwrap();
+    /// let mut d = soapysdr::Device::new("type=null").unwrap();
     /// ```
-    pub fn new(args: &Args) -> Result<Device, Error> {
+    pub fn new<A: Into<Args>>(args: A) -> Result<Device, Error> {
         unsafe {
-            let d = check_error(SoapySDRDevice_make(args.as_raw_const()))?;
+            let d = check_error(SoapySDRDevice_make(args.into().as_raw_const()))?;
             Ok(Device { ptr: d })
         }
     }
 
     #[doc(hidden)]
     pub fn null_device() -> Device {
-        Device::new(&"type=null".into()).unwrap()
+        Device::new("type=null").unwrap()
     }
 
     /// A key that uniquely identifies the device driver.
@@ -333,8 +333,13 @@ impl Device {
         }
     }
 
+    ///  Initialize an RX stream given a list of channels
+    pub fn rx_stream<E: StreamSample>(&self, channels: &[usize]) -> Result<RxStream<E>, Error> {
+        self.rx_stream_args(channels, ())
+    }
+
     ///  Initialize an RX stream given a list of channels and stream arguments.
-    pub fn rx_stream<E: StreamSample>(&self, channels: &[usize], args: &Args) -> Result<RxStream<E>, Error> {
+    pub fn rx_stream_args<E: StreamSample, A: Into<Args>>(&self, channels: &[usize], args: A) -> Result<RxStream<E>, Error> {
         unsafe {
             let format = E::stream_format();
             let mut stream: *mut SoapySDRStream = ptr::null_mut();
@@ -343,7 +348,7 @@ impl Device {
                 Direction::Rx.into(),
                 format.as_ptr(),
                 channels.as_ptr(), channels.len(),
-                args.as_raw_const()
+                args.into().as_raw_const()
             )).map(|_| RxStream {
                 device: self,
                 handle: stream,
@@ -357,7 +362,12 @@ impl Device {
     }
 
     /// Initialize a TX stream given a list of channels and stream arguments.
-    pub fn tx_stream<E: StreamSample>(&self, channels: &[usize], args: &Args) -> Result<TxStream<E>, Error> {
+    pub fn tx_stream<E: StreamSample>(&self, channels: &[usize]) -> Result<TxStream<E>, Error> {
+        self.tx_stream_args(channels, ())
+    }
+
+    /// Initialize a TX stream given a list of channels and stream arguments.
+    pub fn tx_stream_args<E: StreamSample, A: Into<Args>>(&self, channels: &[usize], args: A) -> Result<TxStream<E>, Error> {
         unsafe {
             let format = E::stream_format();
             let mut stream: *mut SoapySDRStream = ptr::null_mut();
@@ -366,7 +376,7 @@ impl Device {
                 Direction::Tx.into(),
                 format.as_ptr(),
                 channels.as_ptr(), channels.len(),
-                args.as_raw_const()
+                args.into().as_raw_const()
             )).map(|_| TxStream {
                 device: self,
                 handle: stream,
@@ -610,9 +620,9 @@ impl Device {
     ///   - Vendor specific implementations can also use the same args to augment
     ///     tuning in other ways such as specifying fractional vs integer N tuning.
     ///
-    pub fn set_frequency(&self, direction: Direction, channel: usize, frequency: f64, args: &Args) -> Result<(), Error> {
+    pub fn set_frequency<A: Into<Args>>(&self, direction: Direction, channel: usize, frequency: f64, args: A) -> Result<(), Error> {
         unsafe {
-            SoapySDRDevice_setFrequency(self.ptr, direction.into(), channel, frequency, args.as_raw_const());
+            SoapySDRDevice_setFrequency(self.ptr, direction.into(), channel, frequency, args.into().as_raw_const());
             check_error(())
         }
     }
@@ -653,10 +663,10 @@ impl Device {
     ///   - "RF" - frequency of the RF frontend
     ///   - "BB" - frequency of the baseband DSP
     ///
-    pub fn set_component_frequency<S: Into<Vec<u8>>>(&self, direction: Direction, channel: usize, name: S, frequency: f64, args: &Args) -> Result<(), Error> {
+    pub fn set_component_frequency<S: Into<Vec<u8>>, A: Into<Args>>(&self, direction: Direction, channel: usize, name: S, frequency: f64, args: A) -> Result<(), Error> {
         unsafe {
             let name_c = CString::new(name).expect("Component name contains null byte");
-            SoapySDRDevice_setFrequencyComponent(self.ptr, direction.into(), channel, name_c.as_ptr(), frequency, args.as_raw_const());
+            SoapySDRDevice_setFrequencyComponent(self.ptr, direction.into(), channel, name_c.as_ptr(), frequency, args.into().as_raw_const());
             check_error(())
         }
     }

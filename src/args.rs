@@ -137,6 +137,30 @@ impl<'a> From<&'a str> for Args {
     }
 }
 
+impl<'a, K: ::std::cmp::Eq + ::std::hash::Hash, V> From<&'a HashMap<K, V>> for Args where &'a K: Into<Vec<u8>>, &'a V: Into<Vec<u8>> {
+    fn from(m: &'a HashMap<K, V>) -> Args {
+        let mut args = Args::new();
+        for (k, v) in m {
+            args.set(k, v);
+        }
+        args
+    }
+}
+
+impl<'a, K, V> From<&'a [(K, V)]> for Args where &'a K: Into<Vec<u8>>, &'a V: Into<Vec<u8>> {
+    fn from(m: &'a [(K, V)]) -> Args {
+        let mut args = Args::new();
+        for &(ref k, ref v) in m {
+            args.set(k, v);
+        }
+        args
+    }
+}
+
+impl<'a> From<()> for Args {
+    fn from(_: ()) -> Args { Args::new() }
+}
+
 impl<'a> From<&'a Args> for String {
     fn from(a: &'a Args) -> String {
         format!("{}", a)

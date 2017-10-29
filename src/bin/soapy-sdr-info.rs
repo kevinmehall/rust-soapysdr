@@ -6,10 +6,10 @@ use std::fmt;
 fn main() {
     let filter = env::args().nth(1).unwrap_or(String::new());
 
-    for devargs in soapysdr::enumerate(&(filter[..]).into()).expect("Error listing devices") {
+    for devargs in soapysdr::enumerate(&filter[..]).expect("Error listing devices") {
         println!("{}", devargs);
 
-        let dev = soapysdr::Device::new(&devargs).expect("Failed to open device");
+        let dev = soapysdr::Device::new(devargs).expect("Failed to open device");
 
         for channel in 0..(dev.num_channels(Rx).unwrap_or(0)) {
             print_channel_info(&dev, Rx, channel).expect("Failed to get channel info");
