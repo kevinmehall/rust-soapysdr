@@ -363,7 +363,7 @@ impl Device {
             let mut stream: *mut SoapySDRStream = ptr::null_mut();
             check_error(SoapySDRDevice_setupStream(self.ptr,
                 &mut stream as *mut _,
-                Direction::Rx.into(),
+                Direction::Tx.into(),
                 format.as_ptr(),
                 channels.as_ptr(), channels.len(),
                 args.as_raw_const()
