@@ -186,6 +186,13 @@ unsafe fn list_result<T: Copy, F: FnOnce(*mut usize) -> *mut T>(f: F) -> Result<
     Ok(ret)
 }
 
+fn optional_string_arg<S: AsRef<str>>(optstr: Option<S>) -> CString {
+    match optstr {
+        Some(s) => CString::new(s.as_ref()).expect("Optional arg string contains null"),
+        None => CString::new("").unwrap(),
+    }
+}
+
 /// Enumerate a list of available devices on the system.
 ///
 /// `args`: a set of arguments to filter the devices returned.
@@ -722,9 +729,66 @@ impl Device {
         }
     }
 
-    // TODO: clocking
+/// List time sources
+    pub fn list_time_sources(&self) -> Result<Vec<String>, Error> {
+        unsafe { string_list_result(|len_ptr| SoapySDRDevice_listTimeSources(self.ptr, len_ptr)) }
+    }
 
-    // TODO: time
+    /// Get the current time source
+    pub fn get_time_source(&self) -> Result<String, Error> {
+        unsafe { string_result(SoapySDRDevice_getTimeSource(self.ptr)) }
+    }
+
+    /// Set the current time source
+    pub fn set_time_source<S: Into<Vec<u8>>>(&self, time_source: S) -> Result<(), Error> {
+        let time_source = CString::new(time_source).expect("Time source contained null");
+        unsafe {
+            SoapySDRDevice_setTimeSource(self.ptr, time_source.as_ptr());
+            check_error(())
+        }
+    }
+
+    /// Check whether there is a given hardware time source.
+    /// Hardware time sources are not the same as time sources (at least for UHD Devices)
+    /// UHD supported hw time sources: "PPS" or "" (i.e. None)
+    pub fn has_hardware_time(
+        &self,
+        hw_time_source: Option<&str>,
+    ) -> Result<bool, Error> {
+        let hw_time_source = optional_string_arg(hw_time_source);
+        unsafe {
+            let has_hw_time = SoapySDRDevice_hasHardwareTime(self.ptr, hw_time_source.as_ptr());
+            check_error(has_hw_time)
+        }
+    }
+
+    /// Get the current timestamp in ns
+    pub fn get_hardware_time(
+        &self,
+        hw_time_source: Option<&str>,
+    ) -> Result<i64, Error> {
+        let hw_time_source = optional_string_arg(hw_time_source);
+        unsafe {
+            let tstamp = SoapySDRDevice_getHardwareTime(self.ptr, hw_time_source.as_ptr());
+            check_error(tstamp)
+        }
+    }
+
+    /// Set the current hardware timestmap for the given source
+    /// UHD supported hardware times: "CMD","PPS","UNKNOWN_PPS"
+    pub fn set_hardware_time(
+        &self,
+        hw_time_source: Option<&str>,
+        new_time_ns: i64,
+    ) -> Result<(), Error> {
+        let hw_time_source = optional_string_arg(hw_time_source);
+        unsafe {
+            SoapySDRDevice_setHardwareTime(self.ptr, new_time_ns, hw_time_source.as_ptr());
+            check_error(())
+        }
+    }
+
+    // TODO: clocking
 
     // TODO: sensors
 
