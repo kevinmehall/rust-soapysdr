@@ -6,10 +6,9 @@ use std::ptr;
 use std::ffi::{ CStr, CString };
 use std::os::raw::{c_int, c_char};
 use libc::c_void;
-use num_complex::Complex;
 use std::marker::PhantomData;
 
-use super::{ Args, ArgInfo };
+use super::{ Args, ArgInfo, StreamSample, Format };
 use arginfo::arg_info_from_c;
 
 /// An error code from SoapySDR
@@ -316,7 +315,8 @@ impl Device {
             let mut len: usize = 0;
             let mut ptr = check_error(SoapySDRDevice_getStreamFormats(self.ptr, direction.into(), channel, &mut len as *mut _))?;
             let ret = slice::from_raw_parts(ptr, len).iter()
-                .map(|&p| Format(CStr::from_ptr(p).to_owned()))
+                .flat_map(|&p| CStr::from_ptr(p).to_str().ok())
+                .flat_map(|s| s.parse().ok())
                 .collect();
             SoapySDRStrings_clear(&mut ptr as *mut _, len);
             Ok(ret)
@@ -331,7 +331,12 @@ impl Device {
         unsafe {
             let mut fullscale: f64 = 0.0;
             let ptr = check_error(SoapySDRDevice_getNativeStreamFormat(self.ptr, direction.into(), channel, &mut fullscale as *mut _))?;
-            Ok((Format(CStr::from_ptr(ptr).to_owned()), fullscale))
+
+            let format = CStr::from_ptr(ptr).to_str().ok()
+                .and_then(|s| s.parse().ok())
+                .ok_or_else(|| Error { code: ErrorCode::Other, message: "Invalid stream format returned by SoapySDR".into()})?;
+
+            Ok((format, fullscale))
         }
     }
 
@@ -350,12 +355,11 @@ impl Device {
     ///  Initialize an RX stream given a list of channels and stream arguments.
     pub fn rx_stream_args<E: StreamSample, A: Into<Args>>(&self, channels: &[usize], args: A) -> Result<RxStream<E>, Error> {
         unsafe {
-            let format = E::stream_format();
             let mut stream: *mut SoapySDRStream = ptr::null_mut();
             check_error(SoapySDRDevice_setupStream(self.ptr,
                 &mut stream as *mut _,
                 Direction::Rx.into(),
-                format.as_ptr(),
+                E::STREAM_FORMAT.as_ptr(),
                 channels.as_ptr(), channels.len(),
                 args.into().as_raw_const()
             )).map(|_| RxStream {
@@ -378,12 +382,11 @@ impl Device {
     /// Initialize a TX stream given a list of channels and stream arguments.
     pub fn tx_stream_args<E: StreamSample, A: Into<Args>>(&self, channels: &[usize], args: A) -> Result<TxStream<E>, Error> {
         unsafe {
-            let format = E::stream_format();
             let mut stream: *mut SoapySDRStream = ptr::null_mut();
             check_error(SoapySDRDevice_setupStream(self.ptr,
                 &mut stream as *mut _,
                 Direction::Tx.into(),
-                format.as_ptr(),
+                E::STREAM_FORMAT.as_ptr(),
                 channels.as_ptr(), channels.len(),
                 args.into().as_raw_const()
             )).map(|_| TxStream {
@@ -1024,145 +1027,3 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
     // TODO: DMA
 
 }
-
-/// A string representing the format of samples.
-///
-///  The first character selects the number type:
-///
-///    - "C" means complex (followed by one of the types below)
-///    - "F" means floating point
-///    - "S" means signed integer
-///    - "U" means unsigned integer
-///
-///  The type character is followed by the number of bits per number (complex is 2x this size per sample)
-///
-///   Example format strings:
-///
-///    - "CF32" -  complex float32 (8 bytes per element)
-///    - "CS16" -  complex int16 (4 bytes per element)
-///    - "CS12" -  complex int12 (3 bytes per element)
-///    - "CS4" -  complex int4 (1 byte per element)
-///    - "S32" -  int32 (4 bytes per element)
-///    - "U8" -  uint8 (1 byte per element)
-///
-/// Use `str::parse()` to construct a Format from one of these strings:
-///
-/// ```
-/// # use soapysdr::Format;
-/// let format: Format = "CF32".parse().unwrap();
-/// assert_eq!(format.to_string(), "CF32");
-/// ```
-#[derive(Clone, Debug, Eq, PartialEq, Hash)]
-pub struct Format(CString);
-
-impl ::std::str::FromStr for Format {
-    type Err = ();
-    fn from_str(s: &str) -> Result<Self, ()> {
-        let mut chars = s.chars();
-        let mut c = chars.next();
-
-        if c == Some('C') {
-            c = chars.next();
-        }
-
-        match c {
-            Some('F') | Some('U') | Some('S') => (),
-            _ => return Err(())
-        }
-
-        if chars.as_str().len() == 0 { return Err(()) }
-
-        for c in chars {
-            if !c.is_numeric() { return Err(()); }
-        }
-
-        return Ok(Format(CString::new(s).unwrap()))
-    }
-}
-
-impl ::std::fmt::Display for Format {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        write!(f, "{}", self.0.to_str().unwrap())
-    }
-}
-
-impl Format {
-    fn as_ptr(&self) -> *const c_char {
-        self.0.as_ptr()
-    }
-}
-
-/// Trait for sample formats used by a TxStream or RxStream
-///
-/// Implementing this trait requires that the type have the same size, alignment, and compatible
-/// memory representation with the SoapySDR type selected by `stream_format`
-pub unsafe trait StreamSample {
-    fn stream_format() -> Format;
-}
-
-#[test]
-fn stream_format_parsable() {
-    u8::stream_format();
-    u16::stream_format();
-    u32::stream_format();
-
-    i8::stream_format();
-    i16::stream_format();
-    i32::stream_format();
-
-    f32::stream_format();
-    f64::stream_format();
-
-    assert!("CU4".parse::<Format>().is_ok());
-    Complex::<u8>::stream_format();
-    assert!("CU12".parse::<Format>().is_ok());
-    Complex::<u16>::stream_format();
-    Complex::<u32>::stream_format();
-
-    assert!("CS4".parse::<Format>().is_ok());
-    Complex::<i8>::stream_format();
-    assert!("CS12".parse::<Format>().is_ok());
-    Complex::<i16>::stream_format();
-    Complex::<i32>::stream_format();
-
-    Complex::<f32>::stream_format();
-    Complex::<f64>::stream_format();
-}
-
-#[test]
-fn stream_format_not_parsable() {
-    assert!("".parse::<Format>().is_err());
-    assert!("32".parse::<Format>().is_err());
-    assert!("Z".parse::<Format>().is_err());
-    assert!("Z32".parse::<Format>().is_err());
-    assert!("CZ".parse::<Format>().is_err());
-
-    assert!("U".parse::<Format>().is_err());
-    assert!("S".parse::<Format>().is_err());
-    assert!("F".parse::<Format>().is_err());
-
-    assert!("CU".parse::<Format>().is_err());
-    assert!("CS".parse::<Format>().is_err());
-    assert!("CF".parse::<Format>().is_err());
-}
-
-unsafe impl StreamSample for u8           { fn stream_format() -> Format { "U8".parse().unwrap() }}
-unsafe impl StreamSample for u16          { fn stream_format() -> Format { "U16".parse().unwrap() }}
-unsafe impl StreamSample for u32          { fn stream_format() -> Format { "U32".parse().unwrap() }}
-unsafe impl StreamSample for i8           { fn stream_format() -> Format { "S8".parse().unwrap() }}
-unsafe impl StreamSample for i16          { fn stream_format() -> Format { "S16".parse().unwrap() }}
-unsafe impl StreamSample for i32          { fn stream_format() -> Format { "S32".parse().unwrap() }}
-unsafe impl StreamSample for f32          { fn stream_format() -> Format { "F32".parse().unwrap() }}
-unsafe impl StreamSample for f64          { fn stream_format() -> Format { "F64".parse().unwrap() }}
-//unsupported CU4
-unsafe impl StreamSample for Complex<u8>  { fn stream_format() -> Format { "CU8".parse().unwrap() }}
-//unsupported CU12
-unsafe impl StreamSample for Complex<u16> { fn stream_format() -> Format { "CU16".parse().unwrap() }}
-unsafe impl StreamSample for Complex<u32> { fn stream_format() -> Format { "CU32".parse().unwrap() }}
-//unsupported CS4
-unsafe impl StreamSample for Complex<i8>  { fn stream_format() -> Format { "CS8".parse().unwrap() }}
-//unsupported CS12
-unsafe impl StreamSample for Complex<i16> { fn stream_format() -> Format { "CS16".parse().unwrap() }}
-unsafe impl StreamSample for Complex<i32> { fn stream_format() -> Format { "CS32".parse().unwrap() }}
-unsafe impl StreamSample for Complex<f32> { fn stream_format() -> Format { "CF32".parse().unwrap() }}
-unsafe impl StreamSample for Complex<f64> { fn stream_format() -> Format { "CF64".parse().unwrap() }}

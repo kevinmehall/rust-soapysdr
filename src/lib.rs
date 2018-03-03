@@ -15,7 +15,10 @@ mod arginfo;
 pub use arginfo::ArgInfo;
 
 mod device;
-pub use device::{enumerate, Device, RxStream, TxStream, Error, ErrorCode, Direction, Range, Format, StreamSample};
+pub use device::{enumerate, Device, RxStream, TxStream, Error, ErrorCode, Direction, Range};
+
+mod format;
+pub use format::{Format, StreamSample};
 
 /// Configures SoapySDR to log to the Rust `log` facility.
 ///
