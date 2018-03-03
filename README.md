@@ -21,12 +21,38 @@ sudo apt install libsoapysdr-dev llvm-3.9-dev libclang-3.9-dev
 sudo apt install soapysdr-module-rtlsdr soapysdr-module-hackrf soapysdr-module-uhd soapysdr-module-lms7
 ```
 
-### Warning
+## Warning
 
 Many SoapySDR driver modules have error handling and thread safety bugs. This library provides
 safe Rust wrappers assuming the drivers meet the (under-documented) intentions of the SoapySDR
-core API contract, but if SoapySDR loads modules that violate this contract and you do atypical things with them, you may encounter unexpected behavior. For details, see
+core API contract, but if SoapySDR loads modules that violate this contract and you do atypical
+things with them, you may encounter unexpected behavior. For details, see
 [this SoapySDR issue](https://github.com/pothosware/SoapySDR/issues/111).
+
+## Utilities
+
+This crate comes with two small utilities that serve as example code.
+
+### soapy-sdr-info
+
+Displays device details like `SoapySDRUtil`.
+
+```
+cargo run --release --features=binaries --bin soapy-sdr-info
+```
+
+### soapy-sdr-stream
+
+Records data from a device.
+
+e.g. capture 15 seconds of data from the FM band:
+
+```
+cargo run --release --features=binaries --bin soapy-sdr-stream -- -d driver=rtlsdr -r out.cfile -f 96M -s 1M -n 15M
+```
+
+The resulting file contains 32-bit little-endian complex float samples, and can be opened with
+[inspectrum](https://github.com/miek/inspectrum).
 
 ## License
 
@@ -37,4 +63,6 @@ Licensed under either of
 
 ### Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in
+the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without
+any additional terms or conditions.
