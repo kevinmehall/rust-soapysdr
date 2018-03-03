@@ -4,15 +4,14 @@ use std::ptr;
 use std::ffi::CStr;
 use std::os::raw::c_char;
 
-
+#[repr(u32)]
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum ArgType {
-
-}
-
-impl From<SoapySDRArgInfoType> for ArgType {
-    fn from(_f: SoapySDRArgInfoType) -> ArgType {
-        unimplemented!();
-    }
+    Bool = SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_BOOL,
+    Float = SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_FLOAT,
+    Int = SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_INT,
+    String = SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_STRING,
+    __Nonexhaustive,
 }
 
 /// Metadata about supported arguments.
@@ -54,6 +53,7 @@ unsafe fn optional_string(s: *mut c_char) -> Option<String> {
     }
 }
 
+#[allow(non_upper_case_globals)]
 pub unsafe fn arg_info_from_c(c: &SoapySDRArgInfo) -> ArgInfo {
     ArgInfo {
         key:         required_string(c.key),
@@ -61,7 +61,13 @@ pub unsafe fn arg_info_from_c(c: &SoapySDRArgInfo) -> ArgInfo {
         name:        optional_string(c.name),
         description: optional_string(c.description),
         units:       optional_string(c.units),
-        data_type:   ArgType::from(c.type_),
+        data_type:   match c.type_ {
+            SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_BOOL => ArgType::Bool,
+            SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_FLOAT => ArgType::Float,
+            SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_INT => ArgType::Int,
+            SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_STRING => ArgType::String,
+            _ => ArgType::__Nonexhaustive,
+        },
         options: {
             let option_vals = slice::from_raw_parts(c.options, c.numOptions);
             let option_names = slice::from_raw_parts(c.optionNames, c.numOptions);
@@ -70,10 +76,4 @@ pub unsafe fn arg_info_from_c(c: &SoapySDRArgInfo) -> ArgInfo {
             }).collect()
         }
     }
-}
-
-pub unsafe fn arg_info_list_from_c(c: *mut SoapySDRArgInfo, len: usize) -> Vec<ArgInfo> {
-    let r = slice::from_raw_parts(c, len).iter().map(|x| arg_info_from_c(x)).collect();
-    SoapySDRArgInfoList_clear(c, len);
-    r
 }

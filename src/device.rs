@@ -10,7 +10,7 @@ use num_complex::Complex;
 use std::marker::PhantomData;
 
 use super::{ Args, ArgInfo };
-use arginfo::arg_info_list_from_c;
+use arginfo::arg_info_from_c;
 
 /// An error code from SoapySDR
 #[repr(i32)]
@@ -175,7 +175,9 @@ unsafe fn string_list_result<F: FnOnce(*mut usize) -> *mut *mut c_char>(f: F) ->
 unsafe fn arg_info_result<F: FnOnce(*mut usize) -> *mut SoapySDRArgInfo>(f: F) -> Result<Vec<ArgInfo>, Error> {
     let mut len: usize = 0;
     let ptr = check_error(f(&mut len as *mut _))?;
-    Ok(arg_info_list_from_c(ptr, len))
+    let r = slice::from_raw_parts(ptr, len).iter().map(|x| arg_info_from_c(x)).collect();
+    SoapySDRArgInfoList_clear(ptr, len);
+    Ok(r)
 }
 
 unsafe fn list_result<T: Copy, F: FnOnce(*mut usize) -> *mut T>(f: F) -> Result<Vec<T>, Error> {
