@@ -1022,6 +1022,96 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
         }
     }
 
+    /// Write a burst of samples
+    ///
+    /// `at_ns` optional nanosecond precision device timestamp at which
+    /// the device is to begin the transmission (c.f. [get_hardware_time](Device::get_hardware_time)).
+    /// `buffers` contains one source slice for each channel of the stream.
+    ///
+    /// # Notes
+    /// This function will attempt to write the entire buffers in a blocking manner.  
+    /// It is not necessary to activate the stream beforehand but doing so may be costly
+    /// with some driver/platforms.
+    ///
+    /// # Panics
+    ///  * If `buffers` is not the same length as the `channels` array passed to `Device::rx_stream`.
+    ///  * If all the buffers in `buffers` are not the same length.
+
+    pub fn write_burst(
+        &mut self,
+        buffers: &[&[E]],
+        at_ns: Option<i64>,
+        timeout_us: i64,
+    ) -> Result<usize, Error> {
+        assert!(
+            buffers.len() == self.nchannels,
+            "Number of buffers must equal number of channels on stream"
+        );
+
+        // Configure the flags for burst mode with/without time.
+        // if the buffers are too large for the device's buffers
+        // we may end up calling write multiple times.
+        // Subsequent calls to send will not require SOAPY_SDR_HAS_TIME to be set
+        let mut flags = SOAPY_SDR_END_BURST as i32;
+        let mut at_ns = match at_ns {
+            Some(t) => {
+                flags |= SOAPY_SDR_HAS_TIME as i32;
+                t
+            }
+            None => 0i64,
+        };
+
+        let num_elems = buffers.get(0).map(|x| x.len()).unwrap_or(0);
+        //check buffer lengths
+        buffers.iter().for_each(|buf| {
+            assert_eq!(buf.len(), num_elems, "All buffers must be the same length")
+        });
+
+        let mut buf_ptrs = Vec::with_capacity(self.nchannels);
+
+        unsafe {
+            let mut tx_d = 0usize; // accumulate tx'ed samples
+            let mut calls_to_write = 0;
+            while tx_d < num_elems {
+                // slice the buffers depending on how much we already transmitted
+                for buf in buffers {
+                    buf_ptrs.push(buf[tx_d..].as_ptr());
+                }
+
+                tx_d += len_result(SoapySDRDevice_writeStream(
+                    self.device.ptr,
+                    self.handle,
+                    buf_ptrs.as_ptr() as *const *const _,
+                    num_elems,
+                    &mut flags as *mut _,
+                    at_ns,
+                    timeout_us,
+                ))? as usize;
+                if flags != 0 {
+                    // this might indicate the driver is doing something unexpected, may be removed after testing
+                    // with most drivers
+                    debug!(
+                        "write_burst: Expected reset flags (0), encountered flag code {}",
+                        flags
+                    );
+                }
+
+                // reset the flags and buffer pointers for the next call
+                flags = SOAPY_SDR_END_BURST as i32;
+                at_ns = 0i64;
+                buf_ptrs.clear();
+                calls_to_write += 1;
+            }
+
+            // remove if testing shows this is done in one call with most drivers
+            debug!(
+                "write_burst: required {} calls to write burst of length {}",
+                calls_to_write, num_elems
+            );
+            Ok(tx_d)
+        }
+    }
+
     // TODO: read_status
 
     // TODO: DMA
