@@ -393,7 +393,6 @@ impl Device {
                 device: self,
                 handle: stream,
                 nchannels: channels.len(),
-                flags: 0,
                 active: false,
                 phantom: PhantomData,
             })
@@ -927,7 +926,6 @@ pub struct TxStream<'a, E: StreamSample> {
     device: &'a Device,
     handle: *mut SoapySDRStream,
     nchannels: usize,
-    flags: i32,
     active: bool,
     phantom: PhantomData<fn(&[E])>,
 }
@@ -957,7 +955,7 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
 
     /// Activate a stream.
     ///
-    /// Call activate to enable a stream before using `write()`
+    /// Call `activate` to enable a stream before using `write()`
     ///
     /// # Arguments:
     ///   * `time_ns` -- optional activation time in nanoseconds
@@ -970,8 +968,6 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
             Ok(())
         }
     }
-
-    // TODO: activate_burst()
 
     /// Deactivate a stream.
     /// The implementation will control switches or halt data flow.
@@ -988,24 +984,41 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
         }
     }
 
-    /// Write samples to the device from the provided buffer.
+    /// Attempt to write samples to the device from the provided buffer.
+    ///
+    /// The stream must first be [activated](TxStream::activate).
     ///
     /// `buffers` contains one source slice for each channel of the stream.
+    ///
+    /// `at_ns` is an optional nanosecond precision device timestamp at which
+    /// the device is to begin the transmission (c.f. [get_hardware_time](Device::get_hardware_time)).
+    ///
+    /// `end_burst` indicates when this packet ends a burst transmission.
     ///
     /// Returns the number of samples written, which may be smaller than the size of the passed arrays.
     ///
     /// # Panics
-    ///  * If `buffers` is not the same length as the `channels` array passed to `Device::rx_stream`.
+    ///  * If `buffers` is not the same length as the `channels` array passed to `Device::tx_stream`.
     ///  * If all the buffers in `buffers` are not the same length.
-    pub fn write(&mut self, buffers: &[&[E]], timeout_us: i64) -> Result<usize, Error> {
+    pub fn write(&mut self, buffers: &[&[E]], at_ns: Option<i64>, end_burst: bool, timeout_us: i64) -> Result<usize, Error> {
         unsafe {
             assert!(buffers.len() == self.nchannels, "Number of buffers must equal number of channels on stream");
 
             let mut buf_ptrs = Vec::with_capacity(self.nchannels);
-            let num_elems = buffers.get(0).map(|x| x.len()).unwrap_or(0);
+            let num_elems = buffers.get(0).map_or(0, |x| x.len());
             for buf in buffers {
                 assert_eq!(buf.len(), num_elems, "All buffers must be the same length");
                 buf_ptrs.push(buf.as_ptr());
+            }
+
+            let mut flags = 0;
+
+            if at_ns.is_some() {
+                flags |= SOAPY_SDR_HAS_TIME as i32;
+            }
+
+            if end_burst {
+                flags |= SOAPY_SDR_END_BURST as i32;
             }
 
             let len = len_result(SoapySDRDevice_writeStream(
@@ -1013,8 +1026,8 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
                 self.handle,
                 buf_ptrs.as_ptr() as *const *const _,
                 num_elems,
-                &mut self.flags as *mut _,
-                0,
+                &mut flags as *mut _,
+                at_ns.unwrap_or(0),
                 timeout_us
             ))?;
 
@@ -1022,94 +1035,38 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
         }
     }
 
-    /// Write a burst of samples
+    /// Write all samples to the device.
     ///
-    /// `at_ns` optional nanosecond precision device timestamp at which
-    /// the device is to begin the transmission (c.f. [get_hardware_time](Device::get_hardware_time)).
+    /// This method repeatedly calls [write](TxStream::write) until the entire provided buffer has
+    /// been written.
+    ///
+    /// The stream must first be [activated](TxStream::activate).
+    ///
     /// `buffers` contains one source slice for each channel of the stream.
     ///
-    /// # Notes
-    /// This function will attempt to write the entire buffers in a blocking manner.  
-    /// It is not necessary to activate the stream beforehand but doing so may be costly
-    /// with some driver/platforms.
+    /// `at_ns` is an optional nanosecond precision device timestamp at which
+    /// the device is to begin the transmission (c.f. [get_hardware_time](Device::get_hardware_time)).
+    ///
+    /// `end_burst` indicates when this packet ends a burst transmission.
     ///
     /// # Panics
     ///  * If `buffers` is not the same length as the `channels` array passed to `Device::rx_stream`.
     ///  * If all the buffers in `buffers` are not the same length.
+    pub fn write_all(&mut self, buffers: &[&[E]], at_ns: Option<i64>, end_burst: bool, timeout_us: i64) -> Result<(), Error> {
+        let mut buffers = buffers.to_owned();
+        let mut at_ns = at_ns;
 
-    pub fn write_burst(
-        &mut self,
-        buffers: &[&[E]],
-        at_ns: Option<i64>,
-        timeout_us: i64,
-    ) -> Result<usize, Error> {
-        assert!(
-            buffers.len() == self.nchannels,
-            "Number of buffers must equal number of channels on stream"
-        );
+        while buffers.get(0).map_or(0, |x| x.len()) > 0 {
+            // The timestamp is only send on the first write.
+            let written = self.write(&buffers, at_ns.take(), end_burst, timeout_us)?;
 
-        // Configure the flags for burst mode with/without time.
-        // if the buffers are too large for the device's buffers
-        // we may end up calling write multiple times.
-        // Subsequent calls to send will not require SOAPY_SDR_HAS_TIME to be set
-        let mut flags = SOAPY_SDR_END_BURST as i32;
-        let mut at_ns = match at_ns {
-            Some(t) => {
-                flags |= SOAPY_SDR_HAS_TIME as i32;
-                t
+            // Advance the buffer pointers
+            for buf in &mut buffers {
+                *buf = &buf[written..];
             }
-            None => 0i64,
-        };
-
-        let num_elems = buffers.get(0).map(|x| x.len()).unwrap_or(0);
-        //check buffer lengths
-        buffers.iter().for_each(|buf| {
-            assert_eq!(buf.len(), num_elems, "All buffers must be the same length")
-        });
-
-        let mut buf_ptrs = Vec::with_capacity(self.nchannels);
-
-        unsafe {
-            let mut tx_d = 0usize; // accumulate tx'ed samples
-            let mut calls_to_write = 0;
-            while tx_d < num_elems {
-                // slice the buffers depending on how much we already transmitted
-                for buf in buffers {
-                    buf_ptrs.push(buf[tx_d..].as_ptr());
-                }
-
-                tx_d += len_result(SoapySDRDevice_writeStream(
-                    self.device.ptr,
-                    self.handle,
-                    buf_ptrs.as_ptr() as *const *const _,
-                    num_elems,
-                    &mut flags as *mut _,
-                    at_ns,
-                    timeout_us,
-                ))? as usize;
-                if flags != 0 {
-                    // this might indicate the driver is doing something unexpected, may be removed after testing
-                    // with most drivers
-                    debug!(
-                        "write_burst: Expected reset flags (0), encountered flag code {}",
-                        flags
-                    );
-                }
-
-                // reset the flags and buffer pointers for the next call
-                flags = SOAPY_SDR_END_BURST as i32;
-                at_ns = 0i64;
-                buf_ptrs.clear();
-                calls_to_write += 1;
-            }
-
-            // remove if testing shows this is done in one call with most drivers
-            debug!(
-                "write_burst: required {} calls to write burst of length {}",
-                calls_to_write, num_elems
-            );
-            Ok(tx_d)
         }
+
+        Ok(())
     }
 
     // TODO: read_status
