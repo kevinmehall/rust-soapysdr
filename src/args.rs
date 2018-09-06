@@ -69,7 +69,7 @@ impl Args {
         unsafe {
             let k = CString::new(key).expect("SoapySDR key can't contain null bytes");
             let v = CString::new(value).expect("SoapySDR value can't contain null bytes");
-            SoapySDRKwargs_set(self.as_raw(), k.as_ptr(), v.as_ptr())
+            SoapySDRKwargs_set(self.as_raw(), k.as_ptr(), v.as_ptr());
         }
     }
 
