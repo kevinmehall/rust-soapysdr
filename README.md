@@ -10,12 +10,12 @@ This library requires libsoapysdr 0.6.0 and libclang 3.5+ (for bindgen) to be in
 
 ### Ubuntu
 
-(Tested on Ubuntu 16.04)
+(Tested on Ubuntu 18.04)
 
 ```console
 sudo add-apt-repository ppa:myriadrf/drivers
 sudo apt update
-sudo apt install libsoapysdr-dev llvm-3.9-dev libclang-3.9-dev
+sudo apt install libsoapysdr-dev llvm-6.0-dev libclang-6.0-dev
 
 # Choose the appropriate drivers for your hardware:
 sudo apt install soapysdr-module-rtlsdr soapysdr-module-hackrf soapysdr-module-uhd soapysdr-module-lms7
