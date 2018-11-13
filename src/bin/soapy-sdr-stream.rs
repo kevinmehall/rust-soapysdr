@@ -7,10 +7,10 @@ extern crate signalbool;
 use std::env;
 use std::cmp::min;
 use std::fs::File;
-use std::io::BufWriter;
+use std::io::{self, BufReader, BufWriter, Read, Write, ErrorKind};
 use std::i64;
 use std::process;
-use byteorder::{ WriteBytesExt, LittleEndian };
+use byteorder::{ WriteBytesExt, LittleEndian, ByteOrder };
 use soapysdr::Direction::{Rx, Tx};
 use getopts::Options;
 use num_complex::Complex;
@@ -30,7 +30,6 @@ fn main() {
     opts.optopt("b", "bandwidth", "baseband filter bandwidth", "HZ");
     opts.optopt("g", "gain", "gain in dB", "GAIN");
     opts.optopt("n", "samples", "with -r: number of samples (default unlimited)", "N");
-    opts.optopt("n", "samples", "with -t: number of times to repeat file (default 1)", "N");
     opts.optflag("h", "help", "print this help menu");
 
     let matches = match opts.parse(args) {
@@ -123,21 +122,70 @@ fn main() {
             while num > 0 && !sb.caught() {
                 let read_size = min(num as usize, buf.len());
                 let len = stream.read(&[&mut buf[..read_size]], 1_000_000).expect("read failed");
-
-                for sample in &buf[..len] {
-                    outfile.write_f32::<LittleEndian>(sample.re).unwrap();
-                    outfile.write_f32::<LittleEndian>(sample.im).unwrap();
-                }
-
+                write_cfile(&buf[..len], &mut outfile).unwrap();
                 num -= len as i64;
             }
             stream.deactivate(None).expect("failed to deactivate");
         }
         Tx => {
-            unimplemented!();
+            let mut stream = dev.tx_stream::<Complex<f32>>(&[channel]).unwrap();
+            let mut buf = vec![Complex::new(0.0, 0.0); stream.mtu().unwrap()];
+
+            let mut infile = BufReader::new(File::open(fname).expect("error opening input file"));
+
+            stream.activate(None).expect("failed to activate stream");
+
+            while !sb.caught() {
+                let len = read_cfile(&mut infile, &mut buf).unwrap();
+
+                let mut samples = &buf[..len];
+
+                while samples.len() > 0 {
+                    let written = stream.write(&[samples], None, false, 1_000_000).expect("write failed");
+                    samples = &samples[written..];
+                }
+
+                if len < buf.len() { break }
+            }
+
+            stream.deactivate(None).expect("failed to deactivate");
         }
     }
     println!("exiting");
+}
+
+fn read_cfile<R: Read>(mut src_file: R, dest_buf: &mut [Complex<f32>]) -> io::Result<usize> {
+    let mut i = 0;
+
+    for sample in dest_buf {
+        let mut tmp = [0u8; 8];
+        let mut tmp_pos = 0;
+
+        while tmp_pos < 8 {
+            // this differs from `read_exact` because it returns early on an EOF between samples instead of failing
+            match src_file.read(&mut tmp[tmp_pos..]) {
+                Ok(0) if tmp_pos == 0 => return Ok(i),
+                Ok(0) => return Err(io::Error::new(ErrorKind::UnexpectedEof, "file ended unexpectedly")),
+                Ok(n) => tmp_pos += n,
+                Err(ref e) if e.kind() == ErrorKind::Interrupted => {}
+                Err(e) => return Err(e),
+            }
+        }
+
+        sample.re = LittleEndian::read_f32(&tmp[..4]);
+        sample.im = LittleEndian::read_f32(&tmp[4..]);
+        i += 1;
+    }
+
+    Ok(i)
+}
+
+fn write_cfile<W: Write>(src_buf: &[Complex<f32>], mut dest_file: W) -> io::Result<()> {
+    for sample in src_buf {
+        dest_file.write_f32::<LittleEndian>(sample.re)?;
+        dest_file.write_f32::<LittleEndian>(sample.im)?;
+    }
+    Ok(())
 }
 
 fn parse_num(s: &str) -> Result<f64, std::num::ParseFloatError> {
