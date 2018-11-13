@@ -563,8 +563,9 @@ impl Device {
 
     /// Set the value of a amplification element in a chain.
     ///
-    /// `name`: the name of an amplification element from `Device::list_gains`
-    /// `gain`: the new amplification value in dB
+    /// # Arguments
+    /// * `name`: the name of an amplification element from `Device::list_gains`
+    /// * `gain`: the new amplification value in dB
     pub fn set_gain_element<S: Into<Vec<u8>>>(&self, direction: Direction, channel: usize, name: S, gain: f64) -> Result<(), Error> {
         unsafe {
             let name_c = CString::new(name).expect("Gain name contains null byte");
@@ -733,7 +734,7 @@ impl Device {
         }
     }
 
-/// List time sources
+    /// List time sources
     pub fn list_time_sources(&self) -> Result<Vec<String>, Error> {
         unsafe { string_list_result(|len_ptr| SoapySDRDevice_listTimeSources(self.ptr, len_ptr)) }
     }
@@ -812,7 +813,7 @@ impl Device {
 
 /// A stream open for receiving.
 ///
-/// To obtain a RxStream, call `Device::rx_stream`. The type parameter `E` represents the type
+/// To obtain a RxStream, call [Device::rx_stream]. The type parameter `E` represents the type
 /// of this stream's samples.
 ///
 /// Streams may involve multiple channels.
@@ -918,7 +919,7 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
 
 /// A stream open for transmitting.
 ///
-/// To obtain a TxStream, call `Device::tx_stream`. The type parameter `E` represents the type
+/// To obtain a TxStream, call [Device::tx_stream]. The type parameter `E` represents the type
 /// of this stream's samples.
 ///
 /// Streams may involve multiple channels.
@@ -1057,7 +1058,7 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
         let mut at_ns = at_ns;
 
         while buffers.get(0).map_or(0, |x| x.len()) > 0 {
-            // The timestamp is only send on the first write.
+            // The timestamp is only sent on the first write.
             let written = self.write(&buffers, at_ns.take(), end_burst, timeout_us)?;
 
             // Advance the buffer pointers
