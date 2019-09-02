@@ -3,6 +3,7 @@ pub use soapysdr_sys::SoapySDRRange as Range;
 use libc;
 use std::slice;
 use std::ptr;
+use std::rc::Rc;
 use std::ffi::{ CStr, CString };
 use std::os::raw::{c_int, c_char};
 use libc::c_void;
@@ -100,14 +101,18 @@ impl From<Direction> for c_int {
 }
 
 /// An opened SDR hardware device.
+#[derive(Clone)]
 pub struct Device {
-    ptr: *mut SoapySDRDevice,
+    ptr: Rc<*mut SoapySDRDevice>,
 }
 
 impl Drop for Device {
     fn drop(&mut self) {
-        unsafe {
-            SoapySDRDevice_unmake(self.ptr);
+        let total_count = Rc::strong_count(&self.ptr) + Rc::weak_count(&self.ptr);
+        if total_count == 1 {
+            unsafe {
+                SoapySDRDevice_unmake(*self.ptr);
+            }
         }
     }
 }
@@ -227,7 +232,7 @@ impl Device {
     pub fn new<A: Into<Args>>(args: A) -> Result<Device, Error> {
         unsafe {
             let d = check_error(SoapySDRDevice_make(args.into().as_raw_const()))?;
-            Ok(Device { ptr: d })
+            Ok(Device { ptr: Rc::new(d) })
         }
     }
 
@@ -242,7 +247,7 @@ impl Device {
     /// Several variants of a product may share a driver.
     pub fn driver_key(&self) -> Result<String, Error> {
         unsafe {
-            string_result(SoapySDRDevice_getDriverKey(self.ptr))
+            string_result(SoapySDRDevice_getDriverKey(*self.ptr))
         }
     }
 
@@ -251,7 +256,7 @@ impl Device {
     /// This key should be meaningful to the user to optimize for the underlying hardware.
     pub fn hardware_key(&self) -> Result<String, Error> {
         unsafe {
-            string_result(SoapySDRDevice_getDriverKey(self.ptr))
+            string_result(SoapySDRDevice_getDriverKey(*self.ptr))
         }
     }
 
@@ -264,14 +269,14 @@ impl Device {
     /// to help identify the instantiated device.
     pub fn hardware_info(&self) -> Result<Args, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getHardwareInfo(self.ptr)).map(|x| Args::from_raw(x))
+            check_error(SoapySDRDevice_getHardwareInfo(*self.ptr)).map(|x| Args::from_raw(x))
         }
     }
 
     /// Get the mapping configuration string.
     pub fn frontend_mapping(&self, direction: Direction) -> Result<String, Error> {
         unsafe {
-            string_result(SoapySDRDevice_getFrontendMapping(self.ptr, direction.into()))
+            string_result(SoapySDRDevice_getFrontendMapping(*self.ptr, direction.into()))
         }
     }
 
@@ -281,7 +286,7 @@ impl Device {
     pub fn set_frontend_mapping<S: Into<Vec<u8>>>(&self, direction: Direction, mapping: S) -> Result<(), Error> {
         unsafe {
             let mapping_c = CString::new(mapping).expect("Mapping contains null byte");
-            SoapySDRDevice_setFrontendMapping(self.ptr, direction.into(), mapping_c.as_ptr());
+            SoapySDRDevice_setFrontendMapping(*self.ptr, direction.into(), mapping_c.as_ptr());
             check_error(())
         }
     }
@@ -289,14 +294,14 @@ impl Device {
     /// Get a number of channels given the streaming direction
     pub fn num_channels(&self, direction: Direction) -> Result<usize, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getNumChannels(self.ptr, direction.into()))
+            check_error(SoapySDRDevice_getNumChannels(*self.ptr, direction.into()))
         }
     }
 
     /// Get channel info given the streaming direction
     pub fn channel_info(&self, direction: Direction, channel: usize) -> Result<Args, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getChannelInfo(self.ptr, direction.into(), channel)).map(|x| Args::from_raw(x))
+            check_error(SoapySDRDevice_getChannelInfo(*self.ptr, direction.into(), channel)).map(|x| Args::from_raw(x))
         }
     }
 
@@ -305,7 +310,7 @@ impl Device {
     /// Returns `true` for full duplex, `false` for half duplex.
     pub fn full_duplex(&self, direction: Direction, channel: usize) -> Result<bool, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getFullDuplex(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_getFullDuplex(*self.ptr, direction.into(), channel))
         }
     }
 
@@ -313,7 +318,7 @@ impl Device {
     pub fn stream_formats(&self, direction: Direction, channel: usize) -> Result<Vec<Format>, Error> {
         unsafe {
             let mut len: usize = 0;
-            let mut ptr = check_error(SoapySDRDevice_getStreamFormats(self.ptr, direction.into(), channel, &mut len as *mut _))?;
+            let mut ptr = check_error(SoapySDRDevice_getStreamFormats(*self.ptr, direction.into(), channel, &mut len as *mut _))?;
             let ret = slice::from_raw_parts(ptr, len).iter()
                 .flat_map(|&p| CStr::from_ptr(p).to_str().ok())
                 .flat_map(|s| s.parse().ok())
@@ -330,7 +335,7 @@ impl Device {
     pub fn native_stream_format(&self, direction: Direction, channel: usize) -> Result<(Format, f64), Error> {
         unsafe {
             let mut fullscale: f64 = 0.0;
-            let ptr = check_error(SoapySDRDevice_getNativeStreamFormat(self.ptr, direction.into(), channel, &mut fullscale as *mut _))?;
+            let ptr = check_error(SoapySDRDevice_getNativeStreamFormat(*self.ptr, direction.into(), channel, &mut fullscale as *mut _))?;
 
             let format = CStr::from_ptr(ptr).to_str().ok()
                 .and_then(|s| s.parse().ok())
@@ -343,7 +348,7 @@ impl Device {
     /// Query the argument info description for stream args.
     pub fn stream_args_info(&self, direction: Direction, channel: usize) -> Result<Vec<ArgInfo>, Error> {
         unsafe {
-            arg_info_result(|len_ptr| SoapySDRDevice_getStreamArgsInfo(self.ptr, direction.into(), channel, len_ptr))
+            arg_info_result(|len_ptr| SoapySDRDevice_getStreamArgsInfo(*self.ptr, direction.into(), channel, len_ptr))
         }
     }
 
@@ -356,14 +361,14 @@ impl Device {
     pub fn rx_stream_args<E: StreamSample, A: Into<Args>>(&self, channels: &[usize], args: A) -> Result<RxStream<E>, Error> {
         unsafe {
             let mut stream: *mut SoapySDRStream = ptr::null_mut();
-            check_error(SoapySDRDevice_setupStream(self.ptr,
+            check_error(SoapySDRDevice_setupStream(*self.ptr,
                 &mut stream as *mut _,
                 Direction::Rx.into(),
                 E::STREAM_FORMAT.as_ptr(),
                 channels.as_ptr(), channels.len(),
                 args.into().as_raw_const()
             )).map(|_| RxStream {
-                device: self,
+                device: self.clone(),
                 handle: stream,
                 nchannels: channels.len(),
                 flags: 0,
@@ -383,14 +388,14 @@ impl Device {
     pub fn tx_stream_args<E: StreamSample, A: Into<Args>>(&self, channels: &[usize], args: A) -> Result<TxStream<E>, Error> {
         unsafe {
             let mut stream: *mut SoapySDRStream = ptr::null_mut();
-            check_error(SoapySDRDevice_setupStream(self.ptr,
+            check_error(SoapySDRDevice_setupStream(*self.ptr,
                 &mut stream as *mut _,
                 Direction::Tx.into(),
                 E::STREAM_FORMAT.as_ptr(),
                 channels.as_ptr(), channels.len(),
                 args.into().as_raw_const()
             )).map(|_| TxStream {
-                device: self,
+                device: self.clone(),
                 handle: stream,
                 nchannels: channels.len(),
                 active: false,
@@ -402,7 +407,7 @@ impl Device {
     /// Get a list of available antennas to select on a given chain.
     pub fn antennas(&self, direction: Direction, channel: usize) -> Result<Vec<String>, Error> {
         unsafe {
-            string_list_result(|len_ptr| SoapySDRDevice_listAntennas(self.ptr, direction.into(), channel, len_ptr))
+            string_list_result(|len_ptr| SoapySDRDevice_listAntennas(*self.ptr, direction.into(), channel, len_ptr))
         }
     }
 
@@ -410,7 +415,7 @@ impl Device {
     pub fn set_antenna<S: Into<Vec<u8>>>(&self, direction: Direction, channel: usize, name: S) -> Result<(), Error> {
         unsafe {
             let name_c = CString::new(name).expect("Antenna name contains null byte");
-            SoapySDRDevice_setAntenna(self.ptr, direction.into(), channel, name_c.as_ptr());
+            SoapySDRDevice_setAntenna(*self.ptr, direction.into(), channel, name_c.as_ptr());
             check_error(())
         }
     }
@@ -418,7 +423,7 @@ impl Device {
     /// Get the selected antenna on a chain.
     pub fn antenna(&self, direction: Direction, channel: usize) -> Result<String, Error> {
         unsafe {
-            string_result(SoapySDRDevice_getAntenna(self.ptr, direction.into(), channel))
+            string_result(SoapySDRDevice_getAntenna(*self.ptr, direction.into(), channel))
         }
     }
 
@@ -427,14 +432,14 @@ impl Device {
     /// Returns true if automatic corrections are supported
     pub fn has_dc_offset_mode(&self, direction: Direction, channel: usize) -> Result<bool, Error> {
         unsafe {
-            check_error(SoapySDRDevice_hasDCOffsetMode(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_hasDCOffsetMode(*self.ptr, direction.into(), channel))
         }
     }
 
     /// Enable or disable automatic DC offset corrections mode.
     pub fn set_dc_offset_mode(&self, direction: Direction, channel: usize, automatic: bool) -> Result<(), Error> {
         unsafe {
-            SoapySDRDevice_setDCOffsetMode(self.ptr, direction.into(), channel, automatic);
+            SoapySDRDevice_setDCOffsetMode(*self.ptr, direction.into(), channel, automatic);
             check_error(())
         }
     }
@@ -442,7 +447,7 @@ impl Device {
     /// Returns true if automatic DC offset mode is enabled
     pub fn dc_offset_mode(&self, direction: Direction, channel: usize) -> Result<bool, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getDCOffsetMode(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_getDCOffsetMode(*self.ptr, direction.into(), channel))
         }
     }
 
@@ -451,7 +456,7 @@ impl Device {
     /// Returns true if manual corrections are supported
     pub fn has_dc_offset(&self, direction: Direction, channel: usize) -> Result<bool, Error> {
         unsafe {
-            check_error(SoapySDRDevice_hasDCOffset(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_hasDCOffset(*self.ptr, direction.into(), channel))
         }
     }
 
@@ -460,7 +465,7 @@ impl Device {
     /// The offsets are configured for each of the I and Q components (1.0 max)
     pub fn set_dc_offset(&self, direction: Direction, channel: usize, offset_i: f64, offset_q: f64) -> Result<(), Error> {
         unsafe {
-            SoapySDRDevice_setDCOffset(self.ptr, direction.into(), channel, offset_i, offset_q);
+            SoapySDRDevice_setDCOffset(*self.ptr, direction.into(), channel, offset_i, offset_q);
             check_error(())
         }
     }
@@ -470,7 +475,7 @@ impl Device {
         unsafe {
             let mut i: f64 = 0.0;
             let mut q: f64 = 0.0;
-            SoapySDRDevice_getDCOffset(self.ptr, direction.into(), channel, &mut i as *mut _, &mut q as *mut _);
+            SoapySDRDevice_getDCOffset(*self.ptr, direction.into(), channel, &mut i as *mut _, &mut q as *mut _);
             check_error((i, q))
         }
     }
@@ -480,7 +485,7 @@ impl Device {
     /// Returns true if IQ balance corrections are supported.
     pub fn has_iq_balance(&self, direction: Direction, channel: usize) -> Result<bool, Error> {
         unsafe {
-            check_error(SoapySDRDevice_hasIQBalance(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_hasIQBalance(*self.ptr, direction.into(), channel))
         }
     }
 
@@ -489,7 +494,7 @@ impl Device {
     /// The correction is configured for each of the I and Q components (1.0 max)
     pub fn set_iq_balance(&self, direction: Direction, channel: usize, balance_i: f64, balance_q: f64) -> Result<(), Error> {
         unsafe {
-            SoapySDRDevice_setIQBalance(self.ptr, direction.into(), channel, balance_i, balance_q);
+            SoapySDRDevice_setIQBalance(*self.ptr, direction.into(), channel, balance_i, balance_q);
             check_error(())
         }
     }
@@ -499,7 +504,7 @@ impl Device {
         unsafe {
             let mut i: f64 = 0.0;
             let mut q: f64 = 0.0;
-            SoapySDRDevice_getIQBalance(self.ptr, direction.into(), channel, &mut i as *mut _, &mut q as *mut _);
+            SoapySDRDevice_getIQBalance(*self.ptr, direction.into(), channel, &mut i as *mut _, &mut q as *mut _);
             check_error((i, q))
         }
     }
@@ -509,21 +514,21 @@ impl Device {
     /// Elements should be in order RF to baseband.
     pub fn list_gains(&self, direction: Direction, channel: usize) -> Result<Vec<String>, Error> {
         unsafe {
-            string_list_result(|len_ptr| SoapySDRDevice_listGains(self.ptr, direction.into(), channel, len_ptr))
+            string_list_result(|len_ptr| SoapySDRDevice_listGains(*self.ptr, direction.into(), channel, len_ptr))
         }
     }
 
     /// Does the device support automatic gain control?
     pub fn has_gain_mode(&self, direction: Direction, channel: usize) -> Result<bool, Error> {
         unsafe {
-            check_error(SoapySDRDevice_hasGainMode(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_hasGainMode(*self.ptr, direction.into(), channel))
         }
     }
 
     /// Enable or disable automatic gain control.
     pub fn set_gain_mode(&self, direction: Direction, channel: usize, automatic: bool) -> Result<(), Error> {
         unsafe {
-            SoapySDRDevice_setGainMode(self.ptr, direction.into(), channel, automatic);
+            SoapySDRDevice_setGainMode(*self.ptr, direction.into(), channel, automatic);
             check_error(())
         }
     }
@@ -531,7 +536,7 @@ impl Device {
     /// Returns true if automatic gain control is enabled
     pub fn gain_mode(&self, direction: Direction, channel: usize) -> Result<bool, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getGainMode(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_getGainMode(*self.ptr, direction.into(), channel))
         }
     }
 
@@ -542,7 +547,7 @@ impl Device {
     /// `gain`: the new amplification value in dB
     pub fn set_gain(&self, direction: Direction, channel: usize, gain: f64) -> Result<(), Error> {
         unsafe {
-            SoapySDRDevice_setGain(self.ptr, direction.into(), channel, gain);
+            SoapySDRDevice_setGain(*self.ptr, direction.into(), channel, gain);
             check_error(())
         }
     }
@@ -550,14 +555,14 @@ impl Device {
     /// Get the overall value of the gain elements in a chain in dB.
     pub fn gain(&self, direction: Direction, channel: usize) -> Result<f64, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getGain(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_getGain(*self.ptr, direction.into(), channel))
         }
     }
 
     /// Get the overall range of possible gain values.
     pub fn gain_range(&self, direction: Direction, channel: usize) -> Result<Range, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getGainRange(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_getGainRange(*self.ptr, direction.into(), channel))
         }
     }
 
@@ -569,7 +574,7 @@ impl Device {
     pub fn set_gain_element<S: Into<Vec<u8>>>(&self, direction: Direction, channel: usize, name: S, gain: f64) -> Result<(), Error> {
         unsafe {
             let name_c = CString::new(name).expect("Gain name contains null byte");
-            SoapySDRDevice_setGainElement(self.ptr, direction.into(), channel, name_c.as_ptr(), gain);
+            SoapySDRDevice_setGainElement(*self.ptr, direction.into(), channel, name_c.as_ptr(), gain);
             check_error(())
         }
     }
@@ -578,7 +583,7 @@ impl Device {
     pub fn gain_element<S: Into<Vec<u8>>>(&self, direction: Direction, channel: usize, name: S) -> Result<f64, Error> {
         unsafe {
             let name_c = CString::new(name).expect("Gain name contains null byte");
-            check_error(SoapySDRDevice_getGainElement(self.ptr, direction.into(), channel, name_c.as_ptr()))
+            check_error(SoapySDRDevice_getGainElement(*self.ptr, direction.into(), channel, name_c.as_ptr()))
         }
     }
 
@@ -586,14 +591,14 @@ impl Device {
     pub fn gain_element_range<S: Into<Vec<u8>>>(&self, direction: Direction, channel: usize, name: S) -> Result<Range, Error> {
         unsafe {
             let name_c = CString::new(name).expect("Gain name contains null byte");
-            check_error(SoapySDRDevice_getGainElementRange(self.ptr, direction.into(), channel, name_c.as_ptr()))
+            check_error(SoapySDRDevice_getGainElementRange(*self.ptr, direction.into(), channel, name_c.as_ptr()))
         }
     }
 
     /// Get the ranges of overall frequency values.
     pub fn frequency_range(&self, direction: Direction, channel: usize) -> Result<Vec<Range>, Error> {
         unsafe {
-            list_result(|len_ptr| SoapySDRDevice_getFrequencyRange(self.ptr, direction.into(), channel, len_ptr))
+            list_result(|len_ptr| SoapySDRDevice_getFrequencyRange(*self.ptr, direction.into(), channel, len_ptr))
         }
     }
 
@@ -605,7 +610,7 @@ impl Device {
     /// Returns the center frequency in Hz.
     pub fn frequency(&self, direction: Direction, channel: usize) -> Result<f64, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getFrequency(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_getFrequency(*self.ptr, direction.into(), channel))
         }
     }
 
@@ -634,7 +639,7 @@ impl Device {
     ///
     pub fn set_frequency<A: Into<Args>>(&self, direction: Direction, channel: usize, frequency: f64, args: A) -> Result<(), Error> {
         unsafe {
-            SoapySDRDevice_setFrequency(self.ptr, direction.into(), channel, frequency, args.into().as_raw_const());
+            SoapySDRDevice_setFrequency(*self.ptr, direction.into(), channel, frequency, args.into().as_raw_const());
             check_error(())
         }
     }
@@ -644,7 +649,7 @@ impl Device {
     /// Elements should be in order RF to baseband.
     pub fn list_frequencies(&self, direction: Direction, channel: usize) -> Result<Vec<String>, Error> {
         unsafe {
-            string_list_result(|len_ptr| SoapySDRDevice_listFrequencies(self.ptr, direction.into(), channel, len_ptr))
+            string_list_result(|len_ptr| SoapySDRDevice_listFrequencies(*self.ptr, direction.into(), channel, len_ptr))
         }
     }
 
@@ -652,7 +657,7 @@ impl Device {
     pub fn component_frequency_range<S: Into<Vec<u8>>>(&self, direction: Direction, channel: usize, name: S) -> Result<Vec<Range>, Error> {
         unsafe {
             let name_c = CString::new(name).expect("Component name contains null byte");
-            list_result(|len_ptr| SoapySDRDevice_getFrequencyRangeComponent(self.ptr, direction.into(), channel, name_c.as_ptr(), len_ptr))
+            list_result(|len_ptr| SoapySDRDevice_getFrequencyRangeComponent(*self.ptr, direction.into(), channel, name_c.as_ptr(), len_ptr))
         }
     }
 
@@ -660,7 +665,7 @@ impl Device {
     pub fn component_frequency<S: Into<Vec<u8>>>(&self, direction: Direction, channel: usize, name: S) -> Result<f64, Error> {
         unsafe {
             let name_c = CString::new(name).expect("Component name contains null byte");
-            check_error(SoapySDRDevice_getFrequencyComponent(self.ptr, direction.into(), channel, name_c.as_ptr()))
+            check_error(SoapySDRDevice_getFrequencyComponent(*self.ptr, direction.into(), channel, name_c.as_ptr()))
         }
     }
 
@@ -678,7 +683,7 @@ impl Device {
     pub fn set_component_frequency<S: Into<Vec<u8>>, A: Into<Args>>(&self, direction: Direction, channel: usize, name: S, frequency: f64, args: A) -> Result<(), Error> {
         unsafe {
             let name_c = CString::new(name).expect("Component name contains null byte");
-            SoapySDRDevice_setFrequencyComponent(self.ptr, direction.into(), channel, name_c.as_ptr(), frequency, args.into().as_raw_const());
+            SoapySDRDevice_setFrequencyComponent(*self.ptr, direction.into(), channel, name_c.as_ptr(), frequency, args.into().as_raw_const());
             check_error(())
         }
     }
@@ -686,21 +691,21 @@ impl Device {
     /// Query the argument info description for tune args.
     pub fn frequency_args_info(&self, direction: Direction, channel: usize) -> Result<Vec<ArgInfo>, Error> {
         unsafe {
-            arg_info_result(|len_ptr| SoapySDRDevice_getFrequencyArgsInfo(self.ptr, direction.into(), channel, len_ptr))
+            arg_info_result(|len_ptr| SoapySDRDevice_getFrequencyArgsInfo(*self.ptr, direction.into(), channel, len_ptr))
         }
     }
 
     /// Get the baseband sample rate of the chain in samples per second.
     pub fn sample_rate(&self, direction: Direction, channel: usize) -> Result<f64, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getSampleRate(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_getSampleRate(*self.ptr, direction.into(), channel))
         }
     }
 
     /// Set the baseband sample rate of the chain in samples per second.
     pub fn set_sample_rate(&self, direction: Direction, channel: usize, rate: f64) -> Result<(), Error> {
         unsafe {
-            SoapySDRDevice_setSampleRate(self.ptr, direction.into(), channel, rate);
+            SoapySDRDevice_setSampleRate(*self.ptr, direction.into(), channel, rate);
             check_error(())
         }
     }
@@ -708,21 +713,21 @@ impl Device {
     /// Get the range of possible baseband sample rates.
     pub fn get_sample_rate_range(&self, direction: Direction, channel: usize) -> Result<Vec<Range>, Error> {
         unsafe {
-            list_result(|len_ptr| SoapySDRDevice_getSampleRateRange(self.ptr, direction.into(), channel, len_ptr))
+            list_result(|len_ptr| SoapySDRDevice_getSampleRateRange(*self.ptr, direction.into(), channel, len_ptr))
         }
     }
 
     /// Get the baseband filter width of the chain in Hz
     pub fn bandwidth(&self, direction: Direction, channel: usize) -> Result<f64, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getBandwidth(self.ptr, direction.into(), channel))
+            check_error(SoapySDRDevice_getBandwidth(*self.ptr, direction.into(), channel))
         }
     }
 
     /// Set the baseband filter width of the chain in Hz
     pub fn set_bandwidth(&self, direction: Direction, channel: usize, bandwidth: f64) -> Result<(), Error> {
         unsafe {
-            SoapySDRDevice_setBandwidth(self.ptr, direction.into(), channel, bandwidth);
+            SoapySDRDevice_setBandwidth(*self.ptr, direction.into(), channel, bandwidth);
             check_error(())
         }
     }
@@ -730,25 +735,25 @@ impl Device {
     /// Get the ranges of possible baseband filter widths.
     pub fn bandwidth_range(&self, direction: Direction, channel: usize) -> Result<Vec<Range>, Error> {
         unsafe {
-            list_result(|len_ptr| SoapySDRDevice_getBandwidthRange(self.ptr, direction.into(), channel, len_ptr))
+            list_result(|len_ptr| SoapySDRDevice_getBandwidthRange(*self.ptr, direction.into(), channel, len_ptr))
         }
     }
 
     /// List time sources
     pub fn list_time_sources(&self) -> Result<Vec<String>, Error> {
-        unsafe { string_list_result(|len_ptr| SoapySDRDevice_listTimeSources(self.ptr, len_ptr)) }
+        unsafe { string_list_result(|len_ptr| SoapySDRDevice_listTimeSources(*self.ptr, len_ptr)) }
     }
 
     /// Get the current time source
     pub fn get_time_source(&self) -> Result<String, Error> {
-        unsafe { string_result(SoapySDRDevice_getTimeSource(self.ptr)) }
+        unsafe { string_result(SoapySDRDevice_getTimeSource(*self.ptr)) }
     }
 
     /// Set the current time source
     pub fn set_time_source<S: Into<Vec<u8>>>(&self, time_source: S) -> Result<(), Error> {
         let time_source = CString::new(time_source).expect("Time source contained null");
         unsafe {
-            SoapySDRDevice_setTimeSource(self.ptr, time_source.as_ptr());
+            SoapySDRDevice_setTimeSource(*self.ptr, time_source.as_ptr());
             check_error(())
         }
     }
@@ -762,7 +767,7 @@ impl Device {
     ) -> Result<bool, Error> {
         let hw_time_source = optional_string_arg(hw_time_source);
         unsafe {
-            let has_hw_time = SoapySDRDevice_hasHardwareTime(self.ptr, hw_time_source.as_ptr());
+            let has_hw_time = SoapySDRDevice_hasHardwareTime(*self.ptr, hw_time_source.as_ptr());
             check_error(has_hw_time)
         }
     }
@@ -774,7 +779,7 @@ impl Device {
     ) -> Result<i64, Error> {
         let hw_time_source = optional_string_arg(hw_time_source);
         unsafe {
-            let tstamp = SoapySDRDevice_getHardwareTime(self.ptr, hw_time_source.as_ptr());
+            let tstamp = SoapySDRDevice_getHardwareTime(*self.ptr, hw_time_source.as_ptr());
             check_error(tstamp)
         }
     }
@@ -788,7 +793,7 @@ impl Device {
     ) -> Result<(), Error> {
         let hw_time_source = optional_string_arg(hw_time_source);
         unsafe {
-            SoapySDRDevice_setHardwareTime(self.ptr, new_time_ns, hw_time_source.as_ptr());
+            SoapySDRDevice_setHardwareTime(*self.ptr, new_time_ns, hw_time_source.as_ptr());
             check_error(())
         }
     }
@@ -817,8 +822,8 @@ impl Device {
 /// of this stream's samples.
 ///
 /// Streams may involve multiple channels.
-pub struct RxStream<'a, E: StreamSample> {
-    device: &'a Device,
+pub struct RxStream<E: StreamSample> {
+    device: Device,
     handle: *mut SoapySDRStream,
     nchannels: usize,
     flags: i32,
@@ -827,18 +832,18 @@ pub struct RxStream<'a, E: StreamSample> {
     phantom: PhantomData<fn(&mut[E])>,
 }
 
-impl<'a, E: StreamSample> Drop for RxStream<'a, E> {
+impl<E: StreamSample> Drop for RxStream<E> {
     fn drop(&mut self) {
         unsafe {
             if self.active {
                 self.deactivate(None).ok();
             }
-            SoapySDRDevice_closeStream(self.device.ptr, self.handle);
+            SoapySDRDevice_closeStream(*self.device.ptr, self.handle);
         }
     }
 }
 
-impl<'a, E: StreamSample> RxStream<'a, E> {
+impl<E: StreamSample> RxStream<E> {
     /// Get the stream's maximum transmission unit (MTU) in number of elements.
     ///
     /// The MTU specifies the maximum payload transfer in a stream operation.
@@ -846,7 +851,7 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
     /// best optimize throughput given the underlying stream implementation.
     pub fn mtu(&self) -> Result<usize, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getStreamMTU(self.device.ptr, self.handle))
+            check_error(SoapySDRDevice_getStreamMTU(*self.device.ptr, self.handle))
         }
     }
 
@@ -860,7 +865,7 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
         if self.active { return Err(Error { code: ErrorCode::Other, message: "Stream is already active".into() }); }
         unsafe {
             let flags = if time_ns.is_some() { SOAPY_SDR_HAS_TIME as i32 } else { 0 };
-            check_ret_error(SoapySDRDevice_activateStream(self.device.ptr, self.handle, flags, time_ns.unwrap_or(0), 0))?;
+            check_ret_error(SoapySDRDevice_activateStream(*self.device.ptr, self.handle, flags, time_ns.unwrap_or(0), 0))?;
             self.active = true;
             Ok(())
         }
@@ -877,7 +882,7 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
         if !self.active { return Err(Error { code: ErrorCode::Other, message: "Stream is not active".into() }); }
         unsafe {
             let flags = if time_ns.is_some() { SOAPY_SDR_HAS_TIME as i32 } else { 0 };
-            check_ret_error(SoapySDRDevice_deactivateStream(self.device.ptr, self.handle, flags, time_ns.unwrap_or(0)))?;
+            check_ret_error(SoapySDRDevice_deactivateStream(*self.device.ptr, self.handle, flags, time_ns.unwrap_or(0)))?;
             self.active = false;
             Ok(())
         }
@@ -902,7 +907,7 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
 
             self.flags = 0;
             let len = len_result(SoapySDRDevice_readStream(
-                self.device.ptr,
+                *self.device.ptr,
                 self.handle,
                 buf_ptrs.as_ptr() as *const *const _,
                 num_samples,
@@ -923,26 +928,26 @@ impl<'a, E: StreamSample> RxStream<'a, E> {
 /// of this stream's samples.
 ///
 /// Streams may involve multiple channels.
-pub struct TxStream<'a, E: StreamSample> {
-    device: &'a Device,
+pub struct TxStream<E: StreamSample> {
+    device: Device,
     handle: *mut SoapySDRStream,
     nchannels: usize,
     active: bool,
     phantom: PhantomData<fn(&[E])>,
 }
 
-impl<'a, E: StreamSample> Drop for TxStream<'a, E> {
+impl<E: StreamSample> Drop for TxStream<E> {
     fn drop(&mut self) {
         unsafe {
             if self.active {
                 self.deactivate(None).ok();
             }
-            SoapySDRDevice_closeStream(self.device.ptr, self.handle);
+            SoapySDRDevice_closeStream(*self.device.ptr, self.handle);
         }
     }
 }
 
-impl<'a, E: StreamSample> TxStream<'a, E> {
+impl<E: StreamSample> TxStream<E> {
     /// Get the stream's maximum transmission unit (MTU) in number of elements.
     ///
     /// The MTU specifies the maximum payload transfer in a stream operation.
@@ -950,7 +955,7 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
     /// best optimize throughput given the underlying stream implementation.
     pub fn mtu(&self) -> Result<usize, Error> {
         unsafe {
-            check_error(SoapySDRDevice_getStreamMTU(self.device.ptr, self.handle))
+            check_error(SoapySDRDevice_getStreamMTU(*self.device.ptr, self.handle))
         }
     }
 
@@ -964,7 +969,7 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
         if self.active { return Err(Error { code: ErrorCode::Other, message: "Stream is already active".into() }); }
         unsafe {
             let flags = if time_ns.is_some() { SOAPY_SDR_HAS_TIME as i32 } else { 0 };
-            check_ret_error(SoapySDRDevice_activateStream(self.device.ptr, self.handle, flags, time_ns.unwrap_or(0), 0))?;
+            check_ret_error(SoapySDRDevice_activateStream(*self.device.ptr, self.handle, flags, time_ns.unwrap_or(0), 0))?;
             self.active = true;
             Ok(())
         }
@@ -979,7 +984,7 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
         if !self.active { return Err(Error { code: ErrorCode::Other, message: "Stream is not active".into() }); }
         unsafe {
             let flags = if time_ns.is_some() { SOAPY_SDR_HAS_TIME as i32 } else { 0 };
-            check_ret_error(SoapySDRDevice_deactivateStream(self.device.ptr, self.handle, flags, time_ns.unwrap_or(0)))?;
+            check_ret_error(SoapySDRDevice_deactivateStream(*self.device.ptr, self.handle, flags, time_ns.unwrap_or(0)))?;
             self.active = false;
             Ok(())
         }
@@ -1023,7 +1028,7 @@ impl<'a, E: StreamSample> TxStream<'a, E> {
             }
 
             let len = len_result(SoapySDRDevice_writeStream(
-                self.device.ptr,
+                *self.device.ptr,
                 self.handle,
                 buf_ptrs.as_ptr() as *const *const _,
                 num_elems,
