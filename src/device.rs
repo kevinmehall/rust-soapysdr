@@ -3,7 +3,7 @@ pub use soapysdr_sys::SoapySDRRange as Range;
 use libc;
 use std::slice;
 use std::ptr;
-use std::rc::Rc;
+use std::sync::Arc;
 use std::ffi::{ CStr, CString };
 use std::os::raw::{c_int, c_char};
 use libc::c_void;
@@ -103,12 +103,12 @@ impl From<Direction> for c_int {
 /// An opened SDR hardware device.
 #[derive(Clone)]
 pub struct Device {
-    ptr: Rc<*mut SoapySDRDevice>,
+    ptr: Arc<*mut SoapySDRDevice>,
 }
 
 impl Drop for Device {
     fn drop(&mut self) {
-        let total_count = Rc::strong_count(&self.ptr) + Rc::weak_count(&self.ptr);
+        let total_count = Arc::strong_count(&self.ptr) + Arc::weak_count(&self.ptr);
         if total_count == 1 {
             unsafe {
                 SoapySDRDevice_unmake(*self.ptr);
@@ -232,7 +232,7 @@ impl Device {
     pub fn new<A: Into<Args>>(args: A) -> Result<Device, Error> {
         unsafe {
             let d = check_error(SoapySDRDevice_make(args.into().as_raw_const()))?;
-            Ok(Device { ptr: Rc::new(d) })
+            Ok(Device { ptr: Arc::new(d) })
         }
     }
 
