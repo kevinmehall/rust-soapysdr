@@ -104,6 +104,10 @@ struct DeviceInner {
     ptr: *mut SoapySDRDevice,
 }
 
+/// Device method implementations are required to be thread safe
+unsafe impl Send for DeviceInner {}
+unsafe impl Sync for DeviceInner {}
+
 impl Drop for DeviceInner {
     fn drop(&mut self) {
         unsafe {
@@ -843,6 +847,9 @@ pub struct RxStream<E: StreamSample> {
     phantom: PhantomData<fn(&mut[E])>,
 }
 
+/// Streams may only be used on one thread at a time but may be sent between threads
+unsafe impl<E: StreamSample> Send for RxStream<E> {}
+
 impl<E: StreamSample> Drop for RxStream<E> {
     fn drop(&mut self) {
         unsafe {
@@ -946,6 +953,9 @@ pub struct TxStream<E: StreamSample> {
     active: bool,
     phantom: PhantomData<fn(&[E])>,
 }
+
+/// Streams may only be used on one thread at a time but may be sent between threads
+unsafe impl<E: StreamSample> Send for TxStream<E> {}
 
 impl<E: StreamSample> Drop for TxStream<E> {
     fn drop(&mut self) {
