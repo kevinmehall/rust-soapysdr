@@ -46,7 +46,7 @@ pub fn configure_logging() {
         };
 
         let msg = unsafe { CStr::from_ptr(message) };
-        log!(level, "{}", msg.to_string_lossy().trim_left_matches(&['\r', '\n'][..]));
+        log!(level, "{}", msg.to_string_lossy().trim_start_matches(&['\r', '\n'][..]));
     }
 
     unsafe {
