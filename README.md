@@ -2,24 +2,30 @@
 
 [SoapySDR](https://github.com/pothosware/SoapySDR/wiki) provides a hardware abstraction layer for many software defined radio devices.
 
-**[API Documentation](https://kevinmehall.net/rustdoc/soapysdr/soapysdr/)**
+**[API Documentation](https://kevinmehall.net/rustdoc/soapysdr/soapysdr/)** | **[Changelog](https://github.com/kevinmehall/rust-soapysdr/releases)**
 
 ## Dependencies
 
-This library requires libsoapysdr 0.6.0 and libclang 3.5+ (for bindgen) to be installed manually.
+This library requires libsoapysdr 0.6.0 or 0.7.0 and libclang 3.5+ (for bindgen) to be installed manually.
 
 ### Ubuntu
 
 (Tested on Ubuntu 18.04)
 
 ```console
-sudo add-apt-repository ppa:myriadrf/drivers
-sudo apt update
 sudo apt install libsoapysdr-dev llvm-6.0-dev libclang-6.0-dev
 
 # Choose the appropriate drivers for your hardware:
 sudo apt install soapysdr-module-rtlsdr soapysdr-module-hackrf soapysdr-module-uhd soapysdr-module-lms7
 ```
+
+### Nix
+
+```
+nix-shell
+```
+
+(see [shell.nix](./shell.nix))
 
 ## Warning
 
