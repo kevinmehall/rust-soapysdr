@@ -3,20 +3,36 @@ rust:
   - stable
   - beta
 
-dist: trusty
+dist: bionic
 sudo: required
+
+matrix:
+  include:
+    - env:
+        - SOAPYSDR_FROM=ppa
+      addons:
+        apt:
+          sources:
+            - sourceline: ppa:myriadrf/drivers
+          packages:
+            - libsoapysdr-dev
+            - llvm-6.0-dev
+            - libclang-6.0-dev
 
 addons:
   apt:
-    sources:
-      - sourceline: ppa:myriadrf/drivers
     packages:
       - libsoapysdr-dev
-      - llvm-3.5-dev
-      - libclang-3.5-dev
+      - llvm-6.0-dev
+      - libclang-6.0-dev
 
 before_script:
   - dpkg -l libsoapysdr-dev
   - dpkg -L libsoapysdr-dev
 
 cache: cargo
+
+script:
+  - cargo build --verbose
+  - cargo test  --verbose --all
+  - cargo build --verbose --features binaries
