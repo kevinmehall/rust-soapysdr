@@ -927,7 +927,7 @@ impl<E: StreamSample> RxStream<E> {
             let len = len_result(SoapySDRDevice_readStream(
                 self.device.inner.ptr,
                 self.handle,
-                buf_ptrs.as_ptr() as *const *const _,
+                buf_ptrs.as_ptr() as *const *mut _,
                 num_samples,
                 &mut self.flags as *mut _,
                 &mut self.time_ns as *mut _,
