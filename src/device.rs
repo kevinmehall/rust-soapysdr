@@ -376,7 +376,7 @@ impl Device {
     pub fn rx_stream_args<E: StreamSample, A: Into<Args>>(&self, channels: &[usize], args: A) -> Result<RxStream<E>, Error> {
         unsafe {
             let mut stream: *mut SoapySDRStream = ptr::null_mut();
-            check_error(SoapySDRDevice_setupStream(self.inner.ptr,
+            check_error(_rust_wrapper_SoapySDRDevice_setupStream(self.inner.ptr,
                 &mut stream as *mut _,
                 Direction::Rx.into(),
                 E::STREAM_FORMAT.as_ptr(),
@@ -403,7 +403,7 @@ impl Device {
     pub fn tx_stream_args<E: StreamSample, A: Into<Args>>(&self, channels: &[usize], args: A) -> Result<TxStream<E>, Error> {
         unsafe {
             let mut stream: *mut SoapySDRStream = ptr::null_mut();
-            check_error(SoapySDRDevice_setupStream(self.inner.ptr,
+            check_error(_rust_wrapper_SoapySDRDevice_setupStream(self.inner.ptr,
                 &mut stream as *mut _,
                 Direction::Tx.into(),
                 E::STREAM_FORMAT.as_ptr(),
