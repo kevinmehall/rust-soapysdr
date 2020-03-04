@@ -20,4 +20,5 @@ repository = "https://github.com/kevinmehall/rust-soapysdr"
 
 [build-dependencies]
 bindgen = "0.51"
+cc = "1.0"
 pkg-config = "0.3.9"
