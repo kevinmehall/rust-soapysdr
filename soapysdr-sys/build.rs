@@ -25,6 +25,9 @@ fn main() {
         cc_builder.include(&inc);
     }
 
+    // Wrapped by _rust_wrapper_SoapySDRDevice_setupStream for 0.7 -> 0.8 compatibility
+    bindgen_builder = bindgen_builder.blacklist_function("SoapySDRDevice_setupStream");
+
     let bindings = bindgen_builder.generate()
         .expect("Unable to generate bindings");
 

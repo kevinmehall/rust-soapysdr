@@ -7,3 +7,6 @@
 //! for API documentation.
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+
+// Compatibility for 0.7 -> 0.8 breaking change
+pub use _rust_wrapper_SoapySDRDevice_setupStream as SoapySDRDevice_setupStream;
