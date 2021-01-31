@@ -6,14 +6,17 @@
 
 ## Dependencies
 
-This library requires libsoapysdr 0.6.0 or 0.7.0 and libclang 3.5+ (for bindgen) to be installed manually.
+This library requires dependencies not handled by Cargo:
+
+  * libsoapysdr 0.6, 0.7, or git master (0.8)
+  * libclang 3.5+ (for bindgen)
 
 ### Ubuntu
 
-(Tested on Ubuntu 18.04)
+(Tested on Ubuntu 20.04)
 
 ```console
-sudo apt install libsoapysdr-dev llvm-6.0-dev libclang-6.0-dev
+sudo apt install libsoapysdr-dev libclang-dev llvm-dev pkg-config
 
 # Choose the appropriate drivers for your hardware:
 sudo apt install soapysdr-module-rtlsdr soapysdr-module-hackrf soapysdr-module-uhd soapysdr-module-lms7
