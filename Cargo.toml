@@ -17,7 +17,7 @@ readme = "README.md"
 [dependencies]
 soapysdr-sys = { version = "0.7.0", path = "./soapysdr-sys" }
 libc = "0.2.20"
-num-complex = "0.2"
+num-complex = "0.4"
 log = { version = "0.3", optional = true }
 
 # Dependencies used only by binaries
