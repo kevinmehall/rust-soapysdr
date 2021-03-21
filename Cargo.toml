@@ -18,7 +18,7 @@ readme = "README.md"
 soapysdr-sys = { version = "0.7.0", path = "./soapysdr-sys" }
 libc = "0.2.20"
 num-complex = "0.4"
-log = { version = "0.3", optional = true }
+log = { version = "0.4", optional = true }
 
 # Dependencies used only by binaries
 # (https://github.com/rust-lang/cargo/issues/1982)
