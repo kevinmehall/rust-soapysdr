@@ -13,6 +13,7 @@ fn main() {
 
     let mut bindgen_builder = bindgen::Builder::default()
         .trust_clang_mangling(false)
+        .size_t_is_usize(true)
         .header("wrapper.h");
 
     let mut cc_builder = cc::Build::new();
