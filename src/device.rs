@@ -813,7 +813,24 @@ impl Device {
         }
     }
 
-    // TODO: clocking
+    /// List clock sources
+    pub fn list_clock_sources(&self) -> Result<Vec<String>, Error> {
+        unsafe { string_list_result(|len_ptr| SoapySDRDevice_listClockSources(self.inner.ptr, len_ptr)) }
+    }
+
+    /// Get the current clock source
+    pub fn get_clock_source(&self) -> Result<String, Error> {
+        unsafe { string_result(SoapySDRDevice_getClockSource(self.inner.ptr)) }
+    }
+
+    /// Set the current clock source
+    pub fn set_clock_source<S: Into<Vec<u8>>>(&self, clock_source: S) -> Result<(), Error> {
+        let clock_source = CString::new(clock_source).expect("clock source contained null");
+        unsafe {
+            SoapySDRDevice_setClockSource(self.inner.ptr, clock_source.as_ptr());
+            check_error(())
+        }
+    }
 
     // TODO: sensors
 
