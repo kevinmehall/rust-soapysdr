@@ -3,7 +3,7 @@ name = "soapysdr-sys"
 
 # Note: Major and minor will track SoapySDR version, patch is
 # specific to this library
-version = "0.7.1"
+version = "0.7.2"
 authors = ["Kevin Mehall <km@kevinmehall.net>"]
 categories = ["external-ffi-bindings"]
 keywords = ["ffi", "sdr"]

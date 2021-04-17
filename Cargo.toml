@@ -1,7 +1,7 @@
 [workspace]
 [package]
 name = "soapysdr"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Kevin Mehall <km@kevinmehall.net>"]
 categories = ["api-bindings", "hardware-support"]
 keywords = ["sdr", "radio"]
@@ -15,7 +15,7 @@ repository = "https://github.com/kevinmehall/rust-soapysdr"
 readme = "README.md"
 
 [dependencies]
-soapysdr-sys = { version = "0.7.0", path = "./soapysdr-sys" }
+soapysdr-sys = { version = "0.7.2", path = "./soapysdr-sys" }
 libc = "0.2.20"
 num-complex = "0.4"
 log = { version = "0.4", optional = true }
