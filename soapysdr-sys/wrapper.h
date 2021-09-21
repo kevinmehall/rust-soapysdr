@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <SoapySDR/Device.h>
 #include <SoapySDR/Logger.h>
 #include <SoapySDR/Formats.h>
@@ -13,3 +14,7 @@ int _rust_wrapper_SoapySDRDevice_setupStream(
     size_t const*channels,
     size_t numChans,
     SoapySDRKwargs const* args);
+
+#if SOAPY_SDR_API_VERSION < 0x00080000
+void SoapySDR_free(void *ptr);
+#endif

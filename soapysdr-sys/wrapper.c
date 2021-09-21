@@ -1,4 +1,5 @@
 #include "wrapper.h"
+#include <stdlib.h>
 
 int _rust_wrapper_SoapySDRDevice_setupStream(
     SoapySDRDevice *device,
@@ -16,3 +17,9 @@ int _rust_wrapper_SoapySDRDevice_setupStream(
     return SoapySDRDevice_lastStatus();
 #endif
 }
+
+#if SOAPY_SDR_API_VERSION < 0x00080000
+void SoapySDR_free(void *ptr){
+    free(ptr);
+}
+#endif
