@@ -4,7 +4,6 @@
 //!
 
 extern crate soapysdr_sys;
-extern crate libc;
 extern crate num_complex;
 #[cfg(feature="log")] #[macro_use] extern crate log;
 
@@ -27,7 +26,7 @@ pub use format::{Format, StreamSample};
 pub fn configure_logging() {
     use log::Level;
     use soapysdr_sys::*;
-    use libc::c_char;
+    use std::os::raw::c_char;
     use std::ffi::CStr;
 
     extern "C" fn soapy_log(level: SoapySDRLogLevel, message: *const c_char) {

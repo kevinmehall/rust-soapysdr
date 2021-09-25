@@ -1,12 +1,11 @@
 use soapysdr_sys::*;
 pub use soapysdr_sys::SoapySDRRange as Range;
-use libc;
 use std::slice;
 use std::ptr;
 use std::sync::Arc;
 use std::ffi::{ CStr, CString };
 use std::os::raw::{c_int, c_char};
-use libc::c_void;
+use std::os::raw::c_void;
 use std::marker::PhantomData;
 
 use super::{ Args, ArgInfo, StreamSample, Format };
@@ -177,7 +176,7 @@ fn len_result(ret: c_int) -> Result<c_int, Error> {
 unsafe fn string_result(r: *mut c_char) -> Result<String, Error> {
     let ptr: *mut c_char = check_error(r)?;
     let ret = CStr::from_ptr(ptr).to_string_lossy().into();
-    libc::free(ptr as *mut c_void);
+    SoapySDR_free(ptr as *mut c_void);
     Ok(ret)
 }
 
@@ -203,7 +202,7 @@ unsafe fn list_result<T: Copy, F: FnOnce(*mut usize) -> *mut T>(f: F) -> Result<
     let mut len: usize = 0;
     let ptr = check_error(f(&mut len as *mut _))?;
     let ret = slice::from_raw_parts(ptr, len).to_owned();
-    libc::free(ptr as *mut c_void);
+    SoapySDR_free(ptr as *mut c_void);
     Ok(ret)
 }
 
@@ -232,7 +231,7 @@ pub fn enumerate<A: Into<Args>>(args: A) -> Result<Vec<Args>, Error> {
         let mut len: usize = 0;
         let devs = check_error(SoapySDRDevice_enumerate(args.into().as_raw_const(), &mut len as *mut _))?;
         let args = slice::from_raw_parts(devs, len).iter().map(|&arg| Args::from_raw(arg)).collect();
-        libc::free(devs as *mut c_void);
+        SoapySDR_free(devs as *mut c_void);
         Ok(args)
     }
 }

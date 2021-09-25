@@ -30,6 +30,13 @@ nix-shell
 
 (see [shell.nix](./shell.nix))
 
+### Windows
+
+Install pre-built PothosSDR and LLVM, then
+
+  - Set `LIBCLANG_PATH` environment variable to LLVM bin directory for rust-bindgen
+  - Add PothosSDR bin directory to system `PATH`
+
 ## Warning
 
 Many SoapySDR driver modules have error handling and thread safety bugs. This library provides
