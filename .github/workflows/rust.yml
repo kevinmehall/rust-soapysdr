@@ -14,9 +14,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Install deps
-      run: sudo apt-get install -y --no-install-recommends libsoapysdr-dev libclang-dev llvm-dev pkg-config
+      run: |
+        sudo apt update
+        sudo apt-get install -y --no-install-recommends libsoapysdr-dev libclang-dev llvm-dev pkg-config
     - uses: actions/checkout@v2
     - name: Build
       run: cargo build
     - name: Run tests
+      run: cargo test
+
+  test-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install deps
+      shell: bash
+      run: |
+        curl -L https://downloads.myriadrf.org/builds/PothosSDR/PothosSDR-2021.07.25-vc16-x64.exe -o pothossdr.exe
+        7z x -opothos -y pothossdr.exe
+        echo "${{github.workspace}}/pothos/bin" >> $GITHUB_PATH
+        echo "C:\\msys64\\mingw64\\bin" >> $GITHUB_PATH
+    - name: Build
+      shell: bash
+      run: cargo build
+    - name: Run tests
+      shell: bash
       run: cargo test
