@@ -837,6 +837,24 @@ impl Device {
 
     // TODO: settings
 
+    /// Write a setting
+    pub fn write_setting<S: Into<Vec<u8>>>(&self, key: S, value: S) -> Result<(), Error> {
+        let key = CString::new(key).expect("key must contain null byte");
+        let value = CString::new(value).expect("value must contain null byte");
+        unsafe {
+            check_ret_error(SoapySDRDevice_writeSetting(self.inner.ptr, key.as_ptr(), value.as_ptr()))?;
+            Ok(())
+        }
+    }
+
+    /// Read a setting
+    pub fn read_setting<S: Into<Vec<u8>>>(&self, key: S) -> Result<String, Error> {
+        let key = CString::new(key).expect("key must contain null byte");
+        unsafe {
+            string_result(SoapySDRDevice_readSetting(self.inner.ptr, key.as_ptr()))
+        }
+    }
+
     // TODO: gpio
 
     // TODO: I2C
