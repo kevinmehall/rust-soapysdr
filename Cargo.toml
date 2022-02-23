@@ -1,7 +1,7 @@
 [workspace]
 [package]
 name = "soapysdr"
-version = "0.3.1"
+version = "0.3.2"
 authors = ["Kevin Mehall <km@kevinmehall.net>"]
 categories = ["api-bindings", "hardware-support"]
 keywords = ["sdr", "radio"]
