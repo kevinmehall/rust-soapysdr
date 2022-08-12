@@ -7,5 +7,5 @@ stdenv.mkDerivation rec {
     pkgconfig
     llvm
   ];
-  LIBCLANG_PATH="${llvmPackages.libclang}/lib";
+  LIBCLANG_PATH="${llvmPackages.libclang.lib}/lib";
 }
