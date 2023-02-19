@@ -19,6 +19,6 @@ repository = "https://github.com/kevinmehall/rust-soapysdr"
 [dependencies]
 
 [build-dependencies]
-bindgen = { version = "0.57.0", default-features = false, features = ["runtime"] }
+bindgen = { version = "0.64.0", default-features = false, features = ["runtime"] }
 cc = "1.0"
 pkg-config = "0.3.9"
