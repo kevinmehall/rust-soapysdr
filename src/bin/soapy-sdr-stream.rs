@@ -2,12 +2,14 @@ extern crate soapysdr;
 extern crate num_complex;
 extern crate byteorder;
 extern crate getopts;
-extern crate signalbool;
+extern crate ctrlc;
 
 use std::env;
 use std::cmp::min;
 use std::fs::File;
 use std::io::{self, BufReader, BufWriter, Read, Write, ErrorKind};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use std::i64;
 use std::process;
 use byteorder::{ WriteBytesExt, LittleEndian, ByteOrder };
@@ -107,9 +109,13 @@ fn main() {
         parse_num(&n).expect("invalid number of samples") as i64
     });
 
-    let sb = signalbool::SignalBool::new(
-        &[signalbool::Signal::SIGINT], signalbool::Flag::Interrupt,
-      ).unwrap();
+    let running = Arc::new(AtomicBool::new(true));
+    let r = running.clone();
+
+    ctrlc::set_handler(move || {
+        r.store(false, Ordering::SeqCst);
+    })
+    .expect("Error setting Ctrl-C handler");
 
     match direction {
         Rx => {
@@ -119,7 +125,7 @@ fn main() {
             let mut outfile = BufWriter::new(File::create(fname).expect("error opening output file"));
             stream.activate(None).expect("failed to activate stream");
 
-            while num > 0 && !sb.caught() {
+            while num > 0 && running.load(Ordering::SeqCst) {
                 let read_size = min(num as usize, buf.len());
                 let len = stream.read(&[&mut buf[..read_size]], 1_000_000).expect("read failed");
                 write_cfile(&buf[..len], &mut outfile).unwrap();
@@ -135,7 +141,7 @@ fn main() {
 
             stream.activate(None).expect("failed to activate stream");
 
-            while !sb.caught() {
+            while running.load(Ordering::SeqCst) {
                 let len = read_cfile(&mut infile, &mut buf).unwrap();
 
                 let mut samples = &buf[..len];
