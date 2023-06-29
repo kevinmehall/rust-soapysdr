@@ -67,18 +67,20 @@ unsafe fn optional_string(s: *mut c_char) -> Option<String> {
 
 pub unsafe fn arg_info_from_c(c: &SoapySDRArgInfo) -> ArgInfo {
     ArgInfo {
-        key:         required_string(c.key),
-        value:       required_string(c.value),
-        name:        optional_string(c.name),
+        key: required_string(c.key),
+        value: required_string(c.value),
+        name: optional_string(c.name),
         description: optional_string(c.description),
-        units:       optional_string(c.units),
-        data_type:   c.type_.into(),
+        units: optional_string(c.units),
+        data_type: c.type_.into(),
         options: {
             let option_vals = slice::from_raw_parts(c.options, c.numOptions);
             let option_names = slice::from_raw_parts(c.optionNames, c.numOptions);
-            option_vals.iter().zip(option_names.iter()).map(|(&name, &val)| {
-                (required_string(name), optional_string(val))
-            }).collect()
-        }
+            option_vals
+                .iter()
+                .zip(option_names.iter())
+                .map(|(&name, &val)| (required_string(name), optional_string(val)))
+                .collect()
+        },
     }
 }

@@ -26,7 +26,9 @@ struct DisplayRange(Vec<soapysdr::Range>);
 impl fmt::Display for DisplayRange {
     fn fmt(&self, w: &mut fmt::Formatter) -> fmt::Result {
         for (i, range) in self.0.iter().enumerate() {
-            if i != 0 { write!(w, ", ")? }
+            if i != 0 {
+                write!(w, ", ")?
+            }
             if range.minimum == range.maximum {
                 write!(w, "{} MHz", range.maximum / 1e6)?
             } else {
@@ -37,8 +39,15 @@ impl fmt::Display for DisplayRange {
     }
 }
 
-fn print_channel_info(dev: &soapysdr::Device, dir: soapysdr::Direction, channel: usize) -> Result<(), soapysdr::Error> {
-    let dir_s = match dir { Rx => "RX", Tx => "Tx"};
+fn print_channel_info(
+    dev: &soapysdr::Device,
+    dir: soapysdr::Direction,
+    channel: usize,
+) -> Result<(), soapysdr::Error> {
+    let dir_s = match dir {
+        Rx => "RX",
+        Tx => "Tx",
+    };
     println!("\t{} Channel {}", dir_s, channel);
 
     let freq_range = dev.frequency_range(dir, channel)?;
