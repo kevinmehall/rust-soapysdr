@@ -1,21 +1,21 @@
-extern crate soapysdr;
-extern crate num_complex;
 extern crate byteorder;
-extern crate getopts;
 extern crate ctrlc;
+extern crate getopts;
+extern crate num_complex;
+extern crate soapysdr;
 
-use std::env;
-use std::cmp::min;
-use std::fs::File;
-use std::io::{self, BufReader, BufWriter, Read, Write, ErrorKind};
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
-use std::i64;
-use std::process;
-use byteorder::{ WriteBytesExt, LittleEndian, ByteOrder };
-use soapysdr::Direction::{Rx, Tx};
+use byteorder::{ByteOrder, LittleEndian, WriteBytesExt};
 use getopts::Options;
 use num_complex::Complex;
+use soapysdr::Direction::{Rx, Tx};
+use std::cmp::min;
+use std::env;
+use std::fs::File;
+use std::i64;
+use std::io::{self, BufReader, BufWriter, ErrorKind, Read, Write};
+use std::process;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
 fn main() {
     let mut args = env::args();
