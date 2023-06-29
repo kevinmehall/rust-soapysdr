@@ -7,7 +7,7 @@ use std::env::consts;
 use std::path::PathBuf;
 
 fn probe_env_var() -> Option<Vec<PathBuf>> {
-    let paths = env::var_os("SOAPY_SDR_ROOT")?;
+    let paths = env::var_os("SOAPY_SDR_ROOT").or_else(|| env::var_os("SoapySDR_DIR"))?;
     for path in env::split_paths(&paths) {
         let dylib_name = format!("{}SoapySDR{}", consts::DLL_PREFIX, consts::DLL_SUFFIX);
         let inc_path = path.join("./include");
