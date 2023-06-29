@@ -10,6 +10,19 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install deps
+      run: |
+        sudo apt update
+        sudo apt-get install -y --no-install-recommends libsoapysdr-dev libclang-dev llvm-dev pkg-config
+    - uses: actions/checkout@v2
+    - name: Run clippy
+      env:
+        RUSTFLAGS: -Dwarnings
+      run: cargo clippy --all-features
+
   test-ubuntu:
     runs-on: ubuntu-latest
     steps:
