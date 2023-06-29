@@ -140,7 +140,7 @@ fn main() {
 
                 let mut samples = &buf[..len];
 
-                while samples.len() > 0 {
+                while !samples.is_empty() {
                     let written = stream.write(&[samples], None, false, 1_000_000).expect("write failed");
                     samples = &samples[written..];
                 }
@@ -189,8 +189,8 @@ fn write_cfile<W: Write>(src_buf: &[Complex<f32>], mut dest_file: W) -> io::Resu
 }
 
 fn parse_num(s: &str) -> Result<f64, std::num::ParseFloatError> {
-         if s.ends_with("k") { s[..s.len()-1].parse::<f64>().map(|x| x * 1e3) }
-    else if s.ends_with("M") { s[..s.len()-1].parse::<f64>().map(|x| x * 1e6) }
-    else if s.ends_with("G") { s[..s.len()-1].parse::<f64>().map(|x| x * 1e9) }
+    if let Some(stripped) = s.strip_suffix('k') { stripped.parse::<f64>().map(|x| x * 1e3) }
+    else if let Some(stripped) = s.strip_suffix('M') { stripped.parse::<f64>().map(|x| x * 1e6) }
+    else if let Some(stripped) = s.strip_suffix('G') { stripped.parse::<f64>().map(|x| x * 1e9) }
     else { s.parse::<f64>() }
 }

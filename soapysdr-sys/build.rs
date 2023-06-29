@@ -45,7 +45,7 @@ fn probe_pothos_sdr() -> Option<Vec<PathBuf>> {
 
 fn main() {
     let include_paths = probe_pkg_config()
-        .or_else(|| probe_pothos_sdr())
+        .or_else(probe_pothos_sdr)
         .expect("Couldn't find SoapySDR");
 
     let mut bindgen_builder = bindgen::Builder::default()

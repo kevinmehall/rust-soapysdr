@@ -5,6 +5,7 @@ use soapysdr_sys::*;
 
 /// Data format of samples
 #[derive(Copy, Clone, Eq, PartialEq, Hash)]
+#[non_exhaustive]
 pub enum Format {
     /// Complex 64-bit floats (complex double)
     CF64,
@@ -65,9 +66,6 @@ pub enum Format {
 
     /// Real unsigned 8-bit integers (uint8)
     U8,
-
-    #[doc(hidden)]
-    __Nonexhaustive
 }
 
 type ParseFormatError = ();
@@ -125,7 +123,6 @@ impl Format {
             Format::U16 => "U16\0",
             Format::S8 => "S8\0",
             Format::U8 => "U8\0",
-            Format::__Nonexhaustive => "unknown\0",
         }
     }
 
@@ -158,6 +155,8 @@ impl ::std::fmt::Display for Format {
 }
 
 /// Trait for sample formats used by a TxStream or RxStream
+///
+/// # Safety
 ///
 /// Implementing this trait requires that the type have the same size, alignment, and compatible
 /// memory representation with the SoapySDR type selected by `STREAM_FORMAT`
