@@ -3,7 +3,26 @@ extern crate cc;
 extern crate pkg_config;
 
 use std::env;
+use std::env::consts;
 use std::path::PathBuf;
+
+fn probe_env_var() -> Option<Vec<PathBuf>> {
+    let paths = env::var_os("SOAPYSDR_LIB_DIR")?;
+    for lib_path in env::split_paths(&paths) {
+        let dylib_name = format!("{}SoapySDR{}", consts::DLL_PREFIX, consts::DLL_SUFFIX);
+        let inc_path = lib_path.join("../include");
+
+        if inc_path.is_dir() && lib_path.join(dylib_name).exists() {
+            if lib_path.is_dir() {
+                println!("cargo:rustc-link-search={}", lib_path.to_str().unwrap());
+            }
+            println!("cargo:rustc-link-lib=SoapySDR");
+
+            return Some(vec![inc_path]);
+        }
+    }
+    None
+}
 
 fn probe_pkg_config() -> Option<Vec<PathBuf>> {
     match pkg_config::Config::new()
@@ -44,7 +63,8 @@ fn probe_pothos_sdr() -> Option<Vec<PathBuf>> {
 }
 
 fn main() {
-    let include_paths = probe_pkg_config()
+    let include_paths = probe_env_var()
+        .or_else(|| probe_pkg_config())
         .or_else(|| probe_pothos_sdr())
         .expect("Couldn't find SoapySDR");
 
