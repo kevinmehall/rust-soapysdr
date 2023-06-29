@@ -7,15 +7,14 @@ use std::env::consts;
 use std::path::PathBuf;
 
 fn probe_env_var() -> Option<Vec<PathBuf>> {
-    let paths = env::var_os("SOAPYSDR_LIB_DIR")?;
-    for lib_path in env::split_paths(&paths) {
+    let paths = env::var_os("SOAPY_SDR_ROOT")?;
+    for path in env::split_paths(&paths) {
         let dylib_name = format!("{}SoapySDR{}", consts::DLL_PREFIX, consts::DLL_SUFFIX);
-        let inc_path = lib_path.join("../include");
+        let inc_path = path.join("./include");
+        let lib_path = path.join("./lib");
 
-        if inc_path.is_dir() && lib_path.join(dylib_name).exists() {
-            if lib_path.is_dir() {
-                println!("cargo:rustc-link-search={}", lib_path.to_str().unwrap());
-            }
+        if lib_path.is_dir() && inc_path.is_dir() && lib_path.join(dylib_name).exists() {
+            println!("cargo:rustc-link-search={}", lib_path.to_str().unwrap());
             println!("cargo:rustc-link-lib=SoapySDR");
 
             return Some(vec![inc_path]);
