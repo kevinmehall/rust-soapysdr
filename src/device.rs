@@ -14,6 +14,7 @@ use arginfo::arg_info_from_c;
 /// An error code from SoapySDR
 #[repr(i32)]
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
+#[non_exhaustive]
 pub enum ErrorCode {
     /// Returned when read has a timeout.
     Timeout = -1,
@@ -43,9 +44,6 @@ pub enum ErrorCode {
 
     /// Error without a specific code, see error string
     Other = 0,
-
-    #[doc(hidden)]
-    __Nonexhaustive
 }
 
 impl ErrorCode {
@@ -125,7 +123,7 @@ impl Device {
     fn from_ptr(ptr: *mut SoapySDRDevice) -> Device {
         Device {
             inner: Arc::new(DeviceInner {
-                ptr: ptr,
+                ptr,
             }),
         }
     }

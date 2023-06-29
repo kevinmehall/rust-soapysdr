@@ -1,6 +1,6 @@
 use soapysdr_sys::*;
 use std::slice;
-use std::ptr;
+
 use std::ffi::CStr;
 use std::os::raw::c_char;
 
@@ -53,12 +53,12 @@ pub struct ArgInfo {
 }
 
 unsafe fn required_string(s: *mut c_char) -> String {
-    assert!(s != ptr::null_mut(), "Null string from SoapySDR");
+    assert!(!s.is_null(), "Null string from SoapySDR");
     CStr::from_ptr(s).to_string_lossy().into()
 }
 
 unsafe fn optional_string(s: *mut c_char) -> Option<String> {
-    if s != ptr::null_mut() {
+    if !s.is_null() {
         Some(CStr::from_ptr(s).to_string_lossy().into())
     } else {
         None

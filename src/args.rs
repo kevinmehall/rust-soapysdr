@@ -16,6 +16,12 @@ impl Drop for Args {
     }
 }
 
+impl Default for Args {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Args {
     /// Create a new, empty `Args` list
     pub fn new() -> Args {
@@ -26,6 +32,12 @@ impl Args {
         })
     }
 
+    /// # Safety
+    ///
+    /// Be careful that [`SoapySDRKwargs`] is either:
+    /// - [`SoapySDRKwargs::keys`] and [`SoapySDRKwargs::vals`] are null and [`SoapySDRKwargs::size`] is 0 or
+    /// - [`SoapySDRKwargs::keys`] and [`SoapySDRKwargs::vals`] both point to valid keys and vals of
+    /// [`SoapySDRKwargs::size`] length.
     pub unsafe fn from_raw(a: SoapySDRKwargs) -> Args {
         Args(a)
     }
@@ -128,8 +140,8 @@ impl<'a> IntoIterator for &'a Args {
 impl<'a> From<&'a str> for Args {
     fn from(s: &'a str) -> Args {
         let mut args = Args::new();
-        for i in s.split(",") {
-            if let Some(pos) = i.find("=") {
+        for i in s.split(',') {
+            if let Some(pos) = i.find('=') {
                 args.set(i[..pos].trim(), i[pos+1..].trim());
             }
         }
@@ -150,14 +162,14 @@ impl<'a, K: ::std::cmp::Eq + ::std::hash::Hash, V> From<&'a HashMap<K, V>> for A
 impl<'a, K, V> From<&'a [(K, V)]> for Args where &'a K: Into<Vec<u8>>, &'a V: Into<Vec<u8>> {
     fn from(m: &'a [(K, V)]) -> Args {
         let mut args = Args::new();
-        for &(ref k, ref v) in m {
+        for (k, v) in m {
             args.set(k, v);
         }
         args
     }
 }
 
-impl<'a> From<()> for Args {
+impl From<()> for Args {
     fn from(_: ()) -> Args { Args::new() }
 }
 
@@ -178,7 +190,7 @@ impl fmt::Display for Args {
         let mut i = self.iter();
         if let Some((k, v)) = i.next() {
             write!(fmt, "{}={}", k, v)?;
-            while let Some((k, v)) = i.next() {
+            for (k, v) in i {
                 write!(fmt, ", {}={}", k, v)?;
             }
         }
