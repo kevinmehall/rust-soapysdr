@@ -40,7 +40,7 @@ fn main() {
     let matches = match opts.parse(args) {
         Ok(m) => m,
         Err(e) => {
-            eprintln!("{}\n Run `{} --help` for help.", e.to_string(), program);
+            eprintln!("{}\n Run `{} --help` for help.", e, program);
             process::exit(2);
         }
     };
