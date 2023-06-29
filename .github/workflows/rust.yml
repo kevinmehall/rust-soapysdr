@@ -22,6 +22,8 @@ jobs:
       env:
         RUSTFLAGS: -Dwarnings
       run: cargo clippy --all-features
+    - name: Run fmt
+      run: cargo fmt --check
 
   test-ubuntu:
     runs-on: ubuntu-latest
