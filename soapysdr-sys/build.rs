@@ -3,7 +3,25 @@ extern crate cc;
 extern crate pkg_config;
 
 use std::env;
+use std::env::consts;
 use std::path::PathBuf;
+
+fn probe_env_var() -> Option<Vec<PathBuf>> {
+    let paths = env::var_os("SOAPY_SDR_ROOT").or_else(|| env::var_os("SoapySDR_DIR"))?;
+    for path in env::split_paths(&paths) {
+        let dylib_name = format!("{}SoapySDR{}", consts::DLL_PREFIX, consts::DLL_SUFFIX);
+        let inc_path = path.join("./include");
+        let lib_path = path.join("./lib");
+
+        if lib_path.is_dir() && inc_path.is_dir() && lib_path.join(dylib_name).exists() {
+            println!("cargo:rustc-link-search={}", lib_path.to_str().unwrap());
+            println!("cargo:rustc-link-lib=SoapySDR");
+
+            return Some(vec![inc_path]);
+        }
+    }
+    None
+}
 
 fn probe_pkg_config() -> Option<Vec<PathBuf>> {
     match pkg_config::Config::new()
@@ -44,8 +62,9 @@ fn probe_pothos_sdr() -> Option<Vec<PathBuf>> {
 }
 
 fn main() {
-    let include_paths = probe_pkg_config()
-        .or_else(|| probe_pothos_sdr())
+    let include_paths = probe_env_var()
+        .or_else(probe_pkg_config)
+        .or_else(probe_pothos_sdr)
         .expect("Couldn't find SoapySDR");
 
     let mut bindgen_builder = bindgen::Builder::default()
