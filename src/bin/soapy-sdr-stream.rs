@@ -108,8 +108,8 @@ fn main() {
     });
 
     let sb = signalbool::SignalBool::new(
-        &[signalbool::Signal::SIGINT], signalbool::Flag::Interrupt,
-      ).unwrap();
+        &[signalbool::Signal::SIGINT], signalbool::Flag::Restart,
+    ).unwrap();
 
     match direction {
         Rx => {
