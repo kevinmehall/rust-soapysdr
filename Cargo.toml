@@ -2,6 +2,7 @@
 [package]
 name = "soapysdr"
 version = "0.3.2"
+edition = "2021"
 authors = ["Kevin Mehall <km@kevinmehall.net>"]
 categories = ["api-bindings", "hardware-support"]
 keywords = ["sdr", "radio"]

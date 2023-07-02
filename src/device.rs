@@ -9,7 +9,7 @@ use std::os::raw::c_void;
 use std::marker::PhantomData;
 
 use super::{ Args, ArgInfo, StreamSample, Format };
-use arginfo::arg_info_from_c;
+use crate::arginfo::arg_info_from_c;
 
 /// An error code from SoapySDR
 #[repr(i32)]

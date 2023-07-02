@@ -1,7 +1,3 @@
-extern crate bindgen;
-extern crate cc;
-extern crate pkg_config;
-
 use std::env;
 use std::env::consts;
 use std::path::PathBuf;

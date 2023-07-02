@@ -3,10 +3,6 @@
 //!
 //!
 
-extern crate soapysdr_sys;
-extern crate num_complex;
-#[cfg(feature="log")] #[macro_use] extern crate log;
-
 mod args;
 pub use args::{Args, ArgsIterator};
 
@@ -24,6 +20,7 @@ pub use format::{Format, StreamSample};
 /// With `env_logger`, use e.g `RUST_LOG=soapysdr=info` to control the log level.
 #[cfg(feature="log")]
 pub fn configure_logging() {
+    use log::log;
     use log::Level;
     use soapysdr_sys::*;
     use std::os::raw::c_char;

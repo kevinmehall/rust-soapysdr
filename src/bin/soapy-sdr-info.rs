@@ -1,5 +1,4 @@
 use std::env;
-extern crate soapysdr;
 use soapysdr::Direction::{Rx, Tx};
 use std::fmt;
 

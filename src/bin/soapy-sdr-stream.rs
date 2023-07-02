@@ -1,9 +1,3 @@
-extern crate soapysdr;
-extern crate num_complex;
-extern crate byteorder;
-extern crate getopts;
-extern crate signalbool;
-
 use std::env;
 use std::cmp::min;
 use std::fs::File;
