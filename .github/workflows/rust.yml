@@ -19,7 +19,7 @@ jobs:
         sudo apt-get install -y --no-install-recommends libsoapysdr-dev libclang-dev llvm-dev pkg-config
     - uses: actions/checkout@v2
     - name: Build
-      run: cargo build
+      run: cargo build --all-features
     - name: Run tests
       run: cargo test
 
@@ -36,7 +36,7 @@ jobs:
         echo "C:\\msys64\\mingw64\\bin" >> $GITHUB_PATH
     - name: Build
       shell: bash
-      run: cargo build
+      run: cargo build --all-features
     - name: Run tests
       shell: bash
       run: cargo test
