@@ -1,7 +1,7 @@
 [workspace]
 [package]
 name = "soapysdr"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2021"
 authors = ["Kevin Mehall <km@kevinmehall.net>"]
 categories = ["api-bindings", "hardware-support"]
@@ -16,7 +16,7 @@ repository = "https://github.com/kevinmehall/rust-soapysdr"
 readme = "README.md"
 
 [dependencies]
-soapysdr-sys = { version = "0.7.3", path = "./soapysdr-sys" }
+soapysdr-sys = { version = "0.7.5", path = "./soapysdr-sys" }
 num-complex = "0.4"
 log = { version = "0.4", optional = true }
 
