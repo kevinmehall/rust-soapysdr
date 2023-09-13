@@ -115,7 +115,7 @@ fn main() {
 
             while num > 0 && !sb.caught() {
                 let read_size = min(num as usize, buf.len());
-                let len = stream.read(&[&mut buf[..read_size]], 1_000_000).expect("read failed");
+                let len = stream.read(&mut [&mut buf[..read_size]], 1_000_000).expect("read failed");
                 write_cfile(&buf[..len], &mut outfile).unwrap();
                 num -= len as i64;
             }
