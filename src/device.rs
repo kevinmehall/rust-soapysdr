@@ -879,7 +879,22 @@ impl Device {
 
     // TODO: sensors
 
-    // TODO: registers
+    // Write a register
+    pub fn write_register<S: Into<Vec<u8>>>(&self, key: S, addr: u32, value: u32) -> Result<(), Error> {
+        let key = CString::new(key).expect("key must not contain null byte");
+        unsafe {
+            check_ret_error(SoapySDRDevice_writeRegister(self.inner.ptr, key.as_ptr(), addr, value))?;
+            Ok(())
+        }
+    }
+
+    /// Read a register
+    pub fn read_register<S: Into<Vec<u8>>>(&self, key: S, addr: u32) -> Result<u32, Error> {
+        let key = CString::new(key).expect("key must not contain null byte");
+        unsafe {
+            check_error(SoapySDRDevice_readRegister(self.inner.ptr,  key.as_ptr(), addr))
+        }
+    }
 
     /// Write a setting
     pub fn write_setting<S: Into<Vec<u8>>>(&self, key: S, value: S) -> Result<(), Error> {
