@@ -4,9 +4,12 @@ stdenv.mkDerivation rec {
   env = buildEnv { name = name; paths = buildInputs; };
   buildInputs = [
     soapysdr-with-plugins
-    pkgconfig
+    pkg-config
     llvm
+    cargo
   ];
+
+  # https://hoverbear.org/blog/rust-bindgen-in-nix/
   LIBCLANG_PATH="${llvmPackages.libclang.lib}/lib";
   BINDGEN_EXTRA_CLANG_ARGS="$(< ${stdenv.cc}/nix-support/libc-crt1-cflags) \
       $(< ${stdenv.cc}/nix-support/libc-cflags) \
