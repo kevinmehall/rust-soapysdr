@@ -8,12 +8,13 @@
 
 This library requires dependencies not handled by Cargo:
 
-  * libsoapysdr 0.6, 0.7, or git master (0.8)
-  * libclang 3.9+ (for bindgen)
+  * libsoapysdr 0.6, 0.7, or 0.8
+  * libclang 5.0+ (for bindgen)
+  * pkg-config
 
 ### Ubuntu
 
-(Tested on Ubuntu 20.04)
+(Tested on Ubuntu 22.04)
 
 ```console
 sudo apt install libsoapysdr-dev libclang-dev llvm-dev pkg-config
