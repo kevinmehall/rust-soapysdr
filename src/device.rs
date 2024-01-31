@@ -80,6 +80,15 @@ impl ::std::error::Error for Error {
     }
 }
 
+#[derive(Clone, Debug, Hash)]
+pub struct StreamResult {
+    pub ret: usize,
+    pub flags: i32,
+    pub time_ns: i64,
+    pub chan_mask: usize,
+}
+
+
 /// Transmit or Receive
 #[repr(u32)]
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
@@ -1365,7 +1374,7 @@ impl<E: StreamSample> RxStream<E> {
     ///
     /// # Panics
     ///  * If `buffers` is not the same length as the `channels` array passed to `Device::rx_stream`.
-    pub fn read(&mut self, buffers: &mut [&mut [E]], timeout_us: i64) -> Result<usize, Error> {
+    pub fn read(&mut self, buffers: &mut [&mut [E]], timeout_us: i64) -> Result<StreamResult, Error> {
         unsafe {
             assert!(buffers.len() == self.nchannels);
 
@@ -1384,8 +1393,13 @@ impl<E: StreamSample> RxStream<E> {
                 &mut self.time_ns as *mut _,
                 timeout_us as _,
             ))?;
-
-            Ok(len as usize)
+            // Is it better to return this StreamResult or just make the values public off of rx_stream
+            Ok(StreamResult{
+                ret: len as usize,
+                flags: self.flags,
+                time_ns: self.time_ns,
+                chan_mask: self.nchannels,
+            })
         }
     }
 
@@ -1603,7 +1617,7 @@ impl<E: StreamSample> TxStream<E> {
         Ok(())
     }
 
- /// Read the status of the stream.
+    /// Read the status of the stream.
     /// 
     /// This is required to detect underflows and such as they are not reported by 
     /// [write](TxStream::write).
@@ -1618,22 +1632,29 @@ impl<E: StreamSample> TxStream<E> {
     /// 
     /// Note that `timeout_us` is only `i32` on Windows and panics if the value is 
     /// too large for `i32` on that platform.
-    pub fn read_status(&mut self, chan_mask: &mut usize, flags: &mut i32, time_ns: &mut i64, timeout_us: i64) -> Result<usize, Error> {
+    pub fn read_status(&mut self, chan_mask: &mut usize, flags: &mut i32, time_ns: &mut i64, timeout_us: i64) -> Result<StreamResult, Error> {
         // Conversion needed for Windows, which takes an i32 here for some reason.
         #[allow(clippy::useless_conversion)]
-        let timeout_us = timeout_us.try_into().unwrap();
+        let timeout_us: i64 = timeout_us.try_into().unwrap();
+        let mut sr = StreamResult {
+            ret: 0,
+            flags: *flags,
+            time_ns: *time_ns,
+            chan_mask: *chan_mask,
+        };
         unsafe {
-            let status = len_result(SoapySDRDevice_readStreamStatus(
+            // or do i want check_result
+            sr.ret = len_result(SoapySDRDevice_readStreamStatus(
                 self.device.inner.ptr,
                 self.handle,
-                chan_mask,
-                flags,
-                time_ns,
-                timeout_us
-            ))?;
-
-            Ok(status as usize)
+                &mut sr.chan_mask as *mut _,
+                &mut sr.flags as *mut _,
+                &mut sr.time_ns as *mut _,
+                timeout_us as _,
+            ))? as usize;
         }
+
+        Ok(sr)
     }
 
     // TODO: DMA
