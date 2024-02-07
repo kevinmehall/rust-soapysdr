@@ -10,7 +10,7 @@ mod arginfo;
 pub use arginfo::ArgInfo;
 
 mod device;
-pub use device::{enumerate, Device, Direction, Error, ErrorCode, Range, RxStream, TxStream};
+pub use device::{enumerate, Device, Direction, Error, StreamResult, ErrorCode, Range, RxStream, TxStream};
 
 mod format;
 pub use format::{Format, StreamSample};
