@@ -26,7 +26,9 @@ impl From<SoapySDRArgInfoType> for ArgType {
     }
 }
 
+
 /// Metadata about supported arguments.
+#[derive(Debug)]
 pub struct ArgInfo {
     /// The key used to identify the argument
     pub key: String,
