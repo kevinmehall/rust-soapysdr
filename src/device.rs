@@ -919,6 +919,11 @@ impl<E: StreamSample> RxStream<E> {
         }
     }
 
+    /// Fetch the active state of the stream.
+    pub fn active(&self) -> bool {
+        self.active
+    }
+
     // TODO: activate_burst()
 
     /// Deactivate a stream.
@@ -1024,6 +1029,11 @@ impl<E: StreamSample> TxStream<E> {
             self.active = true;
             Ok(())
         }
+    }
+
+    /// Fetch the active state of the stream.
+    pub fn active(&self) -> bool {
+        self.active
     }
 
     /// Deactivate a stream.
