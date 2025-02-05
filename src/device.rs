@@ -1148,7 +1148,13 @@ impl<E: StreamSample> TxStream<E> {
     /// returned from a stream read/write.
     /// 
     /// [ErrorCode::Timeout] should generally be ignored.
+    /// 
+    /// Note that `timeout_us` is only `i32` on Windows and panics if the value is 
+    /// too large for `i32` on that platform.
     pub fn read_status(&mut self, chan_mask: &mut usize, flags: &mut i32, time_ns: &mut i64, timeout_us: i64) -> Result<usize, Error> {
+        // Conversion needed for Windows, which takes an i32 here for some reason.
+        #[allow(clippy::useless_conversion)]
+        let timeout_us = timeout_us.try_into().unwrap();
         unsafe {
             let status = len_result(SoapySDRDevice_readStreamStatus(
                 self.device.inner.ptr,
