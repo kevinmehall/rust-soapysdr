@@ -1136,7 +1136,32 @@ impl<E: StreamSample> TxStream<E> {
         Ok(())
     }
 
-    // TODO: read_status
+    /// Read the status of the stream.
+    /// 
+    /// This is required to detect underflows and such as they are not reported by 
+    /// [write](TxStream::write).
+    /// 
+    /// `chan_mask``, `flags``, and `time_ns`` are output parameters and _may_ be 
+    /// set depending on the type of status result.
+    /// 
+    /// Returns the status `Result`, usually this will be an [Error], as would be 
+    /// returned from a stream read/write.
+    /// 
+    /// [ErrorCode::Timeout] should generally be ignored.
+    pub fn read_status(&mut self, chan_mask: &mut usize, flags: &mut i32, time_ns: &mut i64, timeout_us: i64) -> Result<usize, Error> {
+        unsafe {
+            let status = len_result(SoapySDRDevice_readStreamStatus(
+                self.device.inner.ptr,
+                self.handle,
+                chan_mask,
+                flags,
+                time_ns,
+                timeout_us
+            ))?;
+
+            Ok(status as usize)
+        }
+    }
 
     // TODO: DMA
 
