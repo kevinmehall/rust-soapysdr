@@ -64,7 +64,7 @@ fn probe_pothos_sdr() -> Option<Vec<PathBuf>> {
     None
 }
 
-fn panic_help_message_soapysdr() {
+fn panic_help_message_soapysdr() -> ! {
     #[cfg(windows)]
     {
         const MSG: &str = "
@@ -96,7 +96,7 @@ fn panic_help_message_soapysdr() {
     }
 }
 
-fn panic_help_message_libclang() {
+fn panic_help_message_libclang() -> ! {
     #[cfg(windows)]
     {
         let msg = "
@@ -132,13 +132,8 @@ fn panic_help_message_libclang() {
 fn main() {
     let include_paths = probe_env_var()
         .or_else(probe_pkg_config)
-        .or_else(probe_pothos_sdr);
-
-    if include_paths.is_none() {
-        panic_help_message_soapysdr();
-    }
-
-    let include_paths = include_paths.unwrap();
+        .or_else(probe_pothos_sdr)
+        .unwrap_or_else(|| panic_help_message_soapysdr());
 
     if let Err(_) = std::panic::catch_unwind(|| bindgen::clang_version()) {
         panic_help_message_libclang();
