@@ -128,6 +128,10 @@ fn panic_help_message_soapysdr() -> ! {
     }
 }
 
+#[cfg(any(
+    feature = "build_bindings",
+    not(all(any(target_os = "windows", target_os = "linux", target_os = "macos")))
+))]
 fn panic_help_message_libclang() -> ! {
     #[cfg(target_os = "windows")]
     {
@@ -163,13 +167,12 @@ fn panic_help_message_libclang() -> ! {
     }
 }
 
-fn main() {
-    let include_paths = probe_env_var()
-        .or_else(probe_pkg_config)
-        .or_else(probe_pothos_sdr)
-        .unwrap_or_else(|| panic_help_message_soapysdr());
-
-    if std::panic::catch_unwind(bindgen::clang_version).is_err() {
+#[cfg(any(
+    feature = "build_bindings",
+    not(any(target_os = "windows", target_os = "linux", target_os = "macos"))
+))]
+fn build_bindgen_bindings(include_paths: &[PathBuf]) {
+    if std::panic::catch_unwind(|| bindgen::clang_version()).is_err() {
         panic_help_message_libclang();
     }
 
@@ -178,14 +181,9 @@ fn main() {
         .size_t_is_usize(true)
         .header("wrapper.h");
 
-    let mut cc_builder = cc::Build::new();
-    cc_builder.file("wrapper.c");
-
     for inc in include_paths {
         let inc_str = &inc.to_str().expect("PathBuf to string conversion problem");
         bindgen_builder = bindgen_builder.clang_arg("-I".to_owned() + inc_str);
-
-        cc_builder.include(&inc);
     }
 
     // Wrapped by _rust_wrapper_SoapySDRDevice_setupStream for 0.7 -> 0.8 compatibility
@@ -199,6 +197,59 @@ fn main() {
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
+}
+
+#[cfg(not(any(
+    feature = "build_bindings",
+    not(any(target_os = "windows", target_os = "linux", target_os = "macos"))
+)))]
+fn copy_bindgen_bindings() {
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    std::fs::copy("bindings/bindings.rs", out_path.join("bindings.rs"))
+        .expect("Could not copy bindings");
+    #[cfg(target_os = "windows")]
+    std::fs::copy(
+        "bindings/bindings_windows.rs",
+        out_path.join("bindings_windows.rs"),
+    )
+    .expect("Could not copy bindings");
+    #[cfg(target_os = "linux")]
+    std::fs::copy(
+        "bindings/bindings_linux.rs",
+        out_path.join("bindings_linux.rs"),
+    )
+    .expect("Could not copy bindings");
+    #[cfg(target_os = "macos")]
+    std::fs::copy(
+        "bindings/bindings_macos.rs",
+        out_path.join("bindings_macos.rs"),
+    )
+    .expect("Could not copy bindings");
+}
+
+fn main() {
+    let include_paths = probe_env_var()
+        .or_else(probe_pkg_config)
+        .or_else(probe_pothos_sdr)
+        .unwrap_or_else(|| panic_help_message_soapysdr());
+
+    #[cfg(any(
+        feature = "build_bindings",
+        not(any(target_os = "windows", target_os = "linux", target_os = "macos"))
+    ))]
+    build_bindgen_bindings(&include_paths);
+    #[cfg(not(any(
+        feature = "build_bindings",
+        not(any(target_os = "windows", target_os = "linux", target_os = "macos"))
+    )))]
+    copy_bindgen_bindings();
+
+    let mut cc_builder = cc::Build::new();
+    cc_builder.file("wrapper.c");
+
+    for inc in include_paths {
+        cc_builder.include(&inc);
+    }
 
     cc_builder.compile("soapysdr-sys-wrappers");
 }
