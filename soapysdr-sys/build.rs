@@ -41,7 +41,7 @@ fn probe_pkg_config() -> Option<Vec<PathBuf>> {
 
 // Find PothosSDR in paths in windows
 fn probe_pothos_sdr() -> Option<Vec<PathBuf>> {
-    #[cfg(windows)]
+    #[cfg(target_os = "windows")]
     {
         let lib = "SoapySDR";
         let dll = lib.to_owned() + ".dll";
@@ -65,7 +65,7 @@ fn probe_pothos_sdr() -> Option<Vec<PathBuf>> {
 }
 
 fn panic_help_message_soapysdr() -> ! {
-    #[cfg(windows)]
+    #[cfg(target_os = "windows")]
     {
         const MSG: &str = "
 
@@ -90,14 +90,46 @@ fn panic_help_message_soapysdr() -> ! {
         ";
         panic!("{}", MSG);
     }
-    #[cfg(not(windows))]
+    #[cfg(target_os = "macos")]
+    {
+        const MSG: &str = "
+
+
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        SoapySDR (PothosSDR) and pkg-config are required but could not be found.
+        Please install them with Homebrew (https://brew.sh)
+
+
+                brew install pkg-config
+                brew tap pothosware/homebrew-pothos
+                brew update
+
+                followed by the soapy package for your radio,
+                e.g.
+                  * brew install soapyrtlsdr
+                  * brew install soapyhackrf
+                  * brew install soapybladerf
+                  * etc...
+
+
+        and then try again.
+
+
+        Visit https://github.com/kevinmehall/rust-soapysdr for more information.
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+        ";
+        panic!("{}", MSG);
+    }
+    #[cfg(all(not(target_os = "windows"), not(target_os = "macos")))]
     {
         panic!("SoapySDR is required but could not be found. Please install SoapySDR and try again.");
     }
 }
 
 fn panic_help_message_libclang() -> ! {
-    #[cfg(windows)]
+    #[cfg(target_os = "windows")]
     {
         let msg = "
 
@@ -123,7 +155,7 @@ fn panic_help_message_libclang() -> ! {
         ";
         panic!("{}", msg);
     }
-    #[cfg(not(windows))]
+    #[cfg(not(target_os = "windows"))]
     {
         panic!("libclang is required but could not be found. Please install libclang and try again.");
     }
