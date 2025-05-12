@@ -1192,6 +1192,28 @@ impl Device {
         }
     }
 
+    // Master clock rate
+    pub fn list_master_clock_rates(&self) -> Result<Vec<Range>, Error> {
+        unsafe {
+            list_result(|len_ptr| {
+                SoapySDRDevice_getMasterClockRates(self.inner.ptr, len_ptr)
+            })
+        }
+    }
+
+    /// Get the current master clock rate
+    pub fn get_master_clock_rate(&self) -> Result<f64, Error> {
+        unsafe { check_error(SoapySDRDevice_getMasterClockRate(self.inner.ptr)) }
+    }
+
+    /// Set the current master_clock_rate
+    pub fn set_master_clock_rate(&self, clock_rate: f64) -> Result<(), Error> {
+        unsafe {
+            SoapySDRDevice_setMasterClockRate(self.inner.ptr, clock_rate);
+            check_error(())
+        }
+    }
+
     // TODO: sensors
 
     // Write a register
