@@ -88,7 +88,6 @@ pub struct StreamResult {
     pub chan_mask: usize,
 }
 
-
 /// Transmit or Receive
 #[repr(u32)]
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
@@ -1195,9 +1194,7 @@ impl Device {
     // Master clock rate
     pub fn list_master_clock_rates(&self) -> Result<Vec<Range>, Error> {
         unsafe {
-            list_result(|len_ptr| {
-                SoapySDRDevice_getMasterClockRates(self.inner.ptr, len_ptr)
-            })
+            list_result(|len_ptr| SoapySDRDevice_getMasterClockRates(self.inner.ptr, len_ptr))
         }
     }
 
@@ -1265,6 +1262,46 @@ impl Device {
     pub fn read_setting<S: Into<Vec<u8>>>(&self, key: S) -> Result<String, Error> {
         let key = CString::new(key).expect("key must not contain null byte");
         unsafe { string_result(SoapySDRDevice_readSetting(self.inner.ptr, key.as_ptr())) }
+    }
+
+    /// Write a channel setting
+    pub fn write_channel_setting<S: Into<Vec<u8>>>(
+        &self,
+        direction: Direction,
+        channel: usize,
+        key: S,
+        value: S,
+    ) -> Result<(), Error> {
+        let key = CString::new(key).expect("key must not contain null byte");
+        let value = CString::new(value).expect("value must not contain null byte");
+        unsafe {
+            check_ret_error(SoapySDRDevice_writeChannelSetting(
+                self.inner.ptr,
+                direction.into(),
+                channel,
+                key.as_ptr(),
+                value.as_ptr(),
+            ))?;
+            Ok(())
+        }
+    }
+
+    /// Read a channel setting
+    pub fn read_channel_setting<S: Into<Vec<u8>>>(
+        &self,
+        direction: Direction,
+        channel: usize,
+        key: S,
+    ) -> Result<String, Error> {
+        let key = CString::new(key).expect("key must not contain null byte");
+        unsafe {
+            string_result(SoapySDRDevice_readChannelSetting(
+                self.inner.ptr,
+                direction.into(),
+                channel,
+                key.as_ptr(),
+            ))
+        }
     }
 
     // TODO: gpio
@@ -1396,7 +1433,11 @@ impl<E: StreamSample> RxStream<E> {
     ///
     /// # Panics
     ///  * If `buffers` is not the same length as the `channels` array passed to `Device::rx_stream`.
-    pub fn read(&mut self, buffers: &mut [&mut [E]], timeout_us: i64) -> Result<StreamResult, Error> {
+    pub fn read(
+        &mut self,
+        buffers: &mut [&mut [E]],
+        timeout_us: i64,
+    ) -> Result<StreamResult, Error> {
         unsafe {
             assert!(buffers.len() == self.nchannels);
 
@@ -1416,7 +1457,7 @@ impl<E: StreamSample> RxStream<E> {
                 timeout_us as _,
             ))?;
 
-            Ok(StreamResult{
+            Ok(StreamResult {
                 ret: len,
                 flags: self.flags,
                 time_ns: self.time_ns,
