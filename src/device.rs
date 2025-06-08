@@ -292,6 +292,20 @@ impl Device {
         }
     }
 
+    /// List the device's sensors.
+    pub fn list_sensors(&self) -> Result<Vec<String>, Error> {
+        unsafe {
+            string_list_result(|len_ptr| SoapySDRDevice_listSensors(self.inner.ptr, len_ptr))
+        }
+    }
+
+    /// Read sensor value.
+    pub fn read_sensor(&self, key: &str) -> Result<String, Error> {
+        unsafe {
+            string_result(SoapySDRDevice_readSensor(self.inner.ptr, key.as_ptr() as *const i8))
+        }
+    }
+
     /// Set the frontend mapping of available DSP units to RF frontends.
     ///
     /// This controls channel mapping and channel availability.
