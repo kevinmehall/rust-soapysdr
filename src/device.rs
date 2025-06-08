@@ -306,6 +306,14 @@ impl Device {
         }
     }
 
+    /// Get sensor info.
+    pub fn get_sensor_info(&self, key: &str) -> Result<ArgInfo, Error> {
+        Ok(unsafe {
+               arg_info_from_c(&SoapySDRDevice_getSensorInfo(
+                       self.inner.ptr, key.as_ptr() as *const i8))
+        })
+    }
+
     /// Set the frontend mapping of available DSP units to RF frontends.
     ///
     /// This controls channel mapping and channel availability.
