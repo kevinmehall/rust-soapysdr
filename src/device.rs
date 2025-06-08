@@ -306,6 +306,28 @@ impl Device {
         }
     }
 
+    /// Get channel sensor info.
+    pub fn get_channel_sensor_info(&self, dir: Direction, channel: usize, key: &str) -> Result<ArgInfo, Error> {
+        Ok(unsafe {
+               arg_info_from_c(&SoapySDRDevice_getChannelSensorInfo(
+                       self.inner.ptr, dir.into(), channel, key.as_ptr() as *const i8))
+        })
+    }
+
+    /// List the channel's sensors.
+    pub fn list_channel_sensors(&self, dir: Direction, channel: usize) -> Result<Vec<String>, Error> {
+        unsafe {
+            string_list_result(|len_ptr| SoapySDRDevice_listChannelSensors(self.inner.ptr, dir.into(), channel, len_ptr))
+        }
+    }
+
+    /// Read channel sensor value.
+    pub fn read_channel_sensor(&self, dir: Direction, channel: usize, key: &str) -> Result<String, Error> {
+        unsafe {
+            string_result(SoapySDRDevice_readChannelSensor(self.inner.ptr, dir.into(), channel, key.as_ptr() as *const i8))
+        }
+    }
+
     /// Get sensor info.
     pub fn get_sensor_info(&self, key: &str) -> Result<ArgInfo, Error> {
         Ok(unsafe {
