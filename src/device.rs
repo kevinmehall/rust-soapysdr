@@ -292,6 +292,54 @@ impl Device {
         }
     }
 
+    /// List the device's sensors.
+    pub fn list_sensors(&self) -> Result<Vec<String>, Error> {
+        unsafe {
+            string_list_result(|len_ptr| SoapySDRDevice_listSensors(self.inner.ptr, len_ptr))
+        }
+    }
+
+    /// Read sensor value.
+    pub fn read_sensor(&self, key: &str) -> Result<String, Error> {
+        let key_c = CString::new(key).expect("key contains null byte");
+        unsafe {
+            string_result(SoapySDRDevice_readSensor(self.inner.ptr, key_c.as_ptr() as *const i8))
+        }
+    }
+
+    /// Get channel sensor info.
+    pub fn get_channel_sensor_info(&self, dir: Direction, channel: usize, key: &str) -> Result<ArgInfo, Error> {
+        let key_c = CString::new(key).expect("key contains null byte");
+        Ok(unsafe {
+               arg_info_from_c(&SoapySDRDevice_getChannelSensorInfo(
+                       self.inner.ptr, dir.into(), channel, key_c.as_ptr() as *const i8))
+        })
+    }
+
+    /// List the channel's sensors.
+    pub fn list_channel_sensors(&self, dir: Direction, channel: usize) -> Result<Vec<String>, Error> {
+        unsafe {
+            string_list_result(|len_ptr| SoapySDRDevice_listChannelSensors(self.inner.ptr, dir.into(), channel, len_ptr))
+        }
+    }
+
+    /// Read channel sensor value.
+    pub fn read_channel_sensor(&self, dir: Direction, channel: usize, key: &str) -> Result<String, Error> {
+        let key_c = CString::new(key).expect("key contains null byte");
+        unsafe {
+            string_result(SoapySDRDevice_readChannelSensor(self.inner.ptr, dir.into(), channel, key_c.as_ptr() as *const i8))
+        }
+    }
+
+    /// Get sensor info.
+    pub fn get_sensor_info(&self, key: &str) -> Result<ArgInfo, Error> {
+        let key_c = CString::new(key).expect("key contains null byte");
+        Ok(unsafe {
+               arg_info_from_c(&SoapySDRDevice_getSensorInfo(
+                       self.inner.ptr, key_c.as_ptr() as *const i8))
+        })
+    }
+
     /// Set the frontend mapping of available DSP units to RF frontends.
     ///
     /// This controls channel mapping and channel availability.
