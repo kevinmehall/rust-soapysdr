@@ -1021,6 +1021,10 @@ impl<E: StreamSample> RxStream<E> {
         }
     }
 
+    /// Return timestamp of the last successful `read()` operation.
+    pub fn time_ns(&self) -> i64 {
+        self.time_ns
+    }
 }
 
 /// A stream open for transmitting.
