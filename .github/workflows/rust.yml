@@ -11,7 +11,10 @@ env:
 
 jobs:
   test-ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, ubuntu-24.04-arm]
     steps:
       - name: Install deps
         run: |
