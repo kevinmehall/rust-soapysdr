@@ -113,7 +113,7 @@ impl Args {
     /// assert_eq!(i.next(), Some(("serial", "123456")));
     /// assert_eq!(i.next(), None);
     /// ```
-    pub fn iter(&self) -> ArgsIterator {
+    pub fn iter(&self) -> ArgsIterator<'_> {
         ArgsIterator { args: self, pos: 0 }
     }
 }
