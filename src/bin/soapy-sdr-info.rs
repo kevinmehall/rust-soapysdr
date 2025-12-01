@@ -3,7 +3,7 @@ use soapysdr::Direction::{Rx, Tx};
 use std::fmt;
 
 fn main() {
-    let filter = env::args().nth(1).unwrap_or(String::new());
+    let filter = env::args().nth(1).unwrap_or_default();
 
     for devargs in soapysdr::enumerate(&filter[..]).expect("Error listing devices") {
         println!("{}", devargs);

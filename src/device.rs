@@ -1124,7 +1124,7 @@ impl<E: StreamSample> TxStream<E> {
             assert!(buffers.len() == self.nchannels, "Number of buffers must equal number of channels on stream");
 
             let mut buf_ptrs = Vec::with_capacity(self.nchannels);
-            let num_elems = buffers.get(0).map_or(0, |x| x.len());
+            let num_elems = buffers.first().map_or(0, |x| x.len());
             for buf in buffers {
                 assert_eq!(buf.len(), num_elems, "All buffers must be the same length");
                 buf_ptrs.push(buf.as_ptr());
@@ -1175,7 +1175,7 @@ impl<E: StreamSample> TxStream<E> {
         let mut buffers = buffers.to_owned();
         let mut at_ns = at_ns;
 
-        while buffers.get(0).map_or(0, |x| x.len()) > 0 {
+        while buffers.first().map_or(0, |x| x.len()) > 0 {
             // The timestamp is only sent on the first write.
             let written = self.write(&buffers, at_ns.take(), end_burst, timeout_us)?;
 
