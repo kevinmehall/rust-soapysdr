@@ -434,6 +434,7 @@ impl Device {
                 flags: 0,
                 time_ns: 0,
                 active: false,
+                buf_ptrs: vec![std::ptr::null_mut(); channels.len()],
                 phantom: PhantomData,
             })
         }
@@ -459,6 +460,7 @@ impl Device {
                 handle: stream,
                 nchannels: channels.len(),
                 active: false,
+                buf_ptrs: vec![std::ptr::null_mut(); channels.len()],
                 phantom: PhantomData,
             })
         }
@@ -922,6 +924,7 @@ pub struct RxStream<E: StreamSample> {
     flags: i32,
     time_ns: i64,
     active: bool,
+    buf_ptrs: Vec<*mut E>,
     phantom: PhantomData<fn(&mut[E])>,
 }
 
@@ -1003,14 +1006,15 @@ impl<E: StreamSample> RxStream<E> {
 
             let num_samples = buffers.iter().map(|b| b.len()).min().unwrap_or(0);
 
-            //TODO: avoid this allocation
-            let buf_ptrs = buffers.iter().map(|b| b.as_ptr()).collect::<Vec<_>>();
+            for (dst, src) in self.buf_ptrs.iter_mut().zip(buffers.iter_mut()) {
+                *dst = src.as_mut_ptr();
+            }
 
             self.flags = 0;
             let len = len_result(SoapySDRDevice_readStream(
                 self.device.inner.ptr,
                 self.handle,
-                buf_ptrs.as_ptr() as *const *mut _,
+                self.buf_ptrs.as_ptr() as *const *mut _,
                 num_samples,
                 &mut self.flags as *mut _,
                 &mut self.time_ns as *mut _,
@@ -1038,6 +1042,7 @@ pub struct TxStream<E: StreamSample> {
     handle: *mut SoapySDRStream,
     nchannels: usize,
     active: bool,
+    buf_ptrs: Vec<*const E>,
     phantom: PhantomData<fn(&[E])>,
 }
 
@@ -1123,11 +1128,10 @@ impl<E: StreamSample> TxStream<E> {
         unsafe {
             assert!(buffers.len() == self.nchannels, "Number of buffers must equal number of channels on stream");
 
-            let mut buf_ptrs = Vec::with_capacity(self.nchannels);
             let num_elems = buffers.get(0).map_or(0, |x| x.len());
-            for buf in buffers {
-                assert_eq!(buf.len(), num_elems, "All buffers must be the same length");
-                buf_ptrs.push(buf.as_ptr());
+            for (dst, src) in self.buf_ptrs.iter_mut().zip(buffers) {
+                assert_eq!(src.len(), num_elems, "All buffers must be the same length");
+                *dst = src.as_ptr();
             }
 
             let mut flags = 0;
@@ -1143,7 +1147,7 @@ impl<E: StreamSample> TxStream<E> {
             let len = len_result(SoapySDRDevice_writeStream(
                 self.device.inner.ptr,
                 self.handle,
-                buf_ptrs.as_ptr() as *const *const _,
+                self.buf_ptrs.as_ptr() as *const *const _,
                 num_elems,
                 &mut flags as *mut _,
                 at_ns.unwrap_or(0),
