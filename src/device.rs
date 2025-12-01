@@ -877,6 +877,11 @@ impl Device {
         }
     }
 
+    /// Get the current master clock rate
+    pub fn get_master_clock_rate(&self) -> Result<f64, Error> {
+        unsafe { check_error(SoapySDRDevice_getMasterClockRate(self.inner.ptr)) }
+    }
+
     // TODO: sensors
 
     // TODO: registers
