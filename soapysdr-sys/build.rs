@@ -167,7 +167,7 @@ fn main() {
         .or_else(probe_pothos_sdr)
         .unwrap_or_else(|| panic_help_message_soapysdr());
 
-    if let Err(_) = std::panic::catch_unwind(|| bindgen::clang_version()) {
+    if std::panic::catch_unwind(bindgen::clang_version).is_err() {
         panic_help_message_libclang();
     }
 

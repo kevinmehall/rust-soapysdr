@@ -37,7 +37,7 @@ impl Args {
     /// Be careful that [`SoapySDRKwargs`] is either:
     /// - [`SoapySDRKwargs::keys`] and [`SoapySDRKwargs::vals`] are null and [`SoapySDRKwargs::size`] is 0 or
     /// - [`SoapySDRKwargs::keys`] and [`SoapySDRKwargs::vals`] both point to valid keys and vals of
-    /// [`SoapySDRKwargs::size`] length.
+    ///   [`SoapySDRKwargs::size`] length.
     pub unsafe fn from_raw(a: SoapySDRKwargs) -> Args {
         Args(a)
     }

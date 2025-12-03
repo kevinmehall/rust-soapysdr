@@ -2,7 +2,6 @@ use std::env;
 use std::cmp::min;
 use std::fs::File;
 use std::io::{self, BufReader, BufWriter, Read, Write, ErrorKind};
-use std::i64;
 use std::process;
 use byteorder::{ WriteBytesExt, LittleEndian, ByteOrder };
 use soapysdr::Direction::{Rx, Tx};
