@@ -32,9 +32,7 @@ fn probe_pkg_config() -> Option<Vec<PathBuf>> {
             None
         }
         #[cfg(windows)]
-        Err(_) => {
-            None
-        }
+        Err(_) => None,
         Ok(lib) => Some(lib.include_paths),
     }
 }
@@ -124,7 +122,9 @@ fn panic_help_message_soapysdr() -> ! {
     }
     #[cfg(all(not(target_os = "windows"), not(target_os = "macos")))]
     {
-        panic!("SoapySDR is required but could not be found. Please install SoapySDR and try again.");
+        panic!(
+            "SoapySDR is required but could not be found. Please install SoapySDR and try again."
+        );
     }
 }
 
@@ -157,7 +157,9 @@ fn panic_help_message_libclang() -> ! {
     }
     #[cfg(not(target_os = "windows"))]
     {
-        panic!("libclang is required but could not be found. Please install libclang and try again.");
+        panic!(
+            "libclang is required but could not be found. Please install libclang and try again."
+        );
     }
 }
 
@@ -189,7 +191,8 @@ fn main() {
     // Wrapped by _rust_wrapper_SoapySDRDevice_setupStream for 0.7 -> 0.8 compatibility
     bindgen_builder = bindgen_builder.blocklist_function("SoapySDRDevice_setupStream");
 
-    let bindings = bindgen_builder.generate()
+    let bindings = bindgen_builder
+        .generate()
         .expect("Unable to generate bindings");
 
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());

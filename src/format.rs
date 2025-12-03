@@ -1,7 +1,7 @@
-use std::str::FromStr;
-use std::os::raw::c_char;
 use num_complex::Complex;
 use soapysdr_sys::*;
+use std::os::raw::c_char;
+use std::str::FromStr;
 
 /// Data format of samples
 #[derive(Copy, Clone, Eq, PartialEq, Hash)]
@@ -133,7 +133,7 @@ impl Format {
     /// Get the name of the format
     pub fn as_str(&self) -> &str {
         let s = self.as_str_with_nul();
-        &s[..s.len()-1]
+        &s[..s.len() - 1]
     }
 
     /// Get the size of one sample in this format
@@ -164,23 +164,55 @@ pub unsafe trait StreamSample {
     const STREAM_FORMAT: Format;
 }
 
-unsafe impl StreamSample for u8           { const STREAM_FORMAT: Format = Format::U8; }
-unsafe impl StreamSample for u16          { const STREAM_FORMAT: Format = Format::U16; }
-unsafe impl StreamSample for u32          { const STREAM_FORMAT: Format = Format::U32; }
-unsafe impl StreamSample for i8           { const STREAM_FORMAT: Format = Format::S8; }
-unsafe impl StreamSample for i16          { const STREAM_FORMAT: Format = Format::S16; }
-unsafe impl StreamSample for i32          { const STREAM_FORMAT: Format = Format::S32; }
-unsafe impl StreamSample for f32          { const STREAM_FORMAT: Format = Format::F32; }
-unsafe impl StreamSample for f64          { const STREAM_FORMAT: Format = Format::F64; }
+unsafe impl StreamSample for u8 {
+    const STREAM_FORMAT: Format = Format::U8;
+}
+unsafe impl StreamSample for u16 {
+    const STREAM_FORMAT: Format = Format::U16;
+}
+unsafe impl StreamSample for u32 {
+    const STREAM_FORMAT: Format = Format::U32;
+}
+unsafe impl StreamSample for i8 {
+    const STREAM_FORMAT: Format = Format::S8;
+}
+unsafe impl StreamSample for i16 {
+    const STREAM_FORMAT: Format = Format::S16;
+}
+unsafe impl StreamSample for i32 {
+    const STREAM_FORMAT: Format = Format::S32;
+}
+unsafe impl StreamSample for f32 {
+    const STREAM_FORMAT: Format = Format::F32;
+}
+unsafe impl StreamSample for f64 {
+    const STREAM_FORMAT: Format = Format::F64;
+}
 //unsupported CU4
-unsafe impl StreamSample for Complex<u8>  { const STREAM_FORMAT: Format = Format::CU8; }
+unsafe impl StreamSample for Complex<u8> {
+    const STREAM_FORMAT: Format = Format::CU8;
+}
 //unsupported CU12
-unsafe impl StreamSample for Complex<u16> { const STREAM_FORMAT: Format = Format::CU16; }
-unsafe impl StreamSample for Complex<u32> { const STREAM_FORMAT: Format = Format::CU32; }
+unsafe impl StreamSample for Complex<u16> {
+    const STREAM_FORMAT: Format = Format::CU16;
+}
+unsafe impl StreamSample for Complex<u32> {
+    const STREAM_FORMAT: Format = Format::CU32;
+}
 //unsupported CS4
-unsafe impl StreamSample for Complex<i8>  { const STREAM_FORMAT: Format = Format::CS8; }
+unsafe impl StreamSample for Complex<i8> {
+    const STREAM_FORMAT: Format = Format::CS8;
+}
 //unsupported CS12
-unsafe impl StreamSample for Complex<i16> { const STREAM_FORMAT: Format = Format::CS16; }
-unsafe impl StreamSample for Complex<i32> { const STREAM_FORMAT: Format = Format::CS32; }
-unsafe impl StreamSample for Complex<f32> { const STREAM_FORMAT: Format = Format::CF32; }
-unsafe impl StreamSample for Complex<f64> { const STREAM_FORMAT: Format = Format::CF64; }
+unsafe impl StreamSample for Complex<i16> {
+    const STREAM_FORMAT: Format = Format::CS16;
+}
+unsafe impl StreamSample for Complex<i32> {
+    const STREAM_FORMAT: Format = Format::CS32;
+}
+unsafe impl StreamSample for Complex<f32> {
+    const STREAM_FORMAT: Format = Format::CF32;
+}
+unsafe impl StreamSample for Complex<f64> {
+    const STREAM_FORMAT: Format = Format::CF64;
+}
