@@ -4,7 +4,6 @@ use std::ffi::{CStr, CString};
 use std::marker::PhantomData;
 use std::os::raw::c_void;
 use std::os::raw::{c_char, c_int};
-use std::ptr;
 use std::slice;
 use std::sync::Arc;
 
@@ -506,17 +505,15 @@ impl Device {
         args: A,
     ) -> Result<RxStream<E>, Error> {
         unsafe {
-            let mut stream: *mut SoapySDRStream = ptr::null_mut();
-            check_error(SoapySDRDevice_setupStream(
+            let stream = check_error(SoapySDRDevice_setupStream(
                 self.inner.ptr,
-                &mut stream as *mut _,
                 Direction::Rx.into(),
                 E::STREAM_FORMAT.as_ptr(),
                 channels.as_ptr(),
                 channels.len(),
                 args.into().as_raw_const(),
-            ))
-            .map(|_| RxStream {
+            ))?;
+            Ok(RxStream {
                 device: self.clone(),
                 handle: stream,
                 nchannels: channels.len(),
@@ -541,17 +538,15 @@ impl Device {
         args: A,
     ) -> Result<TxStream<E>, Error> {
         unsafe {
-            let mut stream: *mut SoapySDRStream = ptr::null_mut();
-            check_error(SoapySDRDevice_setupStream(
+            let stream = check_error(SoapySDRDevice_setupStream(
                 self.inner.ptr,
-                &mut stream as *mut _,
                 Direction::Tx.into(),
                 E::STREAM_FORMAT.as_ptr(),
                 channels.as_ptr(),
                 channels.len(),
                 args.into().as_raw_const(),
-            ))
-            .map(|_| TxStream {
+            ))?;
+            Ok(TxStream {
                 device: self.clone(),
                 handle: stream,
                 nchannels: channels.len(),

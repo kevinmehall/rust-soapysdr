@@ -17,7 +17,7 @@ readme = "README.md"
 exclude = ["shell.nix", ".github"]
 
 [dependencies]
-soapysdr-sys = { version = "0.7.5", path = "./soapysdr-sys" }
+soapysdr-sys = { version = "0.8.0", path = "./soapysdr-sys" }
 num-complex = "0.4"
 log = { version = "0.4", optional = true }
 

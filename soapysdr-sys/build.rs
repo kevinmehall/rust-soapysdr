@@ -21,7 +21,7 @@ fn probe_env_var() -> Option<Vec<PathBuf>> {
 
 fn probe_pkg_config() -> Option<Vec<PathBuf>> {
     match pkg_config::Config::new()
-        .atleast_version("0.6.0")
+        .atleast_version("0.8.0")
         .probe("SoapySDR")
     {
         #[cfg(not(windows))]
@@ -186,9 +186,6 @@ fn build_bindgen_bindings(include_paths: &[PathBuf]) {
         bindgen_builder = bindgen_builder.clang_arg("-I".to_owned() + inc_str);
     }
 
-    // Wrapped by _rust_wrapper_SoapySDRDevice_setupStream for 0.7 -> 0.8 compatibility
-    bindgen_builder = bindgen_builder.blocklist_function("SoapySDRDevice_setupStream");
-
     let bindings = bindgen_builder
         .generate()
         .expect("Unable to generate bindings");
@@ -200,6 +197,7 @@ fn build_bindgen_bindings(include_paths: &[PathBuf]) {
 }
 
 fn main() {
+    #[allow(unused_variables)]
     let include_paths = probe_env_var()
         .or_else(probe_pkg_config)
         .or_else(probe_pothos_sdr)
@@ -210,13 +208,4 @@ fn main() {
         not(any(target_os = "windows", target_os = "linux", target_os = "macos"))
     ))]
     build_bindgen_bindings(&include_paths);
-
-    let mut cc_builder = cc::Build::new();
-    cc_builder.file("wrapper.c");
-
-    for inc in include_paths {
-        cc_builder.include(&inc);
-    }
-
-    cc_builder.compile("soapysdr-sys-wrappers");
 }

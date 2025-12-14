@@ -288,6 +288,16 @@ extern "C" {
     ) -> *mut SoapySDRArgInfo;
 }
 extern "C" {
+    pub fn SoapySDRDevice_setupStream(
+        device: *mut SoapySDRDevice,
+        direction: ::std::os::raw::c_int,
+        format: *const ::std::os::raw::c_char,
+        channels: *const usize,
+        numChans: usize,
+        args: *const SoapySDRKwargs,
+    ) -> *mut SoapySDRStream;
+}
+extern "C" {
     #[doc = " Close an open stream created by setupStream\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\return 0 for success or error code on failure"]
     pub fn SoapySDRDevice_closeStream(
         device: *mut SoapySDRDevice,
@@ -1272,15 +1282,4 @@ extern "C" {
 extern "C" {
     #[doc = " Get the library version and build information string.\n The format of the version string is <b>major.minor.patch-buildInfo</b>.\n This function is commonly used to identify the software back-end\n to the user for command-line utilities and graphical applications."]
     pub fn SoapySDR_getLibVersion() -> *const ::std::os::raw::c_char;
-}
-extern "C" {
-    pub fn _rust_wrapper_SoapySDRDevice_setupStream(
-        device: *mut SoapySDRDevice,
-        out_stream: *mut *mut SoapySDRStream,
-        direction: ::std::os::raw::c_int,
-        format: *const ::std::os::raw::c_char,
-        channels: *const usize,
-        numChans: usize,
-        args: *const SoapySDRKwargs,
-    ) -> ::std::os::raw::c_int;
 }

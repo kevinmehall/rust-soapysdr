@@ -8,9 +8,9 @@
 
 This library requires dependencies not handled by Cargo:
 
-  * libsoapysdr 0.6, 0.7, or 0.8
-  * libclang 5.0+ (for bindgen)
-  * pkg-config
+- libsoapysdr 0.8
+- pkg-config
+- libclang 5.0+ (optional, for bindgen)
 
 ### Ubuntu
 
@@ -35,8 +35,8 @@ nix-shell
 
 Install pre-built PothosSDR and LLVM, then
 
-  - Set `LIBCLANG_PATH` environment variable to LLVM bin directory for rust-bindgen
-  - Add PothosSDR bin directory to system `PATH`
+- Set `LIBCLANG_PATH` environment variable to LLVM bin directory for rust-bindgen
+- Add PothosSDR bin directory to system `PATH`
 
 ## Warning
 
@@ -75,8 +75,8 @@ The resulting file contains 32-bit little-endian complex float samples, and can 
 
 Licensed under either of
 
-  - Apache License, Version 2.0, (LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
-  - Boost Software License 1.0, (Same as SoapySDR itself, LICENSE-BSL or http://opensource.org/licenses/BSL-1.0)
+- Apache License, Version 2.0, (LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
+- Boost Software License 1.0, (Same as SoapySDR itself, LICENSE-BSL or http://opensource.org/licenses/BSL-1.0)
 
 ### Contribution
 
