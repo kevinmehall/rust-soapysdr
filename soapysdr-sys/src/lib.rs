@@ -6,13 +6,11 @@
 //! C API. See its [header file](https://github.com/pothosware/SoapySDR/blob/master/include/SoapySDR/Device.h)
 //! for API documentation.
 
+#[cfg(feature = "bindgen")]
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
-#[cfg(all(target_os = "windows", not(feature = "build_bindings")))]
-include!(concat!(env!("OUT_DIR"), "/bindings_windows.rs"));
-#[cfg(all(target_os = "linux", not(feature = "build_bindings")))]
-include!(concat!(env!("OUT_DIR"), "/bindings_linux.rs"));
-#[cfg(all(target_os = "macos", not(feature = "build_bindings")))]
-include!(concat!(env!("OUT_DIR"), "/bindings_macos.rs"));
+
+#[cfg(not(feature = "bindgen"))]
+include!("bindings.rs");
 
 // Compatibility for 0.7 -> 0.8 breaking change
 pub use _rust_wrapper_SoapySDRDevice_setupStream as SoapySDRDevice_setupStream;

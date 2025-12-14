@@ -129,7 +129,7 @@ fn panic_help_message_soapysdr() -> ! {
 }
 
 #[cfg(any(
-    feature = "build_bindings",
+    feature = "bindgen",
     not(all(any(target_os = "windows", target_os = "linux", target_os = "macos")))
 ))]
 fn panic_help_message_libclang() -> ! {
@@ -168,7 +168,7 @@ fn panic_help_message_libclang() -> ! {
 }
 
 #[cfg(any(
-    feature = "build_bindings",
+    feature = "bindgen",
     not(any(target_os = "windows", target_os = "linux", target_os = "macos"))
 ))]
 fn build_bindgen_bindings(include_paths: &[PathBuf]) {
@@ -199,34 +199,6 @@ fn build_bindgen_bindings(include_paths: &[PathBuf]) {
         .expect("Couldn't write bindings!");
 }
 
-#[cfg(not(any(
-    feature = "build_bindings",
-    not(any(target_os = "windows", target_os = "linux", target_os = "macos"))
-)))]
-fn copy_bindgen_bindings() {
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-    std::fs::copy("bindings/bindings.rs", out_path.join("bindings.rs"))
-        .expect("Could not copy bindings");
-    #[cfg(target_os = "windows")]
-    std::fs::copy(
-        "bindings/bindings_windows.rs",
-        out_path.join("bindings_windows.rs"),
-    )
-    .expect("Could not copy bindings");
-    #[cfg(target_os = "linux")]
-    std::fs::copy(
-        "bindings/bindings_linux.rs",
-        out_path.join("bindings_linux.rs"),
-    )
-    .expect("Could not copy bindings");
-    #[cfg(target_os = "macos")]
-    std::fs::copy(
-        "bindings/bindings_macos.rs",
-        out_path.join("bindings_macos.rs"),
-    )
-    .expect("Could not copy bindings");
-}
-
 fn main() {
     let include_paths = probe_env_var()
         .or_else(probe_pkg_config)
@@ -234,15 +206,10 @@ fn main() {
         .unwrap_or_else(|| panic_help_message_soapysdr());
 
     #[cfg(any(
-        feature = "build_bindings",
+        feature = "bindgen",
         not(any(target_os = "windows", target_os = "linux", target_os = "macos"))
     ))]
     build_bindgen_bindings(&include_paths);
-    #[cfg(not(any(
-        feature = "build_bindings",
-        not(any(target_os = "windows", target_os = "linux", target_os = "macos"))
-    )))]
-    copy_bindgen_bindings();
 
     let mut cc_builder = cc::Build::new();
     cc_builder.file("wrapper.c");
