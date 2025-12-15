@@ -40,7 +40,7 @@ pub const SOAPY_SDR_U8: &[u8; 3] = b"U8\0";
 pub const SOAPY_SDR_API_VERSION: u32 = 524288;
 pub const SOAPY_SDR_ABI_VERSION: &[u8; 4] = b"0.8\0";
 
-#[doc = "! Definition for a min/max numeric range"]
+///  Definition for a min/max numeric range
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SoapySDRRange {
@@ -48,7 +48,7 @@ pub struct SoapySDRRange {
     pub maximum: f64,
     pub step: f64,
 }
-#[doc = "! Definition for a key/value string map"]
+/// Definition for a key/value string map
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SoapySDRKwargs {
@@ -57,15 +57,19 @@ pub struct SoapySDRKwargs {
     pub vals: *mut *mut ::std::os::raw::c_char,
 }
 extern "C" {
-    #[doc = " Convert a markup string to a key-value map.\n The markup format is: \"key0=value0, key1=value1\""]
+    /// Convert a markup string to a key-value map.
+    ///
+    /// The markup format is: "key0=value0, key1=value1"
     pub fn SoapySDRKwargs_fromString(markup: *const ::std::os::raw::c_char) -> SoapySDRKwargs;
 }
 extern "C" {
-    #[doc = " Convert a key-value map to a markup string.\n The markup format is: \"key0=value0, key1=value1\""]
+    /// Convert a key-value map to a markup string.
+    ///
+    /// The markup format is: "key0=value0, key1=value1"
     pub fn SoapySDRKwargs_toString(args: *const SoapySDRKwargs) -> *mut ::std::os::raw::c_char;
 }
 
-#[doc = "! Possible data types for argument info"]
+/// Possible data types for argument info
 pub type SoapySDRArgInfoType = ::std::os::raw::c_uint;
 
 pub const SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_BOOL: SoapySDRArgInfoType = 0;
@@ -73,41 +77,58 @@ pub const SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_INT: SoapySDRArgInfoType = 1;
 pub const SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_FLOAT: SoapySDRArgInfoType = 2;
 pub const SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_STRING: SoapySDRArgInfoType = 3;
 
-#[doc = "! Definition for argument info"]
+/// Definition for argument info
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SoapySDRArgInfo {
-    #[doc = "! The key used to identify the argument (required)"]
+    /// The key used to identify the argument (required)
     pub key: *mut ::std::os::raw::c_char,
-    #[doc = " The default value of the argument when not specified (required)\n Numbers should use standard floating point and integer formats.\n Boolean values should be represented as \"true\" and  \"false\"."]
+    /// The default value of the argument when not specified (required)
+    ///
+    /// Numbers should use standard floating point and integer formats.
+    /// Boolean values should be represented as "true" and  "false".
     pub value: *mut ::std::os::raw::c_char,
-    #[doc = "! The displayable name of the argument (optional, use key if empty)"]
+    ///  The displayable name of the argument (optional, use key if empty)
     pub name: *mut ::std::os::raw::c_char,
-    #[doc = "! A brief description about the argument (optional)"]
+    ///  A brief description about the argument (optional)
     pub description: *mut ::std::os::raw::c_char,
-    #[doc = "! The units of the argument: dB, Hz, etc (optional)"]
+    ///  The units of the argument: dB, Hz, etc (optional)
     pub units: *mut ::std::os::raw::c_char,
-    #[doc = "! The data type of the argument (required)"]
+    ///  The data type of the argument (required)
     pub type_: SoapySDRArgInfoType,
-    #[doc = " The range of possible numeric values (optional)\n When specified, the argument should be restricted to this range.\n The range is only applicable to numeric argument types."]
+    /// The range of possible numeric values (optional)
+    /// When specified, the argument should be restricted to this range.
+    /// The range is only applicable to numeric argument types.
     pub range: SoapySDRRange,
-    #[doc = "! The size of the options set, or 0 when not used."]
+    ///  The size of the options set, or 0 when not used.
     pub numOptions: usize,
-    #[doc = " A discrete list of possible values (optional)\n When specified, the argument should be restricted to this options set."]
+    /// A discrete list of possible values (optional)
+    /// When specified, the argument should be restricted to this options set.
     pub options: *mut *mut ::std::os::raw::c_char,
-    #[doc = " A discrete list of displayable names for the enumerated options (optional)\n When not specified, the option value itself can be used as a display name."]
+    /// A discrete list of displayable names for the enumerated options (optional)
+    /// When not specified, the option value itself can be used as a display name.
     pub optionNames: *mut *mut ::std::os::raw::c_char,
 }
 extern "C" {
-    #[doc = " Free a pointer allocated by SoapySDR.\n For most platforms this is a simple call around free()"]
+    /// Free a pointer allocated by SoapySDR.
+    ///
+    /// For most platforms this is a simple call around free()
     pub fn SoapySDR_free(ptr: *mut ::std::os::raw::c_void);
 }
 extern "C" {
-    #[doc = " Clear the contents of a list of string\n Convenience call to deal with results that return a string list."]
+    /// Clear the contents of a list of string
+    ///
+    /// Convenience call to deal with results that return a string list.
     pub fn SoapySDRStrings_clear(elems: *mut *mut *mut ::std::os::raw::c_char, length: usize);
 }
 extern "C" {
-    #[doc = " Set a key/value pair in a kwargs structure.\n \\post\n If the key exists, the existing entry will be modified;\n otherwise a new entry will be appended to args.\n On error, the elements of args will not be modified,\n and args is guaranteed to be in a good state.\n \\return 0 for success, otherwise allocation error"]
+    /// Set a key/value pair in a kwargs structure.
+    ///
+    /// If the key exists, the existing entry will be modified;
+    /// otherwise a new entry will be appended to args.
+    /// On error, the elements of args will not be modified,
+    /// and args is guaranteed to be in a good state.
+    /// \return 0 for success, otherwise allocation error
     pub fn SoapySDRKwargs_set(
         args: *mut SoapySDRKwargs,
         key: *const ::std::os::raw::c_char,
@@ -115,30 +136,44 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get a value given a key in a kwargs structure.\n \\return the string or NULL if not found"]
+    /// Get a value given a key in a kwargs structure.
+    ///
+    /// \return the string or NULL if not found
     pub fn SoapySDRKwargs_get(
         args: *const SoapySDRKwargs,
         key: *const ::std::os::raw::c_char,
     ) -> *const ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Clear the contents of a kwargs structure.\n This frees all the underlying memory and clears the members."]
+    /// Clear the contents of a kwargs structure.
+    ///
+    /// This frees all the underlying memory and clears the members.
     pub fn SoapySDRKwargs_clear(args: *mut SoapySDRKwargs);
 }
 extern "C" {
-    #[doc = " Clear a list of kwargs structures.\n This frees all the underlying memory and clears the members."]
+    /// Clear a list of kwargs structures.
+    ///
+    /// This frees all the underlying memory and clears the members.
     pub fn SoapySDRKwargsList_clear(args: *mut SoapySDRKwargs, length: usize);
 }
 extern "C" {
-    #[doc = " Clear the contents of a argument info structure.\n This frees all the underlying memory and clears the members."]
+    /// Clear the contents of a argument info structure.
+    ///
+    /// This frees all the underlying memory and clears the members.
     pub fn SoapySDRArgInfo_clear(info: *mut SoapySDRArgInfo);
 }
 extern "C" {
-    #[doc = " Clear a list of argument info structures.\n This frees all the underlying memory and clears the members."]
+    /// Clear a list of argument info structures.
+    ///
+    /// This frees all the underlying memory and clears the members.
     pub fn SoapySDRArgInfoList_clear(info: *mut SoapySDRArgInfo, length: usize);
 }
 extern "C" {
-    #[doc = " Convert a error code to a string for printing purposes.\n If the error code is unrecognized, errToStr returns \"UNKNOWN\".\n \\param errorCode a negative integer return code\n \\return a pointer to a string representing the error"]
+    /// Convert a error code to a string for printing purposes.
+    ///
+    /// If the error code is unrecognized, errToStr returns "UNKNOWN".
+    /// \param errorCode a negative integer return code
+    /// \return a pointer to a string representing the error
     pub fn SoapySDR_errToStr(errorCode: ::std::os::raw::c_int) -> *const ::std::os::raw::c_char;
 }
 #[repr(C)]
@@ -152,78 +187,152 @@ pub struct SoapySDRStream {
     _unused: [u8; 0],
 }
 extern "C" {
-    #[doc = " Get the last status code after a Device API call.\n The status code is cleared on entry to each Device call.\n When an device API call throws, the C bindings catch\n the exception, and set a non-zero last status code.\n Use lastStatus() to determine success/failure for\n Device calls without integer status return codes."]
+    /// Get the last status code after a Device API call.
+    ///
+    /// The status code is cleared on entry to each Device call.
+    /// When an device API call throws, the C bindings catch
+    /// the exception, and set a non-zero last status code.
+    /// Use lastStatus() to determine success/failure for
+    /// Device calls without integer status return codes.
     pub fn SoapySDRDevice_lastStatus() -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the last error message after a device call fails.\n When an device API call throws, the C bindings catch\n the exception, store its message in thread-safe storage,\n and return a non-zero status code to indicate failure.\n Use lastError() to access the exception's error message."]
+    /// Get the last error message after a device call fails.
+    ///
+    /// When an device API call throws, the C bindings catch
+    /// the exception, store its message in thread-safe storage,
+    /// and return a non-zero status code to indicate failure.
+    /// Use lastError() to access the exception's error message.
     pub fn SoapySDRDevice_lastError() -> *const ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Enumerate a list of available devices on the system.\n \\param args device construction key/value argument filters\n \\param [out] length the number of elements in the result.\n \\return a list of arguments strings, each unique to a device"]
+    /// Enumerate a list of available devices on the system.
+    ///
+    /// \param args device construction key/value argument filters
+    /// \param [out] length the number of elements in the result.
+    /// \return a list of arguments strings, each unique to a device
     pub fn SoapySDRDevice_enumerate(
         args: *const SoapySDRKwargs,
         length: *mut usize,
     ) -> *mut SoapySDRKwargs;
 }
 extern "C" {
-    #[doc = " Enumerate a list of available devices on the system.\n Markup format for args: \"keyA=valA, keyB=valB\".\n \\param args a markup string of key/value argument filters\n \\param [out] length the number of elements in the result.\n \\return a list of arguments strings, each unique to a device"]
+    /// Enumerate a list of available devices on the system.
+    ///
+    /// Markup format for args: "keyA=valA, keyB=valB".
+    /// \param args a markup string of key/value argument filters
+    /// \param [out] length the number of elements in the result.
+    /// \return a list of arguments strings, each unique to a device
     pub fn SoapySDRDevice_enumerateStrArgs(
         args: *const ::std::os::raw::c_char,
         length: *mut usize,
     ) -> *mut SoapySDRKwargs;
 }
 extern "C" {
-    #[doc = " Make a new Device object given device construction args.\n The device pointer will be stored in a table so subsequent calls\n with the same arguments will produce the same device.\n For every call to make, there should be a matched call to unmake.\n\n \\param args device construction key/value argument map\n \\return a pointer to a new Device object"]
+    /// Make a new Device object given device construction args.
+    ///
+    /// The device pointer will be stored in a table so subsequent calls
+    /// with the same arguments will produce the same device.
+    /// For every call to make, there should be a matched call to unmake.
+    /// \param args device construction key/value argument map
+    /// \return a pointer to a new Device object
     pub fn SoapySDRDevice_make(args: *const SoapySDRKwargs) -> *mut SoapySDRDevice;
 }
 extern "C" {
-    #[doc = " Make a new Device object given device construction args.\n The device pointer will be stored in a table so subsequent calls\n with the same arguments will produce the same device.\n For every call to make, there should be a matched call to unmake.\n\n \\param args a markup string of key/value arguments\n \\return a pointer to a new Device object or null for error"]
+    /// Make a new Device object given device construction args.
+    ///
+    /// The device pointer will be stored in a table so subsequent calls
+    /// with the same arguments will produce the same device.
+    /// For every call to make, there should be a matched call to unmake.
+    /// \param args a markup string of key/value arguments
+    /// \return a pointer to a new Device object or null for error
     pub fn SoapySDRDevice_makeStrArgs(args: *const ::std::os::raw::c_char) -> *mut SoapySDRDevice;
 }
 extern "C" {
-    #[doc = " Unmake or release a device object handle.\n\n \\param device a pointer to a device object\n \\return 0 for success or error code on failure"]
+    /// Unmake or release a device object handle.
+    ///
+    /// \param device a pointer to a device object
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_unmake(device: *mut SoapySDRDevice) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Create a list of devices from a list of construction arguments.\n This is a convenience call to parallelize device construction,\n and is fundamentally a parallel for loop of make(Kwargs).\n\n \\param argsList a list of device arguments per each device\n \\param length the length of the argsList array\n \\return a list of device pointers per each specified argument"]
+    /// Create a list of devices from a list of construction arguments.
+    ///
+    /// This is a convenience call to parallelize device construction,
+    /// and is fundamentally a parallel for loop of make(Kwargs).
+    /// \param argsList a list of device arguments per each device
+    /// \param length the length of the argsList array
+    /// \return a list of device pointers per each specified argument
     pub fn SoapySDRDevice_make_list(
         argsList: *const SoapySDRKwargs,
         length: usize,
     ) -> *mut *mut SoapySDRDevice;
 }
 extern "C" {
-    #[doc = " Create a list of devices from a list of construction arguments.\n This is a convenience call to parallelize device construction,\n and is fundamentally a parallel for loop of makeStrArgs(args).\n\n \\param argsList a list of device arguments per each device\n \\param length the length of the argsList array\n \\return a list of device pointers per each specified argument"]
+    /// Create a list of devices from a list of construction arguments.
+    ///
+    /// This is a convenience call to parallelize device construction,
+    /// and is fundamentally a parallel for loop of makeStrArgs(args).
+    /// \param argsList a list of device arguments per each device
+    /// \param length the length of the argsList array
+    /// \return a list of device pointers per each specified argument
     pub fn SoapySDRDevice_make_listStrArgs(
         argsList: *const *const ::std::os::raw::c_char,
         length: usize,
     ) -> *mut *mut SoapySDRDevice;
 }
 extern "C" {
-    #[doc = " Unmake or release a list of device handles\n and free the devices array memory as well.\n This is a convenience call to parallelize device destruction,\n and is fundamentally a parallel for loop of unmake(Device *).\n\n \\param devices a list of pointers to device objects\n \\param length the length of the devices array\n \\return 0 for success or error code on failure"]
+    /// Unmake or release a list of device handles
+    ///
+    /// and free the devices array memory as well.
+    /// This is a convenience call to parallelize device destruction,
+    /// and is fundamentally a parallel for loop of unmake(Device *).
+    /// \param devices a list of pointers to device objects
+    /// \param length the length of the devices array
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_unmake_list(
         devices: *mut *mut SoapySDRDevice,
         length: usize,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " A key that uniquely identifies the device driver.\n This key identifies the underlying implementation.\n Several variants of a product may share a driver.\n \\param device a pointer to a device instance"]
+    /// A key that uniquely identifies the device driver.
+    ///
+    /// This key identifies the underlying implementation.
+    /// Several variants of a product may share a driver.
+    /// \param device a pointer to a device instance
     pub fn SoapySDRDevice_getDriverKey(
         device: *const SoapySDRDevice,
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " A key that uniquely identifies the hardware.\n This key should be meaningful to the user\n to optimize for the underlying hardware.\n \\param device a pointer to a device instance"]
+    /// A key that uniquely identifies the hardware.
+    ///
+    /// This key should be meaningful to the user
+    /// to optimize for the underlying hardware.
+    /// \param device a pointer to a device instance
     pub fn SoapySDRDevice_getHardwareKey(
         device: *const SoapySDRDevice,
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Query a dictionary of available device information.\n This dictionary can any number of values like\n vendor name, product name, revisions, serials...\n This information can be displayed to the user\n to help identify the instantiated device.\n \\param device a pointer to a device instance"]
+    /// Query a dictionary of available device information.
+    ///
+    /// This dictionary can any number of values like
+    /// vendor name, product name, revisions, serials...
+    /// This information can be displayed to the user
+    /// to help identify the instantiated device.
+    /// \param device a pointer to a device instance
     pub fn SoapySDRDevice_getHardwareInfo(device: *const SoapySDRDevice) -> SoapySDRKwargs;
 }
 extern "C" {
-    #[doc = " Set the frontend mapping of available DSP units to RF frontends.\n This mapping controls channel mapping and channel availability.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param mapping a vendor-specific mapping string\n \\return an error code or 0 for success"]
+    /// Set the frontend mapping of available DSP units to RF frontends.
+    ///
+    /// This mapping controls channel mapping and channel availability.
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param mapping a vendor-specific mapping string
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setFrontendMapping(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -231,21 +340,34 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the mapping configuration string.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\return the vendor-specific mapping string"]
+    /// Get the mapping configuration string.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \return the vendor-specific mapping string
     pub fn SoapySDRDevice_getFrontendMapping(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Get a number of channels given the streaming direction\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\return the number of channels"]
+    /// Get a number of channels given the streaming direction
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \return the number of channels
     pub fn SoapySDRDevice_getNumChannels(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
     ) -> usize;
 }
 extern "C" {
-    #[doc = " Get channel info given the streaming direction\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel the channel number to get info for\n \\return channel information"]
+    /// Get channel info given the streaming direction
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel the channel number to get info for
+    /// \return channel information
     pub fn SoapySDRDevice_getChannelInfo(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -253,7 +375,12 @@ extern "C" {
     ) -> SoapySDRKwargs;
 }
 extern "C" {
-    #[doc = " Find out if the specified channel is full or half duplex.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return true for full duplex, false for half duplex"]
+    /// Find out if the specified channel is full or half duplex.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return true for full duplex, false for half duplex
     pub fn SoapySDRDevice_getFullDuplex(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -261,7 +388,14 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[doc = " Query a list of the available stream formats.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] length the number of format strings\n \\return a list of allowed format strings.\n  See SoapySDRDevice_setupStream() for the format syntax."]
+    /// Query a list of the available stream formats.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] length the number of format strings
+    /// \return a list of allowed format strings.
+    ///  See SoapySDRDevice_setupStream() for the format syntax.
     pub fn SoapySDRDevice_getStreamFormats(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -270,7 +404,15 @@ extern "C" {
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Get the hardware's native stream format for this channel.\n This is the format used by the underlying transport layer,\n and the direct buffer access API calls (when available).\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] fullScale the maximum possible value\n \\return the native stream buffer format string"]
+    /// Get the hardware's native stream format for this channel.
+    ///
+    /// This is the format used by the underlying transport layer,
+    /// and the direct buffer access API calls (when available).
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] fullScale the maximum possible value
+    /// \return the native stream buffer format string
     pub fn SoapySDRDevice_getNativeStreamFormat(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -279,7 +421,13 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Query the argument info description for stream args.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] length the number of argument infos\n \\return a list of argument info structures"]
+    /// Query the argument info description for stream args.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] length the number of argument infos
+    /// \return a list of argument info structures
     pub fn SoapySDRDevice_getStreamArgsInfo(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -287,7 +435,53 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRArgInfo;
 }
+
 extern "C" {
+    /// Initialize a stream given a list of channels and stream arguments.
+    ///
+    /// The implementation may change switches or power-up components.
+    /// All stream API calls should be usable with the new stream object
+    /// after setupStream() is complete, regardless of the activity state.
+    ///
+    /// The API allows any number of simultaneous TX and RX streams, but many dual-channel
+    /// devices are limited to one stream in each direction, using either one or both channels.
+    /// This call will return an error if an unsupported combination is requested,
+    /// or if a requested channel in this direction is already in use by another stream.
+    ///
+    /// When multiple channels are added to a stream, they are typically expected to have
+    /// the same sample rate. See SoapySDRDevice_setSampleRate().
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction (`SOAPY_SDR_RX` or `SOAPY_SDR_TX`)
+    /// \param format A string representing the desired buffer format in `readStream()` / `writeStream()`.
+    ///
+    /// The first character selects the number type:
+    ///   - "C" means complex
+    ///   - "F" means floating point
+    ///   - "S" means signed integer
+    ///   - "U" means unsigned integer
+    ///
+    /// The type character is followed by the number of bits per number (complex is 2x this size per sample)
+    ///
+    ///  Example format strings:
+    ///   - "CF32" -  complex float32 (8 bytes per element)
+    ///   - "CS16" -  complex int16 (4 bytes per element)
+    ///   - "CS12" -  complex int12 (3 bytes per element)
+    ///   - "CS4" -  complex int4 (1 byte per element)
+    ///   - "S32" -  int32 (4 bytes per element)
+    ///   - "U8" -  uint8 (1 byte per element)
+    ///
+    /// \param channels a list of channels or empty for automatic
+    /// \param numChans the number of elements in the channels array
+    /// \param args stream args or empty for defaults.
+    ///
+    /// Recommended keys to use in the args dictionary:
+    ///  - "WIRE" - format of the samples between device and host
+    ///
+    /// \return the stream pointer or nullptr for failure.
+    ///
+    /// The returned stream is not required to have internal locking, and may not be used
+    /// concurrently from multiple threads.
     pub fn SoapySDRDevice_setupStream(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -298,21 +492,48 @@ extern "C" {
     ) -> *mut SoapySDRStream;
 }
 extern "C" {
-    #[doc = " Close an open stream created by setupStream\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\return 0 for success or error code on failure"]
+    /// Close an open stream created by setupStream
+    ///
+    /// \param device a pointer to a device instance
+    /// \param stream the opaque pointer to a stream handle
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_closeStream(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the stream's maximum transmission unit (MTU) in number of elements.\n The MTU specifies the maximum payload transfer in a stream operation.\n This value can be used as a stream buffer allocation size that can\n best optimize throughput given the underlying stream implementation.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\return the MTU in number of stream elements (never zero)"]
+    /// Get the stream's maximum transmission unit (MTU) in number of elements.
+    ///
+    /// The MTU specifies the maximum payload transfer in a stream operation.
+    /// This value can be used as a stream buffer allocation size that can
+    /// best optimize throughput given the underlying stream implementation.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param stream the opaque pointer to a stream handle
+    /// \return the MTU in number of stream elements (never zero)
     pub fn SoapySDRDevice_getStreamMTU(
         device: *const SoapySDRDevice,
         stream: *mut SoapySDRStream,
     ) -> usize;
 }
 extern "C" {
-    #[doc = " Activate a stream.\n Call activate to prepare a stream before using read/write().\n The implementation control switches or stimulate data flow.\n\n The timeNs is only valid when the flags have SOAPY_SDR_HAS_TIME.\n The numElems count can be used to request a finite burst size.\n The SOAPY_SDR_END_BURST flag can signal end on the finite burst.\n Not all implementations will support the full range of options.\n In this case, the implementation returns SOAPY_SDR_NOT_SUPPORTED.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\param flags optional flag indicators about the stream\n \\param timeNs optional activation time in nanoseconds\n \\param numElems optional element count for burst control\n \\return 0 for success or error code on failure"]
+    /// Activate a stream.
+    ///
+    /// Call activate to prepare a stream before using read/write().
+    /// The implementation control switches or stimulate data flow.
+    /// The timeNs is only valid when the flags have SOAPY_SDR_HAS_TIME.
+    /// The numElems count can be used to request a finite burst size.
+    /// The SOAPY_SDR_END_BURST flag can signal end on the finite burst.
+    /// Not all implementations will support the full range of options.
+    /// In this case, the implementation returns SOAPY_SDR_NOT_SUPPORTED.
+    ///
+    /// \param device pointer to a device instance
+    /// \param stream the opaque pointer to a stream handle
+    /// \param flags optional flag indicators about the stream
+    /// \param timeNs optional activation time in nanoseconds
+    /// \param numElems optional element count for burst control
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_activateStream(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
@@ -322,7 +543,19 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Deactivate a stream.\n Call deactivate when not using using read/write().\n The implementation control switches or halt data flow.\n\n The timeNs is only valid when the flags have SOAPY_SDR_HAS_TIME.\n Not all implementations will support the full range of options.\n In this case, the implementation returns SOAPY_SDR_NOT_SUPPORTED.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\param flags optional flag indicators about the stream\n \\param timeNs optional deactivation time in nanoseconds\n \\return 0 for success or error code on failure"]
+    /// Deactivate a stream.
+    ///
+    /// Call deactivate when not using using read/write().
+    /// The implementation control switches or halt data flow.
+    /// The timeNs is only valid when the flags have SOAPY_SDR_HAS_TIME.
+    /// Not all implementations will support the full range of options.
+    /// In this case, the implementation returns SOAPY_SDR_NOT_SUPPORTED.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param stream the opaque pointer to a stream handle
+    /// \param flags optional flag indicators about the stream
+    /// \param timeNs optional deactivation time in nanoseconds
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_deactivateStream(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
@@ -331,7 +564,25 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Read elements from a stream for reception.\n This is a multi-channel call, and buffs should be an array of void *,\n where each pointer will be filled with data from a different channel.\n\n **Client code compatibility:**\n The readStream() call should be well defined at all times,\n including prior to activation and after deactivation.\n When inactive, readStream() should implement the timeout\n specified by the caller and return SOAPY_SDR_TIMEOUT.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\param buffs an array of void* buffers num chans in size\n \\param numElems the number of elements in each buffer\n \\param [out] flags optional flag indicators about the result\n \\param [out] timeNs the buffer's timestamp in nanoseconds\n \\param timeoutUs the timeout in microseconds\n \\return the number of elements read per buffer or error code"]
+    /// Read elements from a stream for reception.
+    ///
+    /// This is a multi-channel call, and buffs should be an array of void *,
+    /// where each pointer will be filled with data from a different channel.
+    ///
+    /// **Client code compatibility:**
+    /// The readStream() call should be well defined at all times,
+    /// including prior to activation and after deactivation.
+    /// When inactive, readStream() should implement the timeout
+    /// specified by the caller and return SOAPY_SDR_TIMEOUT.
+    ///
+    /// \param device a pointer to a device instae
+    /// \param stream the opaque pointer to a stream handle
+    /// \param buffs an array of void* buffers num chans in size
+    /// \param numElems the number of elements in each buffer
+    /// \param [out] flags optional flag indicators about the result
+    /// \param [out] timeNs the buffer's timestamp in nanoseconds
+    /// \param timeoutUs the timeout in microseconds
+    /// \return the number of elements read per buffer or error code
     pub fn SoapySDRDevice_readStream(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
@@ -343,7 +594,25 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Write elements to a stream for transmission.\n This is a multi-channel call, and buffs should be an array of void *,\n where each pointer will be filled with data for a different channel.\n\n **Client code compatibility:**\n Client code relies on writeStream() for proper back-pressure.\n The writeStream() implementation must enforce the timeout\n such that the call blocks until space becomes available\n or timeout expiration.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\param buffs an array of void* buffers num chans in size\n \\param numElems the number of elements in each buffer\n \\param [in,out] flags optional input flags and output flags\n \\param timeNs the buffer's timestamp in nanoseconds\n \\param timeoutUs the timeout in microseconds\n \\return the number of elements written per buffer or error"]
+    /// Write elements to a stream for transmission.
+    ///
+    /// This is a multi-channel call, and buffs should be an array of void *,
+    /// where each pointer will be filled with data for a different channel.
+    ///
+    /// **Client code compatibility:**
+    /// Client code relies on writeStream() for proper back-pressure.
+    /// The writeStream() implementation must enforce the timeout
+    /// such that the call blocks until space becomes available
+    /// or timeout expiration.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param stream t opaque pointer to a stream handle
+    /// \param buffs an array of void* buffers num chans in size
+    /// \param numElems the number of elements in each buffer
+    /// \param [in,out] flags optional input flags and output flags
+    /// \param timeNs the buffer's timestamp in nanoseconds
+    /// \param timeoutUs the timeout in microseconds
+    /// \return the number of elements written per buffer or error
     pub fn SoapySDRDevice_writeStream(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
@@ -355,7 +624,24 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Readback status information about a stream.\n This call is typically used on a transmit stream\n to report time errors, underflows, and burst completion.\n\n **Client code compatibility:**\n Client code may continually poll readStreamStatus() in a loop.\n Implementations of readStreamStatus() should wait in the call\n for a status change event or until the timeout expiration.\n When stream status is not implemented on a particular stream,\n readStreamStatus() should return SOAPY_SDR_NOT_SUPPORTED.\n Client code may use this indication to disable a polling loop.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\param chanMask to which channels this status applies\n \\param flags optional input flags and output flags\n \\param timeNs the buffer's timestamp in nanoseconds\n \\param timeoutUs the timeout in microseconds\n \\return 0 for success or error code like timeout"]
+    /// Readback status information about a stream.
+    ///
+    /// This call is typically used on a transmit stream
+    /// to report time errors, underflows, and burst completion.
+    /// **Client code compatibility:**
+    /// Client code may continually poll readStreamStatus() in a loop.
+    /// Implementations of readStreamStatus() should wait in the call
+    /// for a status change event or until the timeout expiration.
+    /// When stream status is not implemented on a particular stream,
+    /// readStreamStatus() should return SOAPY_SDR_NOT_SUPPORT.
+    /// Client code may use this indication to disable a polling loop.
+    /// \param device a pointer to a device instance
+    /// \param stream the opaque pointer to a stream handle
+    /// \param chanMask to which channels this status applies
+    /// \param flags optional input flags and output flags
+    /// \param timeNs the buffer's timestamp in nanoseconds
+    /// \param timeoutUs the timeout in microseconds
+    /// \return 0 for success or error code like timeout
     pub fn SoapySDRDevice_readStreamStatus(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
@@ -366,14 +652,31 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " How many direct access buffers can the stream provide?\n This is the number of times the user can call acquire()\n on a stream without making subsequent calls to release().\n A return value of 0 means that direct access is not supported.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\return the number of direct access buffers or 0"]
+    /// How many direct access buffers can the stream provide?
+    ///
+    /// This is the number of times the user can call acquire()
+    /// on a stream without making subsequent calls to release().
+    /// A return value of 0 means that direct access is not supported.
+    /// \param device a pointer to a device instance
+    /// \param stream the opaque pointer to a stream handle
+    /// \return the number of direct access buffers or 0
     pub fn SoapySDRDevice_getNumDirectAccessBuffers(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
     ) -> usize;
 }
 extern "C" {
-    #[doc = " Get the buffer addresses for a scatter/gather table entry.\n When the underlying DMA implementation uses scatter/gather\n then this call provides the user addresses for that table.\n\n Example: The caller may query the DMA memory addresses once\n after stream creation to pre-allocate a re-usable ring-buffer.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\param handle an index value between 0 and num direct buffers - 1\n \\param buffs an array of void* buffers num chans in size\n \\return 0 for success or error code when not supported"]
+    /// Get the buffer addresses for a scatter/gather table entry.
+    ///
+    /// When the underlying DMA implementation uses scatter/gather
+    /// then this call provides the user addresses for that table.
+    /// Example: The caller may query the DMA memory addresses once
+    /// after stream creation to pre-allocate a re-usable ring-buffer.
+    /// \param device a pointer to a device instance
+    /// \param stream the opaque pointer to a stream handle
+    /// \param handle an index value between 0 and num direct buffers - 1
+    /// \param buffs  array of void* buffers num chans in size
+    /// \return 0 for success or error code when not supported
     pub fn SoapySDRDevice_getDirectAccessBufferAddrs(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
@@ -382,7 +685,23 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Acquire direct buffers from a receive stream.\n This call is part of the direct buffer access API.\n\n The buffs array will be filled with a stream pointer for each channel.\n Each pointer can be read up to the number of return value elements.\n\n The handle will be set by the implementation so that the caller\n may later release access to the buffers with releaseReadBuffer().\n Handle represents an index into the internal scatter/gather table\n such that handle is between 0 and num direct buffers - 1.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\param handle an index value used in the release() call\n \\param buffs an array of void* buffers num chans in size\n \\param flags optional flag indicators about the result\n \\param timeNs the buffer's timestamp in nanoseconds\n \\param timeoutUs the timeout in microseconds\n \\return the number of elements read per buffer or error code"]
+    /// Acquire direct buffers from a receive stream.
+    ///
+    /// This call is part of the direct buffer access API.
+    /// The buffs array will be filled with a stream pointer for each channel.
+    /// Each pointer can be read up to the number of return value elements.
+    /// The handle will be set by the implementation so that the caller
+    /// may later release access to the buffers with releaseReadBuffer().
+    /// Handle represents an index into the internal scatter/gather table
+    /// such that handle is between 0 and num direct buffe - 1.
+    /// \param device a pointer to a device instance
+    /// \param stream the opaque pointer to a stream handle
+    /// \param handle an index value used in the release() call
+    /// \param buffs an array of void* buffers num chans in size
+    /// \param flags optional flag indicators about the result
+    /// \param timeNs the buffer's timestamp in nanoseconds
+    /// \param timeoutUs the timeout in microseconds
+    /// \return the number of elements read per buffer or error code
     pub fn SoapySDRDevice_acquireReadBuffer(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
@@ -394,7 +713,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Release an acquired buffer back to the receive stream.\n This call is part of the direct buffer access API.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\param handle the opaque handle from the acquire() call"]
+    /// Release an acquired buffer back to the receive stream.
+    ///
+    /// This call is part of the direct buffer access API.
+    /// \param device a pointer to a device instance
+    /// \param stream the opaque pointer to a stream handle
+    /// \param handle the opaque handle from the acquire() call
     pub fn SoapySDRDevice_releaseReadBuffer(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
@@ -402,7 +726,21 @@ extern "C" {
     );
 }
 extern "C" {
-    #[doc = " Acquire direct buffers from a transmit stream.\n This call is part of the direct buffer access API.\n\n The buffs array will be filled with a stream pointer for each channel.\n Each pointer can be written up to the number of return value elements.\n\n The handle will be set by the implementation so that the caller\n may later release access to the buffers with releaseWriteBuffer().\n Handle represents an index into the internal scatter/gather table\n such that handle is between 0 and num direct buffers - 1.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\param handle an index value used in the release() call\n \\param buffs an array of void* buffers num chans in size\n \\param timeoutUs the timeout in microseconds\n \\return the number of available elements per buffer or error"]
+    /// Acquire direct buffers from a transmit stream.
+    ///
+    /// This call is part of the direct buffer access API.
+    /// The buffs array will be filled with a stream pointer for each channel.
+    /// Each pointer can be written up to the number of return value elements.
+    /// The handle will be set by the implementation so that the caller
+    /// may later release access to the buffers with releaseWriteBuffer().
+    /// Handle represents an index into the internal scatter/gather table
+    /// such that handle is between 0 and num dire buffers - 1.
+    /// \param device a pointer to a device instance
+    /// \param stream the opaque pointer to a stream handle
+    /// \param handle an index value used in the release() call
+    /// \param buffs an array of void* buffers num chans in size
+    /// \param timeoutUs the timeout in microseconds
+    /// \return the number of available elements per buffer or error
     pub fn SoapySDRDevice_acquireWriteBuffer(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
@@ -412,7 +750,19 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Release an acquired buffer back to the transmit stream.\n This call is part of the direct buffer access API.\n\n Stream meta-data is provided as part of the release call,\n and not the acquire call so that the caller may acquire\n buffers without committing to the contents of the meta-data,\n which can be determined by the user as the buffers are filled.\n\n \\param device a pointer to a device instance\n \\param stream the opaque pointer to a stream handle\n \\param handle the opaque handle from the acquire() call\n \\param numElems the number of elements written to each buffer\n \\param flags optional input flags and output flags\n \\param timeNs the buffer's timestamp in nanoseconds"]
+    /// Release an acquired buffer back to the transmit stream.
+    ///
+    /// This call is part of the direct buffer access API.
+    /// Stream meta-data is provided as part of the release call,
+    /// and not the acquire call so that the caller may acquire
+    /// buffers without committing to the contents of the meta-data,
+    /// which can be determined by the user as the buffers are filled.
+    /// \param device a pointer to a device instance
+    /// \param stream the opaque pointer to a stream handle
+    /// \param handle the opaque handle fr the acquire() call
+    /// \param numElems the number of elements written to each buffer
+    /// \param flags optional input flags and output flags
+    /// \param timeNs the buffer's timestamp in nanoseconds
     pub fn SoapySDRDevice_releaseWriteBuffer(
         device: *mut SoapySDRDevice,
         stream: *mut SoapySDRStream,
@@ -423,7 +773,13 @@ extern "C" {
     );
 }
 extern "C" {
-    #[doc = " Get a list of available antennas to select on a given chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] length the number of antenna names\n \\return a list of available antenna names"]
+    /// Get a list of available antennas to select on a given chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] length the number of antenna names
+    /// \return a list of available antenna names
     pub fn SoapySDRDevice_listAntennas(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -432,7 +788,13 @@ extern "C" {
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Set the selected antenna on a chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param name the name of an available antenna\n \\return an error code or 0 for success"]
+    /// Set the selected antenna on a chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param name the name of an available antenna
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setAntenna(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -441,7 +803,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the selected antenna on a chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return the name of an available antenna"]
+    /// Get the selected antenna on a chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return the name of an available antenna
     pub fn SoapySDRDevice_getAntenna(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -449,7 +816,12 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Does the device support automatic DC offset corrections?\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return true if automatic corrections are supported"]
+    /// Does the device support automatic DC offset corrections?
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return true if automatic corrections are supported
     pub fn SoapySDRDevice_hasDCOffsetMode(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -457,7 +829,13 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[doc = " Set the automatic DC offset corrections mode.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param automatic true for automatic offset correction\n \\return an error code or 0 for success"]
+    /// Set the automatic DC offset corrections mode.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param automatic true for automatic offset correction
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setDCOffsetMode(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -466,7 +844,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the automatic DC offset corrections mode.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return true for automatic offset correction"]
+    /// Get the automatic DC offset corrections mode.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return true for automatic offset correction
     pub fn SoapySDRDevice_getDCOffsetMode(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -474,7 +857,12 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[doc = " Does the device support frontend DC offset correction?\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return true if DC offset corrections are supported"]
+    /// Does the device support frontend DC offset correction?
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return true if DC offset corrections are supported
     pub fn SoapySDRDevice_hasDCOffset(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -482,7 +870,14 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[doc = " Set the frontend DC offset correction.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param offsetI the relative correction (1.0 max)\n \\param offsetQ the relative correction (1.0 max)\n \\return an error code or 0 for success"]
+    /// Set the frontend DC offset correction.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param offsetI the relative correction (1.0 max)
+    /// \param offsetQ the relative correction (1.0 max)
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setDCOffset(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -492,7 +887,14 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the frontend DC offset correction.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] offsetI the relative correction (1.0 max)\n \\param [out] offsetQ the relative correction (1.0 max)\n \\return 0 for success or error code on failure"]
+    /// Get the frontend DC offset correction.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] offsetI the relative correction (1.0 max)
+    /// \param [out] offsetQ the relative correction (1.0 max)
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_getDCOffset(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -502,7 +904,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Does the device support frontend IQ balance correction?\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return true if IQ balance corrections are supported"]
+    /// Does the device support frontend IQ balance correction?
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return true if IQ balance corrections are supported
     pub fn SoapySDRDevice_hasIQBalance(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -510,7 +917,14 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[doc = " Set the frontend IQ balance correction.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param balanceI the relative correction (1.0 max)\n \\param balanceQ the relative correction (1.0 max)\n \\return an error code or 0 for success"]
+    /// Set the frontend IQ balance correction.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param balanceI the relative correction (1.0 max)
+    /// \param balanceQ the relative correction (1.0 max)
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setIQBalance(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -520,7 +934,14 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the frontend IQ balance correction.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] balanceI the relative correction (1.0 max)\n \\param [out] balanceQ the relative correction (1.0 max)\n \\return 0 for success or error code on failure"]
+    /// Get the frontend IQ balance correction.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] balanceI the relative correction (1.0 max)
+    /// \param [out] balanceQ the relative correction (1.0 max)
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_getIQBalance(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -530,7 +951,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Does the device support automatic frontend IQ balance correction?\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return true if automatic IQ balance corrections are supported"]
+    /// Does the device support automatic frontend IQ balance correction?
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return true if automatic IQ balance corrections are supported
     pub fn SoapySDRDevice_hasIQBalanceMode(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -538,7 +964,13 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[doc = " Set the automatic frontend IQ balance correction.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param automatic true for automatic correction\n \\return 0 for success or error code on failure"]
+    /// Set the automatic frontend IQ balance correction.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param automatic true for automatic correction
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_setIQBalanceMode(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -547,7 +979,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the automatic frontend IQ balance corrections mode.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return true for automatic correction"]
+    /// Get the automatic frontend IQ balance corrections mode.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return true for automatic correction
     pub fn SoapySDRDevice_getIQBalanceMode(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -555,7 +992,12 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[doc = " Does the device support frontend frequency correction?\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return true if frequency corrections are supported"]
+    /// Does the device support frontend frequency correction?
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return true if frequency corrections are supported
     pub fn SoapySDRDevice_hasFrequencyCorrection(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -563,7 +1005,13 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[doc = " Fine tune the frontend frequency correction.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param value the correction in PPM\n \\return an error code or 0 for success"]
+    /// Fine tune the frontend frequency correction.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param value the correction in PPM
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setFrequencyCorrection(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -572,7 +1020,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the frontend frequency correction value.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return the correction value in PPM"]
+    /// Get the frontend frequency correction value.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return the correction value in PPM
     pub fn SoapySDRDevice_getFrequencyCorrection(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -580,7 +1033,14 @@ extern "C" {
     ) -> f64;
 }
 extern "C" {
-    #[doc = " List available amplification elements.\n Elements should be in order RF to baseband.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel\n \\param [out] length the number of gain names\n \\return a list of gain string names"]
+    /// List available amplification elements.
+    ///
+    /// Elements should be in order RF to baseband.
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel
+    /// \param [out] length the number of gain names
+    /// \return a list of gain string names
     pub fn SoapySDRDevice_listGains(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -589,7 +1049,12 @@ extern "C" {
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Does the device support automatic gain control?\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return true for automatic gain control"]
+    /// Does the device support automatic gain control?
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return true for automatic gain control
     pub fn SoapySDRDevice_hasGainMode(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -597,7 +1062,13 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[doc = " Set the automatic gain mode on the chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param automatic true for automatic gain setting\n \\return an error code or 0 for success"]
+    /// Set the automatic gain mode on the chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param automatic true for automatic gain setting
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setGainMode(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -606,7 +1077,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the automatic gain mode on the chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return true for automatic gain setting"]
+    /// Get the automatic gain mode on the chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return true for automatic gain setting
     pub fn SoapySDRDevice_getGainMode(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -614,7 +1090,14 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[doc = " Set the overall amplification in a chain.\n The gain will be distributed automatically across available element.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param value the new amplification value in dB\n \\return an error code or 0 for success"]
+    /// Set the overall amplification in a chain.
+    ///
+    /// The gain will be distributed automatically across available element.
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param value the new amplification value in dB
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setGain(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -623,7 +1106,14 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Set the value of a amplification element in a chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param name the name of an amplification element\n \\param value the new amplification value in dB\n \\return an error code or 0 for success"]
+    /// Set the value of a amplification element in a chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param name the name of an amplification element
+    /// \param value the new amplification value in dB
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setGainElement(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -633,7 +1123,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the overall value of the gain elements in a chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return the value of the gain in dB"]
+    /// Get the overall value of the gain elements in a chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return the value of the gain in dB
     pub fn SoapySDRDevice_getGain(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -641,7 +1136,13 @@ extern "C" {
     ) -> f64;
 }
 extern "C" {
-    #[doc = " Get the value of an individual amplification element in a chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param name the name of an amplification element\n \\return the value of the gain in dB"]
+    /// Get the value of an individual amplification element in a chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param name the name of an amplification element
+    /// \return the value of the gain in dB
     pub fn SoapySDRDevice_getGainElement(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -650,7 +1151,12 @@ extern "C" {
     ) -> f64;
 }
 extern "C" {
-    #[doc = " Get the overall range of possible gain values.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return the range of possible gain values for this channel in dB"]
+    /// Get the overall range of possible gain values.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return the range of possible gain values for this channel in dB
     pub fn SoapySDRDevice_getGainRange(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -658,7 +1164,13 @@ extern "C" {
     ) -> SoapySDRRange;
 }
 extern "C" {
-    #[doc = " Get the range of possible gain values for a specific element.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param name the name of an amplification element\n \\return the range of possible gain values for the specified amplification element in dB"]
+    /// Get the range of possible gain values for a specific element.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param name the name of an amplification element
+    /// \return the range of possible gain values for the specified amplification element in dB
     pub fn SoapySDRDevice_getGainElementRange(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -667,7 +1179,32 @@ extern "C" {
     ) -> SoapySDRRange;
 }
 extern "C" {
-    #[doc = " Set the center frequency of the chain.\n  - For RX, this specifies the down-conversion frequency.\n  - For TX, this specifies the up-conversion frequency.\n\n The default implementation of setFrequency() will tune the \"RF\"\n component as close as possible to the requested center frequency.\n Tuning inaccuracies will be compensated for with the \"BB\" component.\n\n The args can be used to augment the tuning algorithm.\n  - Use \"OFFSET\" to specify an \"RF\" tuning offset,\n    usually with the intention of moving the LO out of the passband.\n    The offset will be compensated for using the \"BB\" component.\n  - Use the name of a component for the key and a frequency in Hz\n    as the value (any format) to enforce a specific frequency.\n    The other components will be tuned with compensation\n    to achieve the specified overall frequency.\n  - Use the name of a component for the key and the value \"IGNORE\"\n    so that the tuning algorithm will avoid altering the component.\n  - Vendor specific implementations can also use the same args to augment\n    tuning in other ways such as specifying fractional vs integer N tuning.\n\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param frequency the center frequency in Hz\n \\param args optional tuner arguments\n \\return an error code or 0 for success"]
+    /// Set the center frequency of the chain.
+    ///
+    ///  - For RX, this specifies the down-conversion frequency.
+    ///  - For TX, this specifies the up-conversion frequency.
+    /// The default implementation of setFrequency() will tune the "RF"
+    /// component as close as possible to the requested center frequency.
+    /// Tuning inaccuracies will be compensated for with the "BB" component.
+    /// The args can be used to augment the tuning algorithm.
+    ///  - Use "OFFSET" to specify an "RF" tuning offset,
+    ///    usually with t intention of moving the LO out of the passband.
+    ///     The offset will be compensated for using the "BB" component.
+    ///   - Use the name of a component for the key and a frequency in Hz
+    ///     as the value (any format) to enforce a specific frequency.
+    ///     The other components will be tuned with compensation
+    ///     to achieve the specified overall frequency.
+    ///   - Use the name of a component for the key and the value "IGNORE"
+    ///     so that the tuning algorithm will avoid altering the component.
+    ///   - Vendor specific implementations can also use the same args to augment
+    ///     tuning in other ways such as specifying fractional vs integer N tuning.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param frequency the center frequency in Hz
+    /// \param args optional tuner arguments
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setFrequency(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -677,7 +1214,21 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Tune the center frequency of the specified element.\n  - For RX, this specifies the down-conversion frequency.\n  - For TX, this specifies the up-conversion frequency.\n\n Recommended names used to represent tunable components:\n  - \"CORR\" - freq error correction in PPM\n  - \"RF\" - frequency of the RF frontend\n  - \"BB\" - frequency of the baseband DSP\n\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param name the name of a tunable element\n \\param frequency the center frequency in Hz\n \\param args optional tuner arguments\n \\return an error code or 0 for success"]
+    /// Tune the center frequency of the specified element.
+    ///
+    ///  - For RX, this specifies the down-conversion frequency.
+    ///  - For TX, this specifies the up-conversion frequency.
+    /// Recommended names used to represent tunable components:
+    ///  - "CORR" - freq error correction in PPM
+    ///  - "RF" - frequency of the RF frontend
+    ///  - "BB" - frequency of the baseband DSP
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel  the device
+    /// \param name the name of a tunable element
+    /// \param frequency the center frequency in Hz
+    /// \param args optional tuner arguments
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setFrequencyComponent(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -688,7 +1239,14 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the overall center frequency of the chain.\n  - For RX, this specifies the down-conversion frequency.\n  - For TX, this specifies the up-conversion frequency.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return the center frequency in Hz"]
+    /// Get the overall center frequency of the chain.
+    ///
+    ///  - For RX, this specifies the down-conversion frequency.
+    ///  - For TX, this specifies the up-conversion frequency.
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return the center frequency in Hz
     pub fn SoapySDRDevice_getFrequency(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -696,7 +1254,13 @@ extern "C" {
     ) -> f64;
 }
 extern "C" {
-    #[doc = " Get the frequency of a tunable element in the chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param name the name of a tunable element\n \\return the tunable element's frequency in Hz"]
+    /// Get the frequency of a tunable element in the chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param name the name of a tunable element
+    /// \return the tunable element's frequency in Hz
     pub fn SoapySDRDevice_getFrequencyComponent(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -705,7 +1269,14 @@ extern "C" {
     ) -> f64;
 }
 extern "C" {
-    #[doc = " List available tunable elements in the chain.\n Elements should be in order RF to baseband.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel\n \\param [out] length the number names\n \\return a list of tunable elements by name"]
+    /// List available tunable elements in the chain.
+    ///
+    /// Elements should be in order RF to baseband.
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel
+    /// \param [out] length the number names
+    /// \return a list of tunable elements by name
     pub fn SoapySDRDevice_listFrequencies(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -714,7 +1285,13 @@ extern "C" {
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Get the range of overall frequency values.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] length the number of ranges\n \\return a list of frequency ranges in Hz"]
+    /// Get the range of overall frequency values.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] length the number of ranges
+    /// \return a list of frequency ranges in Hz
     pub fn SoapySDRDevice_getFrequencyRange(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -723,7 +1300,14 @@ extern "C" {
     ) -> *mut SoapySDRRange;
 }
 extern "C" {
-    #[doc = " Get the range of tunable values for the specified element.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param name the name of a tunable element\n \\param [out] length the number of ranges\n \\return a list of frequency ranges in Hz"]
+    /// Get the range of tunable values for the specified element.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param name the name of a tunable element
+    /// \param [out] length the number of ranges
+    /// \return a list of frequency ranges in Hz
     pub fn SoapySDRDevice_getFrequencyRangeComponent(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -733,7 +1317,13 @@ extern "C" {
     ) -> *mut SoapySDRRange;
 }
 extern "C" {
-    #[doc = " Query the argument info description for tune args.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] length the number of argument infos\n \\return a list of argument info structures"]
+    /// Query the argument info description for tune args.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] length the number of argument infos
+    /// \return a list of argument info structures
     pub fn SoapySDRDevice_getFrequencyArgsInfo(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -742,7 +1332,13 @@ extern "C" {
     ) -> *mut SoapySDRArgInfo;
 }
 extern "C" {
-    #[doc = " Set the baseband sample rate of the chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param rate the sample rate in samples per second\n \\return an error code or 0 for success"]
+    /// Set the baseband sample rate of the chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param rate the sample rate in samples per second
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setSampleRate(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -751,7 +1347,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the baseband sample rate of the chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return the sample rate in samples per second"]
+    /// Get the baseband sample rate of the chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return the sample rate in samples per second
     pub fn SoapySDRDevice_getSampleRate(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -759,7 +1360,14 @@ extern "C" {
     ) -> f64;
 }
 extern "C" {
-    #[doc = " Get the range of possible baseband sample rates.\n \\deprecated replaced by getSampleRateRange()\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] length the number of sample rates\n \\return a list of possible rates in samples per second"]
+    /// Get the range of possible baseband sample rates.
+    ///
+    /// \deprecated replaced by getSampleRateRange()
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] length the number of sample rates
+    /// \return a list of possible rates in samples per second
     pub fn SoapySDRDevice_listSampleRates(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -768,7 +1376,13 @@ extern "C" {
     ) -> *mut f64;
 }
 extern "C" {
-    #[doc = " Get the range of possible baseband sample rates.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] length the number of sample rates\n \\return a list of sample rate ranges in samples per second"]
+    /// Get the range of possible baseband sample rates.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] length the number of sample rates
+    /// \return a list of sample rate ranges in samples per second
     pub fn SoapySDRDevice_getSampleRateRange(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -777,7 +1391,13 @@ extern "C" {
     ) -> *mut SoapySDRRange;
 }
 extern "C" {
-    #[doc = " Set the baseband filter width of the chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param bw the baseband filter width in Hz\n \\return an error code or 0 for success"]
+    /// Set the baseband filter width of the chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param bw the baseband filter width in Hz
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setBandwidth(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -786,7 +1406,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the baseband filter width of the chain.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\return the baseband filter width in Hz"]
+    /// Get the baseband filter width of the chain.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \return the baseband filter width in Hz
     pub fn SoapySDRDevice_getBandwidth(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -794,7 +1419,14 @@ extern "C" {
     ) -> f64;
 }
 extern "C" {
-    #[doc = " Get the range of possible baseband filter widths.\n \\deprecated replaced by getBandwidthRange()\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] length the number of bandwidths\n \\return a list of possible bandwidths in Hz"]
+    /// Get the range of possible baseband filter widths.
+    ///
+    /// \deprecated replaced by getBandwidthRange()
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] length the number of bandwidths
+    /// \return a list of possible bandwidths in Hz
     pub fn SoapySDRDevice_listBandwidths(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -803,7 +1435,13 @@ extern "C" {
     ) -> *mut f64;
 }
 extern "C" {
-    #[doc = " Get the range of possible baseband filter widths.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] length the number of ranges\n \\return a list of bandwidth ranges in Hz"]
+    /// Get the range of possible baseband filter widths.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] length the number of ranges
+    /// \return a list of bandwidth ranges in Hz
     pub fn SoapySDRDevice_getBandwidthRange(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -812,97 +1450,156 @@ extern "C" {
     ) -> *mut SoapySDRRange;
 }
 extern "C" {
-    #[doc = " Set the master clock rate of the device.\n \\param device a pointer to a device instance\n \\param rate the clock rate in Hz\n \\return an error code or 0 for success"]
+    /// Set the master clock rate of the device.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param rate the clock rate in Hz
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setMasterClockRate(
         device: *mut SoapySDRDevice,
         rate: f64,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the master clock rate of the device.\n \\param device a pointer to a device instance\n \\return the clock rate in Hz"]
+    /// Get the master clock rate of the device.
+    ///
+    /// \param device a pointer to a device instance
+    /// \return the clock rate in Hz
     pub fn SoapySDRDevice_getMasterClockRate(device: *const SoapySDRDevice) -> f64;
 }
 extern "C" {
-    #[doc = " Get the range of available master clock rates.\n \\param device a pointer to a device instance\n \\param [out] length the number of ranges\n \\return a list of clock rate ranges in Hz"]
+    /// Get the range of available master clock rates.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param [out] length the number of ranges
+    /// \return a list of clock rate ranges in Hz
     pub fn SoapySDRDevice_getMasterClockRates(
         device: *const SoapySDRDevice,
         length: *mut usize,
     ) -> *mut SoapySDRRange;
 }
 extern "C" {
-    #[doc = " Set the reference clock rate of the device.\n \\param device a pointer to a device instance\n \\param rate the clock rate in Hz\n \\return an error code or 0 for success"]
+    /// Set the reference clock rate of the device.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param rate the clock rate in Hz
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setReferenceClockRate(
         device: *mut SoapySDRDevice,
         rate: f64,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the reference clock rate of the device.\n \\param device a pointer to a device instance\n \\return the clock rate in Hz"]
+    /// Get the reference clock rate of the device.
+    ///
+    /// \param device a pointer to a device instance
+    /// \return the clock rate in Hz
     pub fn SoapySDRDevice_getReferenceClockRate(device: *const SoapySDRDevice) -> f64;
 }
 extern "C" {
-    #[doc = " Get the range of available reference clock rates.\n \\param device a pointer to a device instance\n \\param [out] length the number of sources\n \\return a list of clock rate ranges in Hz"]
+    /// Get the range of available reference clock rates.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param [out] length the number of sources
+    /// \return a list of clock rate ranges in Hz
     pub fn SoapySDRDevice_getReferenceClockRates(
         device: *const SoapySDRDevice,
         length: *mut usize,
     ) -> *mut SoapySDRRange;
 }
 extern "C" {
-    #[doc = " Get the list of available clock sources.\n \\param device a pointer to a device instance\n \\param [out] length the number of sources\n \\return a list of clock source names"]
+    /// Get the list of available clock sources.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param [out] length the number of sources
+    /// \return a list of clock source names
     pub fn SoapySDRDevice_listClockSources(
         device: *const SoapySDRDevice,
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Set the clock source on the device\n \\param device a pointer to a device instance\n \\param source the name of a clock source\n \\return an error code or 0 for success"]
+    /// Set the clock source on the device
+    ///
+    /// \param device a pointer to a device instance
+    /// \param source the name of a clock source
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setClockSource(
         device: *mut SoapySDRDevice,
         source: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the clock source of the device\n \\param device a pointer to a device instance\n \\return the name of a clock source"]
+    /// Get the clock source of the device
+    ///
+    /// \param device a pointer to a device instance
+    /// \return the name of a clock source
     pub fn SoapySDRDevice_getClockSource(
         device: *const SoapySDRDevice,
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Get the list of available time sources.\n \\param device a pointer to a device instance\n \\param [out] length the number of sources\n \\return a list of time source names"]
+    /// Get the list of available time sources.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param [out] length the number of sources
+    /// \return a list of time source names
     pub fn SoapySDRDevice_listTimeSources(
         device: *const SoapySDRDevice,
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Set the time source on the device\n \\param device a pointer to a device instance\n \\param source the name of a time source\n \\return an error code or 0 for success"]
+    /// Set the time source on the device
+    ///
+    /// \param device a pointer to a device instance
+    /// \param source the name of a time source
+    /// \return an error code or 0 for success
     pub fn SoapySDRDevice_setTimeSource(
         device: *mut SoapySDRDevice,
         source: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Get the time source of the device\n \\param device a pointer to a device instance\n \\return the name of a time source"]
+    /// Get the time source of the device
+    ///
+    /// \param device a pointer to a device instance
+    /// \return the name of a time source
     pub fn SoapySDRDevice_getTimeSource(
         device: *const SoapySDRDevice,
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Does this device have a hardware clock?\n \\param device a pointer to a device instance\n \\param what optional argument\n \\return true if the hardware clock exists"]
+    /// Does this device have a hardware clock?
+    ///
+    /// \param device a pointer to a device instance
+    /// \param what optional argument
+    /// \return true if the hardware clock exists
     pub fn SoapySDRDevice_hasHardwareTime(
         device: *const SoapySDRDevice,
         what: *const ::std::os::raw::c_char,
     ) -> bool;
 }
 extern "C" {
-    #[doc = " Read the time from the hardware clock on the device.\n The what argument can refer to a specific time counter.\n \\param device a pointer to a device instance\n \\param what optional argument\n \\return the time in nanoseconds"]
+    /// Read the time from the hardware clock on the device.
+    ///
+    /// The what argument can refer to a specific time counter.
+    /// \param device a pointer to a device instance
+    /// \param what optional argument
+    /// \return the time in nanoseconds
     pub fn SoapySDRDevice_getHardwareTime(
         device: *const SoapySDRDevice,
         what: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    #[doc = " Write the time to the hardware clock on the device.\n The what argument can refer to a specific time counter.\n \\param device a pointer to a device instance\n \\param timeNs time in nanoseconds\n \\param what optional argument\n \\return 0 for success or error code on failure"]
+    /// Write the time to the hardware clock on the device.
+    ///
+    /// The what argument can refer to a specific time counter.
+    /// \param device a pointer to a device instance
+    /// \param timeNs time in nanoseconds
+    /// \param what optional argument
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_setHardwareTime(
         device: *mut SoapySDRDevice,
         timeNs: ::std::os::raw::c_longlong,
@@ -910,7 +1607,15 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Set the time of subsequent configuration calls.\n The what argument can refer to a specific command queue.\n Implementations may use a time of 0 to clear.\n \\deprecated replaced by setHardwareTime()\n \\param device a pointer to a device instance\n \\param timeNs time in nanoseconds\n \\param what optional argument\n \\return 0 for success or error code on failure"]
+    /// Set the time of subsequent configuration calls.
+    ///
+    /// The what argument can refer to a specific command queue.
+    /// Implementations may use a time of 0 to clear.
+    /// \deprecated replaced by setHardwareTime()
+    /// \param device a pointer to a device instance
+    /// \param timeNs time in nanoseconds
+    /// \param what optional argument
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_setCommandTime(
         device: *mut SoapySDRDevice,
         timeNs: ::std::os::raw::c_longlong,
@@ -918,28 +1623,51 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " List the available global readback sensors.\n A sensor can represent a reference lock, RSSI, temperature.\n \\param device a pointer to a device instance\n \\param [out] length the number of sensor names\n \\return a list of available sensor string names"]
+    /// List the available global readback sensors.
+    ///
+    /// A sensor can represent a reference lock, RSSI, temperature.
+    /// \param device a pointer to a device instance
+    /// \param [out] length the number of sensor names
+    /// \return a list of available sensor string names
     pub fn SoapySDRDevice_listSensors(
         device: *const SoapySDRDevice,
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Get meta-information about a sensor.\n Example: displayable name, type, range.\n \\param device a pointer to a device instance\n \\param key the ID name of an available sensor\n \\return meta-information about a sensor"]
+    /// Get meta-information about a sensor.
+    ///
+    /// Example: displayable name, type, range.
+    /// \param device a pointer to a device instance
+    /// \param key the ID name of an available sensor
+    /// \return meta-information about a sensor
     pub fn SoapySDRDevice_getSensorInfo(
         device: *const SoapySDRDevice,
         key: *const ::std::os::raw::c_char,
     ) -> SoapySDRArgInfo;
 }
 extern "C" {
-    #[doc = " Readback a global sensor given the name.\n The value returned is a string which can represent\n a boolean (\"true\"/\"false\"), an integer, or float.\n \\param device a pointer to a device instance\n \\param key the ID name of an available sensor\n \\return the current value of the sensor"]
+    /// Readback a global sensor given the name.
+    ///
+    /// The value returned is a string which can represent
+    /// a boolean ("true"/"false"), an integer, or float.
+    /// \param device a pointer to a device instance
+    /// \param key the ID name of an available sensor
+    /// \return the current value of the sensor
     pub fn SoapySDRDevice_readSensor(
         device: *const SoapySDRDevice,
         key: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " List the available channel readback sensors.\n A sensor can represent a reference lock, RSSI, temperature.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] length the number of sensor names\n \\return a list of available sensor string names"]
+    /// List the available channel readback sensors.
+    ///
+    /// A sensor can represent a reference lock, RSSI, temperature.
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] length the number of sensor names
+    /// \return a list of available sensor string names
     pub fn SoapySDRDevice_listChannelSensors(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -948,7 +1676,14 @@ extern "C" {
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Get meta-information about a channel sensor.\n Example: displayable name, type, range.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param key the ID name of an available sensor\n \\return meta-information about a sensor"]
+    /// Get meta-information about a channel sensor.
+    ///
+    /// Example: displayable name, type, range.
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param key the ID name of an available sensor
+    /// \return meta-information about a sensor
     pub fn SoapySDRDevice_getChannelSensorInfo(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -957,7 +1692,15 @@ extern "C" {
     ) -> SoapySDRArgInfo;
 }
 extern "C" {
-    #[doc = " Readback a channel sensor given the name.\n The value returned is a string which can represent\n a boolean (\"true\"/\"false\"), an integer, or float.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param key the ID name of an available sensor\n \\return the current value of the sensor"]
+    /// Readback a channel sensor given the name.
+    ///
+    /// The value returned is a string which can represent
+    /// a boolean ("true"/"false"), an integer, or float.
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param key the ID name of an available sensor
+    /// \return the current value of the sensor
     pub fn SoapySDRDevice_readChannelSensor(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -966,14 +1709,26 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Get a list of available register interfaces by name.\n \\param device a pointer to a device instance\n \\param [out] length the number of interfaces\n \\return a list of available register interfaces"]
+    /// Get a list of available register interfaces by name.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param [out] length the number of interfaces
+    /// \return a list of available register interfaces
     pub fn SoapySDRDevice_listRegisterInterfaces(
         device: *const SoapySDRDevice,
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Write a register on the device given the interface name.\n This can represent a register on a soft CPU, FPGA, IC;\n the interpretation is up the implementation to decide.\n \\param device a pointer to a device instance\n \\param name the name of a available register interface\n \\param addr the register address\n \\param value the register value\n \\return 0 for success or error code on failure"]
+    /// Write a register on the device given the interface name.
+    ///
+    /// This can represent a register on a soft CPU, FPGA, IC;
+    /// the interpretation is up the implementation to decide.
+    /// \param device a pointer to a device instance
+    /// \param name the name of a available register interface
+    /// \param addr the register address
+    /// \param value the register value
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_writeRegister(
         device: *mut SoapySDRDevice,
         name: *const ::std::os::raw::c_char,
@@ -982,7 +1737,12 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Read a register on the device given the interface name.\n \\param device a pointer to a device instance\n \\param name the name of a available register interface\n \\param addr the register address\n \\return the register value"]
+    /// Read a register on the device given the interface name.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param name the name of a available register interface
+    /// \param addr the register address
+    /// \return the register value
     pub fn SoapySDRDevice_readRegister(
         device: *const SoapySDRDevice,
         name: *const ::std::os::raw::c_char,
@@ -990,7 +1750,16 @@ extern "C" {
     ) -> ::std::os::raw::c_uint;
 }
 extern "C" {
-    #[doc = " Write a memory block on the device given the interface name.\n This can represent a memory block on a soft CPU, FPGA, IC;\n the interpretation is up the implementation to decide.\n \\param device a pointer to a device instance\n \\param name the name of a available memory block interface\n \\param addr the memory block start address\n \\param value the memory block content\n \\param length the number of words in the block\n \\return 0 for success or error code on failure"]
+    /// Write a memory block on the device given the interface name.
+    ///
+    /// This can represent a memory block on a soft CPU, FPGA, IC;
+    /// the interpretation is up the implementation to decide.
+    /// \param device a pointer to a device instance
+    /// \param name the name of a available memory block interface
+    /// \param addr the memory block start address
+    /// \param value the memory block content
+    /// \param length the number of words in the block
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_writeRegisters(
         device: *mut SoapySDRDevice,
         name: *const ::std::os::raw::c_char,
@@ -1000,7 +1769,15 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Read a memory block on the device given the interface name.\n Pass the number of words to be read in via length;\n length will be set to the number of actual words read.\n \\param device a pointer to a device instance\n \\param name the name of a available memory block interface\n \\param addr the memory block start address\n \\param [inout] length number of words to be read from memory block\n \\return the memory block content"]
+    /// Read a memory block on the device given the interface name.
+    ///
+    /// Pass the number of words to be read in via length;
+    /// length will be set to the number of actual words read.
+    /// \param device a pointer to a device instance
+    /// \param name the name of a available memory block interface
+    /// \param addr the memory block start address
+    /// \param [inout] length number of words to be read from memory block
+    /// \return the memory block content
     pub fn SoapySDRDevice_readRegisters(
         device: *const SoapySDRDevice,
         name: *const ::std::os::raw::c_char,
@@ -1009,14 +1786,24 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_uint;
 }
 extern "C" {
-    #[doc = " Describe the allowed keys and values used for settings.\n \\param device a pointer to a device instance\n \\param [out] length the number of sensor names\n \\return a list of argument info structures"]
+    /// Describe the allowed keys and values used for settings.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param [out] length the number of sensor names
+    /// \return a list of argument info structures
     pub fn SoapySDRDevice_getSettingInfo(
         device: *const SoapySDRDevice,
         length: *mut usize,
     ) -> *mut SoapySDRArgInfo;
 }
 extern "C" {
-    #[doc = " Write an arbitrary setting on the device.\n The interpretation is up the implementation.\n \\param device a pointer to a device instance\n \\param key the setting identifier\n \\param value the setting value\n \\return 0 for success or error code on failure"]
+    /// Write an arbitrary setting on the device.
+    ///
+    /// The interpretation is up the implementation.
+    /// \param device a pointer to a device instance
+    /// \param key the setting identifier
+    /// \param value the setting value
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_writeSetting(
         device: *mut SoapySDRDevice,
         key: *const ::std::os::raw::c_char,
@@ -1024,14 +1811,24 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Read an arbitrary setting on the device.\n \\param device a pointer to a device instance\n \\param key the setting identifier\n \\return the setting value"]
+    /// Read an arbitrary setting on the device.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param key the setting identifier
+    /// \return the setting value
     pub fn SoapySDRDevice_readSetting(
         device: *const SoapySDRDevice,
         key: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Describe the allowed keys and values used for channel settings.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param [out] length the number of sensor names\n \\return a list of argument info structures"]
+    /// Describe the allowed keys and values used for channel settings.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param [out] length the number of sensor names
+    /// \return a list of argument info structures
     pub fn SoapySDRDevice_getChannelSettingInfo(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -1040,7 +1837,14 @@ extern "C" {
     ) -> *mut SoapySDRArgInfo;
 }
 extern "C" {
-    #[doc = " Write an arbitrary channel setting on the device.\n The interpretation is up the implementation.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param key the setting identifier\n \\param value the setting value\n \\return 0 for success or error code on failure"]
+    /// Write an arbitrary channel setting on the device.
+    ///
+    /// The interpretation is up the implementation. \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param key the setting identifier
+    /// \param value the setting value
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_writeChannelSetting(
         device: *mut SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -1050,7 +1854,13 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Read an arbitrary channel setting on the device.\n \\param device a pointer to a device instance\n \\param direction the channel direction RX or TX\n \\param channel an available channel on the device\n \\param key the setting identifier\n \\return the setting value"]
+    /// Read an arbitrary channel setting on the device.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param key the setting identifier
+    /// \return the setting value
     pub fn SoapySDRDevice_readChannelSetting(
         device: *const SoapySDRDevice,
         direction: ::std::os::raw::c_int,
@@ -1059,14 +1869,22 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Get a list of available GPIO banks by name.\n \\param [out] length the number of GPIO banks\n \\param device a pointer to a device instance"]
+    /// Get a list of available GPIO banks by name.
+    ///
+    /// \param [out] length the number of GPIO banks
+    /// \param device a pointer to a device instance
     pub fn SoapySDRDevice_listGPIOBanks(
         device: *const SoapySDRDevice,
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Write the value of a GPIO bank.\n \\param device a pointer to a device instance\n \\param bank the name of an available bank\n \\param value an integer representing GPIO bits\n \\return 0 for success or error code on failure"]
+    /// Write the value of a GPIO bank.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param bank the name of an available bank
+    /// \param value an integer representing GPIO bits
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_writeGPIO(
         device: *mut SoapySDRDevice,
         bank: *const ::std::os::raw::c_char,
@@ -1074,7 +1892,13 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Write the value of a GPIO bank with modification mask.\n \\param device a pointer to a device instance\n \\param bank the name of an available bank\n \\param value an integer representing GPIO bits\n \\param mask a modification mask where 1 = modify\n \\return 0 for success or error code on failure"]
+    /// Write the value of a GPIO bank with modification mask.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param bank the name of an available bank
+    /// \param value an integer representing GPIO bits
+    /// \param mask a modification mask where 1 = modify
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_writeGPIOMasked(
         device: *mut SoapySDRDevice,
         bank: *const ::std::os::raw::c_char,
@@ -1083,14 +1907,24 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Readback the value of a GPIO bank.\n \\param device a pointer to a device instance\n \\param bank the name of an available bank\n \\return an integer representing GPIO bits"]
+    /// Readback the value of a GPIO bank.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param bank the name of an available bank
+    /// \return an integer representing GPIO bits
     pub fn SoapySDRDevice_readGPIO(
         device: *const SoapySDRDevice,
         bank: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_uint;
 }
 extern "C" {
-    #[doc = " Write the data direction of a GPIO bank.\n 1 bits represent outputs, 0 bits represent inputs.\n \\param device a pointer to a device instance\n \\param bank the name of an available bank\n \\param dir an integer representing data direction bits\n \\return 0 for success or error code on failure"]
+    /// Write the data direction of a GPIO bank.
+    ///
+    /// 1 bits represent outputs, 0 bits represent inputs.
+    /// \param device a pointer to a device instance
+    /// \param bank the name of an available bank
+    /// \param dir an integer representing data direction bits
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_writeGPIODir(
         device: *mut SoapySDRDevice,
         bank: *const ::std::os::raw::c_char,
@@ -1098,7 +1932,14 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Write the data direction of a GPIO bank with modification mask.\n 1 bits represent outputs, 0 bits represent inputs.\n \\param device a pointer to a device instance\n \\param bank the name of an available bank\n \\param dir an integer representing data direction bits\n \\param mask a modification mask where 1 = modify\n \\return 0 for success or error code on failure"]
+    /// Write the data direction of a GPIO bank with modification mask.
+    ///
+    /// 1 bits represent outputs, 0 bits represent inputs.
+    /// \param device a pointer to a device instance
+    /// \param bank the name of an available bank
+    /// \param dir an integer representing data direction bits
+    /// \param mask a modification mask where 1 = modify
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_writeGPIODirMasked(
         device: *mut SoapySDRDevice,
         bank: *const ::std::os::raw::c_char,
@@ -1107,14 +1948,27 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Read the data direction of a GPIO bank.\n \\param device a pointer to a device instance\n 1 bits represent outputs, 0 bits represent inputs.\n \\param bank the name of an available bank\n \\return an integer representing data direction bits"]
+    /// Read the data direction of a GPIO bank.
+    ///
+    /// \param device a pointer to a device instance
+    /// 1 bits represent outputs, 0 bits represent inputs.
+    /// \param bank the name of an available bank
+    /// \return an integer representing data direction bits
     pub fn SoapySDRDevice_readGPIODir(
         device: *const SoapySDRDevice,
         bank: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_uint;
 }
 extern "C" {
-    #[doc = " Write to an available I2C slave.\n If the device contains multiple I2C masters,\n the address bits can encode which master.\n \\param device a pointer to a device instance\n \\param addr the address of the slave\n \\param data an array of bytes write out\n \\param numBytes the number of bytes to write\n \\return 0 for success or error code on failure"]
+    /// Write to an available I2C slave.
+    ///
+    /// If the device contains multiple I2C masters,
+    /// the address bits can encode which master.
+    /// \param device a pointer to a device instance
+    /// \param addr the address of the slave
+    /// \param data an array of bytes write out
+    /// \param numBytes the number of bytes to write
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_writeI2C(
         device: *mut SoapySDRDevice,
         addr: ::std::os::raw::c_int,
@@ -1123,7 +1977,16 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Read from an available I2C slave.\n If the device contains multiple I2C masters,\n the address bits can encode which master.\n Pass the number of bytes to be read in via numBytes;\n numBytes will be set to the number of actual bytes read.\n \\param device a pointer to a device instance\n \\param addr the address of the slave\n \\param [inout] numBytes the number of bytes to read\n \\return an array of bytes read from the slave"]
+    /// Read from an available I2C slave.
+    ///
+    /// If the device contains multiple I2C masters,
+    /// the address bits can encode which master.
+    /// Pass the number of bytes to be read in via numBytes;
+    /// numBytes will be set to the number of actual bytes read.
+    /// \param device a pointer to a device instance
+    /// \param addr the address of the slave
+    /// \param [inout] numBytes the number of bytes to read
+    /// \return an array of bytes read from the slave
     pub fn SoapySDRDevice_readI2C(
         device: *mut SoapySDRDevice,
         addr: ::std::os::raw::c_int,
@@ -1131,7 +1994,18 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Perform a SPI transaction and return the result.\n Its up to the implementation to set the clock rate,\n and read edge, and the write edge of the SPI core.\n SPI slaves without a readback pin will return 0.\n\n If the device contains multiple SPI masters,\n the address bits can encode which master.\n\n \\param device a pointer to a device instance\n \\param addr an address of an available SPI slave\n \\param data the SPI data, numBits-1 is first out\n \\param numBits the number of bits to clock out\n \\return the readback data, numBits-1 is first in"]
+    /// Perform a SPI transaction and return the result.
+    ///
+    /// Its up to the implementation to set the clock rate,
+    /// and read edge, and the write edge of the SPI core.
+    /// SPI slaves without a readback pin will return 0.
+    /// If the device contains multiple SPI masters,
+    /// the address bits can encode which master.
+    /// \param device a pointer to a device instance
+    /// \param addr an address of an available SPI slave
+    /// \param data the SPI data, numBits-1 is first out
+    /// \param num Bits the number of bits to clock t
+    /// \return the readback data, numBits-1 is first in
     pub fn SoapySDRDevice_transactSPI(
         device: *mut SoapySDRDevice,
         addr: ::std::os::raw::c_int,
@@ -1140,14 +2014,25 @@ extern "C" {
     ) -> ::std::os::raw::c_uint;
 }
 extern "C" {
-    #[doc = " Enumerate the available UART devices.\n \\param device a pointer to a device instance\n \\param [out] length the number of UART names\n \\return a list of names of available UARTs"]
+    /// Enumerate the available UART devices.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param [out] length the number of UART names
+    /// \return a list of names of available UARTs
     pub fn SoapySDRDevice_listUARTs(
         device: *const SoapySDRDevice,
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Write data to a UART device.\n Its up to the implementation to set the baud rate,\n carriage return settings, flushing on newline.\n \\param device a pointer to a device instance\n \\param which the name of an available UART\n \\param data a null terminated array of bytes\n \\return 0 for success or error code on failure"]
+    /// Write data to a UART device.
+    ///
+    /// Its up to the implementation to set the baud rate,
+    /// carriage return settings, flushing on newline.
+    /// \param device a pointer to a device instance
+    /// \param which the name of an available UART
+    /// \param data a null terminated array of bytes
+    /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_writeUART(
         device: *mut SoapySDRDevice,
         which: *const ::std::os::raw::c_char,
@@ -1155,7 +2040,14 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    #[doc = " Read bytes from a UART until timeout or newline.\n Its up to the implementation to set the baud rate,\n carriage return settings, flushing on newline.\n \\param device a pointer to a device instance\n \\param which the name of an available UART\n \\param timeoutUs a timeout in microseconds\n \\return a null terminated array of bytes"]
+    /// Read bytes from a UART until timeout or newline.
+    ///
+    /// Its up to the implementation to set the baud rate,
+    /// carriage return settings, flushing on newline.
+    /// \param device a pointer to a device instance
+    /// \param which the name of an available UART
+    /// \param timeoutUs a timeout in microseconds
+    /// \return a null terminated array of bytes
     pub fn SoapySDRDevice_readUART(
         device: *const SoapySDRDevice,
         which: *const ::std::os::raw::c_char,
@@ -1163,123 +2055,201 @@ extern "C" {
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " A handle to the native device used by the driver.\n The implementation may return a null value if it does not support\n or does not wish to provide access to the native handle.\n \\param device a pointer to a device instance\n \\return a handle to the native device or null"]
+    /// A handle to the native device used by the driver.
+    ///
+    /// The implementation may return a null value if it does not support
+    /// or does not wish to provide access to the native handle.
+    /// \param device a pointer to a device instance
+    /// \return a handle to the native device or null
     pub fn SoapySDRDevice_getNativeDeviceHandle(
         device: *const SoapySDRDevice,
     ) -> *mut ::std::os::raw::c_void;
 }
 
-#[doc = " The available priority levels for log messages.\n\n The default log level threshold is SOAPY_SDR_INFO.\n Log messages with lower priorities are dropped.\n\n The default threshold can be set via the\n SOAPY_SDR_LOG_LEVEL environment variable.\n Set SOAPY_SDR_LOG_LEVEL to the string value:\n \"WARNING\", \"ERROR\", \"DEBUG\", etc...\n or set it to the equivalent integer value."]
+/// The available priority levels for log messages.
+///
+/// The default log level threshold is SOAPY_SDR_INFO.
+/// Log messages with lower priorities are dropped.
+/// The default threshold can be set via the
+/// SOAPY_SDR_LOG_LEVEL environment variable.
+/// Set SOAPY_SDR_LOG_LEVEL to the string value:
+/// "WARNING", "ERROR", "DEBUG", etc...
+/// or set it to the equivalent integer value.
 pub type SoapySDRLogLevel = ::std::os::raw::c_uint;
 
-#[doc = "!< A fatal error. The application will most likely terminate. This is the highest priority."]
+/// A fatal error. The application will most likely terminate. This is the highest priority.
 pub const SoapySDRLogLevel_SOAPY_SDR_FATAL: SoapySDRLogLevel = 1;
-#[doc = "!< A critical error. The application might not be able to continue running successfully."]
+/// A critical error. The application might not be able to continue running successfully.
 pub const SoapySDRLogLevel_SOAPY_SDR_CRITICAL: SoapySDRLogLevel = 2;
-#[doc = "!< An error. An operation did not complete successfully, but the application as a whole is not affected."]
+/// An error. An operation did not complete successfully, but the application as a whole is not affected.
 pub const SoapySDRLogLevel_SOAPY_SDR_ERROR: SoapySDRLogLevel = 3;
-#[doc = "!< A warning. An operation completed with an unexpected result."]
+/// A warning. An operation completed with an unexpected result.
 pub const SoapySDRLogLevel_SOAPY_SDR_WARNING: SoapySDRLogLevel = 4;
-#[doc = "!< A notice, which is an information with just a higher priority."]
+/// A notice, which is an information with just a higher priority.
 pub const SoapySDRLogLevel_SOAPY_SDR_NOTICE: SoapySDRLogLevel = 5;
-#[doc = "!< An informational message, usually denoting the successful completion of an operation."]
+/// An informational message, usually denoting the successful completion of an operation.
 pub const SoapySDRLogLevel_SOAPY_SDR_INFO: SoapySDRLogLevel = 6;
-#[doc = "!< A debugging message."]
+/// A debugging message.
 pub const SoapySDRLogLevel_SOAPY_SDR_DEBUG: SoapySDRLogLevel = 7;
-#[doc = "!< A tracing message. This is the lowest priority."]
+/// A tracing message. This is the lowest priority.
 pub const SoapySDRLogLevel_SOAPY_SDR_TRACE: SoapySDRLogLevel = 8;
-#[doc = "!< Streaming status indicators such as \"U\" (underflow) and \"O\" (overflow)."]
+/// Streaming status indicators such as "U" (underflow) and "O" (overflow).
 pub const SoapySDRLogLevel_SOAPY_SDR_SSI: SoapySDRLogLevel = 9;
+
 extern "C" {
-    #[doc = " Send a message to the registered logger.\n \\param logLevel a possible logging level\n \\param message a logger message string"]
+    /// Send a message to the registered logger.
+    ///
+    /// \param logLevel a possible logging level
+    /// \param message a logger message string
     pub fn SoapySDR_log(logLevel: SoapySDRLogLevel, message: *const ::std::os::raw::c_char);
 }
-#[doc = " Typedef for the registered log handler function."]
+/// Typedef for the registered log handler function.
 pub type SoapySDRLogHandler = ::std::option::Option<
     unsafe extern "C" fn(logLevel: SoapySDRLogLevel, message: *const ::std::os::raw::c_char),
 >;
 extern "C" {
-    #[doc = " Register a new system log handler.\n Platforms should call this to replace the default stdio handler.\n Passing `NULL` restores the default."]
+    /// Register a new system log handler.
+    ///
+    /// Platforms should call this to replace the default stdio handler.
+    /// Passing `NULL` restores the default.
     pub fn SoapySDR_registerLogHandler(handler: SoapySDRLogHandler);
 }
 extern "C" {
-    #[doc = " Set the log level threshold.\n Log messages with lower priority are dropped."]
+    /// Set the log level threshold.
+    ///
+    /// Log messages with lower priority are dropped.
     pub fn SoapySDR_setLogLevel(logLevel: SoapySDRLogLevel);
 }
 extern "C" {
-    #[doc = " Get the size of a single element in the specified format.\n \\param format a supported format string\n \\return the size of an element in bytes"]
+    /// Get the size of a single element in the specified format.
+    ///
+    /// \param format a supported format string
+    /// \return the size of an element in bytes
     pub fn SoapySDR_formatToSize(format: *const ::std::os::raw::c_char) -> usize;
 }
 extern "C" {
-    #[doc = "! Query the root installation path"]
+    ///  Query the root installation path
     pub fn SoapySDR_getRootPath() -> *const ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " The list of paths automatically searched by loadModules().\n \\param [out] length the number of elements in the result.\n \\return a list of automatically searched file paths"]
+    /// The list of paths automatically searched by loadModules().
+    ///
+    /// \param [out] length the number of elements in the result.
+    /// \return a list of automatically searched file paths
     pub fn SoapySDR_listSearchPaths(length: *mut usize) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " List all modules found in default path.\n The result is an array of strings owned by the caller.\n \\param [out] length the number of elements in the result.\n \\return a list of file paths to loadable modules"]
+    /// List all modules found in default path.
+    ///
+    /// The result is an array of strings owned by the caller.
+    /// \param [out] length the number of elements in the result.
+    /// \return a list of file paths to loadable modules
     pub fn SoapySDR_listModules(length: *mut usize) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " List all modules found in the given path.\n The result is an array of strings owned by the caller.\n \\param path a directory on the system\n \\param [out] length the number of elements in the result.\n \\return a list of file paths to loadable modules"]
+    /// List all modules found in the given path.
+    ///
+    /// The result is an array of strings owned by the caller.
+    /// \param path a directory on the system
+    /// \param [out] length the number of elements in the result.
+    /// \return a list of file paths to loadable modules
     pub fn SoapySDR_listModulesPath(
         path: *const ::std::os::raw::c_char,
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Load a single module given its file system path.\n The caller must free the result error string.\n \\param path the path to a specific module file\n \\return an error message, empty on success"]
+    /// Load a single module given its file system path.
+    ///
+    /// The caller must free the result error string.
+    /// \param path the path to a specific module file
+    /// \return an error message, empty on success
     pub fn SoapySDR_loadModule(path: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " List all registration loader errors for a given module path.\n The resulting dictionary contains all registry entry names\n provided by the specified module. The value of each entry\n is an error message string or empty on successful load.\n \\param path the path to a specific module file\n \\return a dictionary of registry names to error messages"]
+    /// List all registration loader errors for a given module path.
+    ///
+    /// The resulting dictionary contains all registry entry names
+    /// provided by the specified module. The value of each entry
+    /// is an error message string or empty on successful load.
+    /// \param path the path to a specific module file
+    /// \return a dictionary of registry names to error messages
     pub fn SoapySDR_getLoaderResult(path: *const ::std::os::raw::c_char) -> SoapySDRKwargs;
 }
 extern "C" {
-    #[doc = " Get a version string for the specified module.\n Modules may optionally provide version strings.\n \\param path the path to a specific module file\n \\return a version string or empty if no version provided"]
+    /// Get a version string for the specified module.
+    ///
+    /// Modules may optionally provide version strings.
+    /// \param path the path to a specific module file
+    /// \return a version string or empty if no version provided
     pub fn SoapySDR_getModuleVersion(
         path: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Unload a module that was loaded with loadModule().\n The caller must free the result error string.\n \\param path the path to a specific module file\n \\return an error message, empty on success"]
+    /// Unload a module that was loaded with loadModule().
+    ///
+    /// The caller must free the result error string.
+    /// \param path the path to a specific module file
+    /// \return an error message, empty on success
     pub fn SoapySDR_unloadModule(
         path: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Load the support modules installed on this system.\n This call will only actually perform the load once.\n Subsequent calls are a NOP."]
+    /// Load the support modules installed on this system.
+    ///
+    /// This call will only actually perform the load once.
+    /// Subsequent calls are a NOP.
     pub fn SoapySDR_loadModules();
 }
 extern "C" {
-    #[doc = " Unload all currently loaded support modules."]
+    /// Unload all currently loaded support modules.
     pub fn SoapySDR_unloadModules();
 }
 extern "C" {
-    #[doc = " Convert a tick count into a time in nanoseconds using the tick rate.\n \\param ticks a integer tick count\n \\param rate the ticks per second\n \\return the time in nanoseconds"]
+    /// Convert a tick count into a time in nanoseconds using the tick rate.
+    ///
+    /// \param ticks a integer tick count
+    /// \param rate the ticks per second
+    /// \return the time in nanoseconds
     pub fn SoapySDR_ticksToTimeNs(
         ticks: ::std::os::raw::c_longlong,
         rate: f64,
     ) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    #[doc = " Convert a time in nanoseconds into a tick count using the tick rate.\n \\param timeNs time in nanoseconds\n \\param rate the ticks per second\n \\return the integer tick count"]
+    /// Convert a time in nanoseconds into a tick count using the tick rate.
+    ///
+    /// \param timeNs time in nanoseconds
+    /// \param rate the ticks per second
+    /// \return the integer tick count
     pub fn SoapySDR_timeNsToTicks(
         timeNs: ::std::os::raw::c_longlong,
         rate: f64,
     ) -> ::std::os::raw::c_longlong;
 }
 extern "C" {
-    #[doc = " Get the SoapySDR library API version as a string.\n The format of the version string is <b>major.minor.increment</b>,\n where the digits are taken directly from <b>SOAPY_SDR_API_VERSION</b>."]
+    /// Get the SoapySDR library API version as a string.
+    ///
+    /// The format of the version string is <b>major.minor.increment</b>,
+    /// where the digits are taken directly from <b>SOAPY_SDR_API_VERSION</b>.
     pub fn SoapySDR_getAPIVersion() -> *const ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Get the ABI version string that the library was built against.\n A client can compare <b>SOAPY_SDR_ABI_VERSION</b> to getABIVersion()\n to check for ABI incompatibility before using the library.\n If the values are not equal then the client code was\n compiled against a different ABI than the library."]
+    /// Get the ABI version string that the library was built against.
+    ///
+    /// A client can compare <b>SOAPY_SDR_ABI_VERSION</b> to getABIVersion()
+    /// to check for ABI incompatibility before using the library.
+    /// If the values are not equal then the client code was
+    /// compiled against a different ABI than the library.
     pub fn SoapySDR_getABIVersion() -> *const ::std::os::raw::c_char;
 }
 extern "C" {
-    #[doc = " Get the library version and build information string.\n The format of the version string is <b>major.minor.patch-buildInfo</b>.\n This function is commonly used to identify the software back-end\n to the user for command-line utilities and graphical applications."]
+    /// Get the library version and build information string.
+    ///
+    /// The format of the version string is <b>major.minor.patch-buildInfo</b>.
+    /// This function is commonly used to identify the software back-end
+    /// to the user for command-line utilities and graphical applications.
     pub fn SoapySDR_getLibVersion() -> *const ::std::os::raw::c_char;
 }
