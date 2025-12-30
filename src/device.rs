@@ -268,7 +268,7 @@ impl Device {
     /// This key should be meaningful to the user to optimize for the underlying hardware.
     pub fn hardware_key(&self) -> Result<String, Error> {
         unsafe {
-            string_result(SoapySDRDevice_getDriverKey(self.inner.ptr))
+            string_result(SoapySDRDevice_getHardwareKey(self.inner.ptr))
         }
     }
 
