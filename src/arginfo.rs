@@ -5,12 +5,12 @@ use std::ffi::CStr;
 use std::os::raw::c_char;
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[non_exhaustive]
 pub enum ArgType {
     Bool,
     Float,
     Int,
     String,
-    __Nonexhaustive,
 }
 
 impl From<SoapySDRArgInfoType> for ArgType {
@@ -21,7 +21,7 @@ impl From<SoapySDRArgInfoType> for ArgType {
             soapysdr_sys::SOAPY_SDR_ARG_INFO_FLOAT => ArgType::Float,
             soapysdr_sys::SOAPY_SDR_ARG_INFO_INT => ArgType::Int,
             soapysdr_sys::SOAPY_SDR_ARG_INFO_STRING => ArgType::String,
-            _ => ArgType::__Nonexhaustive,
+            _ => panic!("Unexpected SoapySDRArgInfoType value"),
         }
     }
 }
