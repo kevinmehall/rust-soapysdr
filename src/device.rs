@@ -48,13 +48,13 @@ pub enum ErrorCode {
 impl ErrorCode {
     fn from_c(code: c_int) -> ErrorCode {
         match code {
-            SOAPY_SDR_TIMEOUT => ErrorCode::Timeout,
-            SOAPY_SDR_STREAM_ERROR => ErrorCode::StreamError,
-            SOAPY_SDR_CORRUPTION => ErrorCode::Corruption,
-            SOAPY_SDR_OVERFLOW => ErrorCode::Overflow,
-            SOAPY_SDR_NOT_SUPPORTED => ErrorCode::NotSupported,
-            SOAPY_SDR_TIME_ERROR => ErrorCode::TimeError,
-            SOAPY_SDR_UNDERFLOW => ErrorCode::Underflow,
+            soapysdr_sys::SOAPY_SDR_TIMEOUT => ErrorCode::Timeout,
+            soapysdr_sys::SOAPY_SDR_STREAM_ERROR => ErrorCode::StreamError,
+            soapysdr_sys::SOAPY_SDR_CORRUPTION => ErrorCode::Corruption,
+            soapysdr_sys::SOAPY_SDR_OVERFLOW => ErrorCode::Overflow,
+            soapysdr_sys::SOAPY_SDR_NOT_SUPPORTED => ErrorCode::NotSupported,
+            soapysdr_sys::SOAPY_SDR_TIME_ERROR => ErrorCode::TimeError,
+            soapysdr_sys::SOAPY_SDR_UNDERFLOW => ErrorCode::Underflow,
             _ => ErrorCode::Other,
         }
     }

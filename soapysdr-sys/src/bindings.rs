@@ -72,10 +72,10 @@ extern "C" {
 /// Possible data types for argument info
 pub type SoapySDRArgInfoType = ::std::os::raw::c_uint;
 
-pub const SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_BOOL: SoapySDRArgInfoType = 0;
-pub const SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_INT: SoapySDRArgInfoType = 1;
-pub const SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_FLOAT: SoapySDRArgInfoType = 2;
-pub const SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_STRING: SoapySDRArgInfoType = 3;
+pub const SOAPY_SDR_ARG_INFO_BOOL: SoapySDRArgInfoType = 0;
+pub const SOAPY_SDR_ARG_INFO_INT: SoapySDRArgInfoType = 1;
+pub const SOAPY_SDR_ARG_INFO_FLOAT: SoapySDRArgInfoType = 2;
+pub const SOAPY_SDR_ARG_INFO_STRING: SoapySDRArgInfoType = 3;
 
 /// Definition for argument info
 #[repr(C)]
@@ -2078,23 +2078,23 @@ extern "C" {
 pub type SoapySDRLogLevel = ::std::os::raw::c_uint;
 
 /// A fatal error. The application will most likely terminate. This is the highest priority.
-pub const SoapySDRLogLevel_SOAPY_SDR_FATAL: SoapySDRLogLevel = 1;
+pub const SOAPY_SDR_FATAL: SoapySDRLogLevel = 1;
 /// A critical error. The application might not be able to continue running successfully.
-pub const SoapySDRLogLevel_SOAPY_SDR_CRITICAL: SoapySDRLogLevel = 2;
+pub const SOAPY_SDR_CRITICAL: SoapySDRLogLevel = 2;
 /// An error. An operation did not complete successfully, but the application as a whole is not affected.
-pub const SoapySDRLogLevel_SOAPY_SDR_ERROR: SoapySDRLogLevel = 3;
+pub const SOAPY_SDR_ERROR: SoapySDRLogLevel = 3;
 /// A warning. An operation completed with an unexpected result.
-pub const SoapySDRLogLevel_SOAPY_SDR_WARNING: SoapySDRLogLevel = 4;
+pub const SOAPY_SDR_WARNING: SoapySDRLogLevel = 4;
 /// A notice, which is an information with just a higher priority.
-pub const SoapySDRLogLevel_SOAPY_SDR_NOTICE: SoapySDRLogLevel = 5;
+pub const SOAPY_SDR_NOTICE: SoapySDRLogLevel = 5;
 /// An informational message, usually denoting the successful completion of an operation.
-pub const SoapySDRLogLevel_SOAPY_SDR_INFO: SoapySDRLogLevel = 6;
+pub const SOAPY_SDR_INFO: SoapySDRLogLevel = 6;
 /// A debugging message.
-pub const SoapySDRLogLevel_SOAPY_SDR_DEBUG: SoapySDRLogLevel = 7;
+pub const SOAPY_SDR_DEBUG: SoapySDRLogLevel = 7;
 /// A tracing message. This is the lowest priority.
-pub const SoapySDRLogLevel_SOAPY_SDR_TRACE: SoapySDRLogLevel = 8;
+pub const SOAPY_SDR_TRACE: SoapySDRLogLevel = 8;
 /// Streaming status indicators such as "U" (underflow) and "O" (overflow).
-pub const SoapySDRLogLevel_SOAPY_SDR_SSI: SoapySDRLogLevel = 9;
+pub const SOAPY_SDR_SSI: SoapySDRLogLevel = 9;
 
 extern "C" {
     /// Send a message to the registered logger.

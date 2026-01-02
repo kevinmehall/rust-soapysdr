@@ -17,10 +17,10 @@ impl From<SoapySDRArgInfoType> for ArgType {
     #[allow(non_upper_case_globals)]
     fn from(arg_info_type: SoapySDRArgInfoType) -> Self {
         match arg_info_type {
-            SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_BOOL => ArgType::Bool,
-            SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_FLOAT => ArgType::Float,
-            SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_INT => ArgType::Int,
-            SoapySDRArgInfoType_SOAPY_SDR_ARG_INFO_STRING => ArgType::String,
+            soapysdr_sys::SOAPY_SDR_ARG_INFO_BOOL => ArgType::Bool,
+            soapysdr_sys::SOAPY_SDR_ARG_INFO_FLOAT => ArgType::Float,
+            soapysdr_sys::SOAPY_SDR_ARG_INFO_INT => ArgType::Int,
+            soapysdr_sys::SOAPY_SDR_ARG_INFO_STRING => ArgType::String,
             _ => ArgType::__Nonexhaustive,
         }
     }

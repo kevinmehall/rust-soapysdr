@@ -179,6 +179,7 @@ fn build_bindgen_bindings(include_paths: &[PathBuf]) {
     let mut bindgen_builder = bindgen::Builder::default()
         .trust_clang_mangling(false)
         .size_t_is_usize(true)
+        .prepend_enum_name(false)
         .header("wrapper.h");
 
     for inc in include_paths {
