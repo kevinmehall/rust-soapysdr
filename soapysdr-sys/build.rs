@@ -128,10 +128,7 @@ fn panic_help_message_soapysdr() -> ! {
     }
 }
 
-#[cfg(any(
-    feature = "bindgen",
-    not(all(any(target_os = "windows", target_os = "linux", target_os = "macos")))
-))]
+#[cfg(feature = "bindgen")]
 fn panic_help_message_libclang() -> ! {
     #[cfg(target_os = "windows")]
     {
@@ -167,10 +164,7 @@ fn panic_help_message_libclang() -> ! {
     }
 }
 
-#[cfg(any(
-    feature = "bindgen",
-    not(any(target_os = "windows", target_os = "linux", target_os = "macos"))
-))]
+#[cfg(feature = "bindgen")]
 fn build_bindgen_bindings(include_paths: &[PathBuf]) {
     if std::panic::catch_unwind(|| bindgen::clang_version()).is_err() {
         panic_help_message_libclang();
@@ -198,15 +192,13 @@ fn build_bindgen_bindings(include_paths: &[PathBuf]) {
 }
 
 fn main() {
+    // Sets library search paths as a side effect
     #[allow(unused_variables)]
     let include_paths = probe_env_var()
         .or_else(probe_pkg_config)
         .or_else(probe_pothos_sdr)
         .unwrap_or_else(|| panic_help_message_soapysdr());
 
-    #[cfg(any(
-        feature = "bindgen",
-        not(any(target_os = "windows", target_os = "linux", target_os = "macos"))
-    ))]
+    #[cfg(feature = "bindgen")]
     build_bindgen_bindings(&include_paths);
 }
