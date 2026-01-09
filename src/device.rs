@@ -7,6 +7,7 @@ use std::ffi::{ CStr, CString };
 use std::os::raw::{c_int, c_char};
 use std::os::raw::c_void;
 use std::marker::PhantomData;
+use std::mem::MaybeUninit;
 
 use super::{ Args, ArgInfo, StreamSample, Format };
 use crate::arginfo::arg_info_from_c;
@@ -950,13 +951,18 @@ impl<E: StreamSample> RxStream<E> {
     /// # Panics
     ///  * If `buffers` is not the same length as the `channels` array passed to `Device::rx_stream`.
     pub fn read(&mut self, buffers: &mut [&mut [E]], timeout_us: i64) -> Result<usize, Error> {
+        const MAX_NUMBER_OF_CHANNELS: usize = 64;
         unsafe {
             assert!(buffers.len() == self.nchannels);
+            assert!(buffers.len() < MAX_NUMBER_OF_CHANNELS);
 
             let num_samples = buffers.iter().map(|b| b.len()).min().unwrap_or(0);
 
-            //TODO: avoid this allocation
-            let buf_ptrs = buffers.iter().map(|b| b.as_ptr()).collect::<Vec<_>>();
+            let uninit_buf: MaybeUninit<[*const E; MAX_NUMBER_OF_CHANNELS]> = MaybeUninit::uninit();
+            let mut buf_ptrs = uninit_buf.assume_init();
+            for idx in 0..self.nchannels {
+                buf_ptrs[idx] = buffers[idx].as_ptr();
+            }
 
             self.flags = 0;
             let len = len_result(SoapySDRDevice_readStream(
