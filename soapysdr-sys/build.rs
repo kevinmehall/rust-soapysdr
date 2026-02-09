@@ -163,11 +163,152 @@ fn panic_help_message_libclang() -> ! {
     }
 }
 
+fn build_bundled_soapysdr(build_static: bool) -> Vec<PathBuf> {
+    let revision_to_build =
+        std::env::var("SOAPY_SDR_TAG").unwrap_or_else(|_| "soapy-sdr-0.8.1".to_string());
+    let revision_to_build = revision_to_build.as_str();
+    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let soapysdr_dir = out_dir.join("SoapySDR");
+
+    // Keep a stamp file of the version we cloned to check if we need to clone from fresh if the
+    // above revision_to_build string changes
+    let revision_file = out_dir.join(".soapysdr_revision");
+
+    let needs_clone = if let Ok(cached_revision) = std::fs::read_to_string(&revision_file) {
+        cached_revision.trim() != revision_to_build
+    } else {
+        true
+    };
+
+    if needs_clone {
+        if let Err(e) = std::fs::remove_dir_all(&soapysdr_dir) {
+            assert_eq!(
+                e.kind(),
+                std::io::ErrorKind::NotFound,
+                "Failed to remove old SoapySDR directory: {e}"
+            );
+        }
+
+        let status = std::process::Command::new("git")
+            .arg("clone")
+            .arg("--depth")
+            .arg("1")
+            .arg("--branch")
+            .arg(revision_to_build)
+            .arg("https://github.com/pothosware/SoapySDR.git")
+            .arg(&soapysdr_dir)
+            .status()
+            .expect("Failed to execute git clone");
+
+        assert!(
+            status.success(),
+            "Failed to clone SoapySDR: git exited with status {status}"
+        );
+
+        std::fs::write(&revision_file, revision_to_build).expect("Failed to write revision cache");
+    }
+
+    if build_static {
+        let lib_cmakelists = soapysdr_dir.join("lib/CMakeLists.txt");
+        let lib_cmakelists_content =
+            std::fs::read_to_string(&lib_cmakelists).expect("Failed to read lib/CMakeLists.txt");
+
+        // Patch the CMakeLists.txt to build static instead of shared as unfortunately it looks like the upstream
+        // project forces shared libraries instead of respecting BUILD_SHARED_LIBS.
+        let patched_content = lib_cmakelists_content
+            .replace("add_library(SoapySDR SHARED", "add_library(SoapySDR STATIC");
+
+        std::fs::write(&lib_cmakelists, patched_content)
+            .expect("Failed to write patched lib/CMakeLists.txt");
+
+        // Patch Config.h to undefine SOAPY_SDR_DLL for static builds
+        let config_h = soapysdr_dir.join("include/SoapySDR/Config.h");
+        let config_h_content = std::fs::read_to_string(&config_h).expect("Failed to read Config.h");
+
+        let patched_config = config_h_content.replace(
+            "#define SOAPY_SDR_DLL //always building a DLL",
+            "// #define SOAPY_SDR_DLL //always building a DLL (disabled for static build)",
+        );
+
+        std::fs::write(&config_h, patched_config).expect("Failed to write patched Config.h");
+    }
+
+    println!("cargo:rerun-if-env-changed=SOAPY_SDR_ROOT");
+
+    let install_prefix = out_dir.join("soapysdr-install");
+    cmake::Config::new(&soapysdr_dir)
+        // Compatibility if building with CMake 4 since the upstream project doesn't specify this.
+        .define("CMAKE_POLICY_VERSION_MINIMUM", "3.5")
+        .define("CMAKE_INSTALL_PREFIX", &install_prefix)
+        // If SOAPY_SDR_ROOT isn't specified as an environment variable in the build,
+        // default to telling SoapySDR it's being installed to /usr. Failure to properly configure
+        // this screws up module discovery.
+        .define(
+            "SOAPY_SDR_ROOT",
+            std::env::var("SOAPY_SDR_ROOT").unwrap_or_else(|_| "/usr".to_string()),
+        )
+        // Disable a bunch of SoapySDR features except for the ones needed to build the library.
+        .define("ENABLE_LIBRARY", "ON")
+        .define("ENABLE_APPS", "OFF")
+        .define("ENABLE_LDOC", "OFF")
+        .define("ENABLE_CSHARP", "OFF")
+        .define("ENABLE_DOCS", "OFF")
+        .define("ENABLE_PYTHON2", "OFF")
+        .define("ENABLE_PYTHON3", "OFF")
+        .define("ENABLE_TESTS", "OFF")
+        .define("ENABLE_LUAJIT", "OFF")
+        .build_target("install")
+        .build();
+
+    let lib_kind = if build_static { "static" } else { "dylib" };
+
+    println!(
+        "cargo:rustc-link-search=native={}/lib",
+        install_prefix.display()
+    );
+    println!("cargo:rustc-link-lib={lib_kind}=SoapySDR");
+
+    // Any libraries SoapySDR needs to be linked against need to be specified here since static libraries don't
+    // carry that information for you.
+    if cfg!(unix) && build_static {
+        // Detect which C++ standard library to use based on the compiler
+        let cpp_lib = if cfg!(target_env = "musl") {
+            // musl-based systems typically use libstdc++
+            "stdc++"
+        } else if std::env::var("RUSTFLAGS")
+            .ok()
+            .is_some_and(|f| f.contains("libc++"))
+            || std::env::var("RUSTFLAGS")
+                .ok()
+                .is_some_and(|f| f.contains("stdlib=libc++"))
+        {
+            // User explicitly requested libc++
+            "c++"
+        } else if cfg!(target_os = "macos") {
+            // macOS defaults to libc++
+            "c++"
+        } else {
+            // Linux and others typically use libstdc++
+            "stdc++"
+        };
+        println!("cargo:rustc-link-lib={cpp_lib}");
+        println!("cargo:rustc-link-lib=pthread");
+    }
+
+    vec![install_prefix.join("include")]
+}
+
 fn main() {
-    let include_paths = probe_env_var()
-        .or_else(probe_pkg_config)
-        .or_else(probe_pothos_sdr)
-        .unwrap_or_else(|| panic_help_message_soapysdr());
+    println!("cargo:rerun-if-env-changed=BUILD_SOAPYSDR_STATIC");
+
+    let include_paths = if cfg!(feature = "bundled") {
+        build_bundled_soapysdr(std::env::var("BUILD_SOAPYSDR_STATIC").is_ok_and(|v| v == "1"))
+    } else {
+        probe_env_var()
+            .or_else(probe_pkg_config)
+            .or_else(probe_pothos_sdr)
+            .unwrap_or_else(|| panic_help_message_soapysdr())
+    };
 
     if std::panic::catch_unwind(bindgen::clang_version).is_err() {
         panic_help_message_libclang();
