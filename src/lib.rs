@@ -15,6 +15,47 @@ pub use device::{enumerate, Device, Direction, Error, ErrorCode, Range, RxStream
 mod format;
 pub use format::{Format, StreamSample};
 
+unsafe fn to_string_vec(
+    f: unsafe extern "C" fn(length: *mut usize) -> *mut *mut std::ffi::c_char,
+) -> Vec<String> {
+    let mut length = 0;
+    let array_of_cstring = unsafe { f(&mut length) };
+    if array_of_cstring.is_null() {
+        return vec![];
+    }
+
+    unsafe { std::slice::from_raw_parts(array_of_cstring, length) }
+        .iter()
+        .filter_map(|cstr| {
+            unsafe { std::ffi::CStr::from_ptr(*cstr) }
+                .to_str()
+                .ok()
+                .map(str::to_string)
+        })
+        .collect()
+}
+
+/// List the search paths for modules.
+pub fn list_search_paths() -> Vec<String> {
+    unsafe { to_string_vec(soapysdr_sys::SoapySDR_listSearchPaths) }
+}
+
+/// List the modules that have been found. The search path can be adjusted via the `SOAPY_SDR_PLUGIN_PATH` environment
+/// variable if it's not found.
+pub fn list_modules() -> Vec<String> {
+    unsafe { to_string_vec(soapysdr_sys::SoapySDR_listModules) }
+}
+
+/// Load SoapySDR modules.
+pub fn load_modules() {
+    unsafe { soapysdr_sys::SoapySDR_loadModules() }
+}
+
+/// Unload SoapySDR modules.
+pub fn unload_modules() {
+    unsafe { soapysdr_sys::SoapySDR_unloadModules() }
+}
+
 /// Configures SoapySDR to log to the Rust `log` facility.
 ///
 /// With `env_logger`, use e.g `RUST_LOG=soapysdr=info` to control the log level.
