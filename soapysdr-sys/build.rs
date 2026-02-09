@@ -28,12 +28,20 @@ fn probe_pkg_config() -> Option<Vec<PathBuf>> {
         // windows users likely don't have pkg_config installed, so
         // this would be a confusing error message
         Err(e) => {
-            eprintln!("pkg_config: {}", e);
+            eprintln!("pkg_config: {e}");
             None
         }
         #[cfg(windows)]
         Err(_) => None,
-        Ok(lib) => Some(lib.include_paths),
+        Ok(lib) => {
+            for link_path in lib.link_paths {
+                println!("cargo:rustc-link-search={}", link_path.display());
+            }
+            for lib in lib.libs {
+                println!("cargo:rustc-link-lib={lib}");
+            }
+            Some(lib.include_paths)
+        }
     }
 }
 
