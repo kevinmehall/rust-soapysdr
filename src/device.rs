@@ -1215,7 +1215,57 @@ impl Device {
 
     // TODO: sensors
 
-    // TODO: registers
+    /// Write a register on device given interface name
+    pub fn write_register<S: Into<Vec<u8>>>(
+        &self,
+        name: S,
+        address: u32,
+        value: u32,
+    ) -> Result<(), Error> {
+        let name = CString::new(name).expect("name must not contain null byte");
+        unsafe {
+            SoapySDRDevice_writeRegister(self.inner.ptr, name.as_ptr(), address, value);
+            check_error(())
+        }
+    }
+
+    /// Read a register on device given interface name
+    pub fn read_register<S: Into<Vec<u8>>>(&self, name: S, address: u32) -> Result<u32, Error> {
+        let name = CString::new(name).expect("name must not contain null byte");
+        unsafe {
+            let value = SoapySDRDevice_readRegister(self.inner.ptr, name.as_ptr(), address);
+            check_error(value)
+        }
+    }
+
+    /// Write a memory block on the device given interface name
+    pub fn write_registers<S: Into<Vec<u8>>>(
+        &self,
+        name: S,
+        address: u32,
+        value: &[u32],
+    ) -> Result<(), Error> {
+        let name = CString::new(name).expect("name must not contain null byte");
+        unsafe {
+            SoapySDRDevice_writeRegisters(
+                self.inner.ptr,
+                name.as_ptr(),
+                address,
+                value.as_ptr(),
+                value.len(),
+            );
+            check_error(())
+        }
+    }
+
+    /// Get a list of available register interfaces by name
+    pub fn list_register_interfaces(&self) -> Result<Vec<String>, Error> {
+        unsafe {
+            string_list_result(|len_ptr| {
+                SoapySDRDevice_listRegisterInterfaces(self.inner.ptr, len_ptr)
+            })
+        }
+    }
 
     /// Write a setting
     pub fn write_setting<S: Into<Vec<u8>>>(&self, key: S, value: S) -> Result<(), Error> {
