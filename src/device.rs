@@ -1215,7 +1215,7 @@ impl Device {
 
     // TODO: sensors
 
-    // Write a register on device given interface name
+    /// Write a register on device given interface name
     pub fn write_register<S: Into<Vec<u8>>>(
         &self,
         name: S,
@@ -1229,7 +1229,7 @@ impl Device {
         }
     }
 
-    // Read a register on device given interface name
+    /// Read a register on device given interface name
     pub fn read_register<S: Into<Vec<u8>>>(&self, name: S, address: u32) -> Result<u32, Error> {
         let name = CString::new(name).expect("name must not contain null byte");
         unsafe {
@@ -1238,7 +1238,7 @@ impl Device {
         }
     }
 
-    // Write a memory block on the device given interface name
+    /// Write a memory block on the device given interface name
     pub fn write_registers<S: Into<Vec<u8>>>(
         &self,
         name: S,
@@ -1258,7 +1258,7 @@ impl Device {
         }
     }
 
-    // Get a list of avaliable register interfaces by name
+    /// Get a list of available register interfaces by name
     pub fn list_register_interfaces(&self) -> Result<Vec<String>, Error> {
         unsafe {
             string_list_result(|len_ptr| {
