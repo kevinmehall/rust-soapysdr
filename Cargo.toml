@@ -30,7 +30,6 @@ signalbool = { version = "0.2.0", optional = true }
 [features]
 default = ["log"]
 binaries = ["byteorder", "getopts", "signalbool"]
-bindgen = ["soapysdr-sys/bindgen"]
 
 [[bin]]
 name = "soapy-sdr-info"

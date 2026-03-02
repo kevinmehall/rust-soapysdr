@@ -6,8 +6,4 @@
 //! C API. See its [header file](https://github.com/pothosware/SoapySDR/blob/master/include/SoapySDR/Device.h)
 //! for API documentation.
 
-#[cfg(feature = "bindgen")]
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
-
-#[cfg(not(feature = "bindgen"))]
 include!("bindings.rs");
