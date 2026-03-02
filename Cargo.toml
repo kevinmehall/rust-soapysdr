@@ -1,7 +1,7 @@
 [workspace]
 [package]
 name = "soapysdr"
-version = "0.4.5"
+version = "0.5.0"
 edition = "2024"
 rust-version = "1.85"
 authors = ["Kevin Mehall <km@kevinmehall.net>"]
@@ -12,7 +12,6 @@ Library wrapping SoapySDR, a hardware abstraction layer for many software define
 including rtl-sdr, HackRF, USRP, LimeSDR, BladeRF, and Airspy.
 """
 license = "BSL-1.0 OR Apache-2.0"
-documentation = "https://kevinmehall.net/rustdoc/soapysdr/soapysdr/"
 repository = "https://github.com/kevinmehall/rust-soapysdr"
 readme = "README.md"
 exclude = ["shell.nix", ".github"]

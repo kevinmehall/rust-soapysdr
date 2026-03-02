@@ -45,7 +45,7 @@ brew install pkg-config
 brew tap pothosware/homebrew-pothos
 brew update
 
-# Then install the appropriate packages for your hardwar:
+# Then install the appropriate packages for your hardware:
 brew install soapyrtlsdr
 brew install soapyhackrf
 brew install soapybladerf

@@ -43,7 +43,7 @@ brew install pkg-config
 brew tap pothosware/homebrew-pothos
 brew update
 
-# Then install the appropriate packages for your hardwar:
+# Then install the appropriate packages for your hardware:
 brew install soapyrtlsdr
 brew install soapyhackrf
 brew install soapybladerf
@@ -89,9 +89,3 @@ Licensed under either of
 
 - Apache License, Version 2.0, (LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
 - Boost Software License 1.0, (Same as SoapySDR itself, LICENSE-BSL or http://opensource.org/licenses/BSL-1.0)
-
-### Contribution
-
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in
-the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without
-any additional terms or conditions.
