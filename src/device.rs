@@ -171,44 +171,52 @@ fn len_result(ret: c_int) -> Result<c_int, Error> {
 }
 
 unsafe fn string_result(r: *mut c_char) -> Result<String, Error> {
-    let ptr: *mut c_char = check_error(r)?;
-    let ret = CStr::from_ptr(ptr).to_string_lossy().into();
-    SoapySDR_free(ptr as *mut c_void);
-    Ok(ret)
+    unsafe {
+        let ptr: *mut c_char = check_error(r)?;
+        let ret = CStr::from_ptr(ptr).to_string_lossy().into();
+        SoapySDR_free(ptr as *mut c_void);
+        Ok(ret)
+    }
 }
 
 unsafe fn string_list_result<F: FnOnce(*mut usize) -> *mut *mut c_char>(
     f: F,
 ) -> Result<Vec<String>, Error> {
-    let mut len: usize = 0;
-    let mut ptr = check_error(f(&mut len as *mut _))?;
-    let ret = slice::from_raw_parts(ptr, len)
-        .iter()
-        .map(|&p| CStr::from_ptr(p).to_string_lossy().into())
-        .collect();
-    SoapySDRStrings_clear(&mut ptr as *mut _, len);
-    Ok(ret)
+    unsafe {
+        let mut len: usize = 0;
+        let mut ptr = check_error(f(&mut len as *mut _))?;
+        let ret = slice::from_raw_parts(ptr, len)
+            .iter()
+            .map(|&p| CStr::from_ptr(p).to_string_lossy().into())
+            .collect();
+        SoapySDRStrings_clear(&mut ptr as *mut _, len);
+        Ok(ret)
+    }
 }
 
 unsafe fn arg_info_result<F: FnOnce(*mut usize) -> *mut SoapySDRArgInfo>(
     f: F,
 ) -> Result<Vec<ArgInfo>, Error> {
-    let mut len: usize = 0;
-    let ptr = check_error(f(&mut len as *mut _))?;
-    let r = slice::from_raw_parts(ptr, len)
-        .iter()
-        .map(|x| arg_info_from_c(x))
-        .collect();
-    SoapySDRArgInfoList_clear(ptr, len);
-    Ok(r)
+    unsafe {
+        let mut len: usize = 0;
+        let ptr = check_error(f(&mut len as *mut _))?;
+        let r = slice::from_raw_parts(ptr, len)
+            .iter()
+            .map(|x| arg_info_from_c(x))
+            .collect();
+        SoapySDRArgInfoList_clear(ptr, len);
+        Ok(r)
+    }
 }
 
 unsafe fn list_result<T: Copy, F: FnOnce(*mut usize) -> *mut T>(f: F) -> Result<Vec<T>, Error> {
-    let mut len: usize = 0;
-    let ptr = check_error(f(&mut len as *mut _))?;
-    let ret = slice::from_raw_parts(ptr, len).to_owned();
-    SoapySDR_free(ptr as *mut c_void);
-    Ok(ret)
+    unsafe {
+        let mut len: usize = 0;
+        let ptr = check_error(f(&mut len as *mut _))?;
+        let ret = slice::from_raw_parts(ptr, len).to_owned();
+        SoapySDR_free(ptr as *mut c_void);
+        Ok(ret)
+    }
 }
 
 fn optional_string_arg<S: AsRef<str>>(optstr: Option<S>) -> CString {

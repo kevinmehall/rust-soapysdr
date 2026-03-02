@@ -10,7 +10,7 @@ mod arginfo;
 pub use arginfo::ArgInfo;
 
 mod device;
-pub use device::{enumerate, Device, Direction, Error, ErrorCode, Range, RxStream, TxStream};
+pub use device::{Device, Direction, Error, ErrorCode, Range, RxStream, TxStream, enumerate};
 
 mod format;
 pub use format::{Format, StreamSample};
@@ -20,8 +20,8 @@ pub use format::{Format, StreamSample};
 /// With `env_logger`, use e.g `RUST_LOG=soapysdr=info` to control the log level.
 #[cfg(feature = "log")]
 pub fn configure_logging() {
-    use log::log;
     use log::Level;
+    use log::log;
     use soapysdr_sys::*;
     use std::ffi::CStr;
     use std::os::raw::c_char;

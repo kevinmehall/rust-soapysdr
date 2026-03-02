@@ -2,7 +2,8 @@
 [package]
 name = "soapysdr"
 version = "0.4.5"
-edition = "2021"
+edition = "2024"
+rust-version = "1.85"
 authors = ["Kevin Mehall <km@kevinmehall.net>"]
 categories = ["api-bindings", "hardware-support"]
 keywords = ["sdr", "radio"]

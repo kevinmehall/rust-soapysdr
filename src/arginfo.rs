@@ -54,34 +54,40 @@ pub struct ArgInfo {
 }
 
 unsafe fn required_string(s: *mut c_char) -> String {
-    assert!(!s.is_null(), "Null string from SoapySDR");
-    CStr::from_ptr(s).to_string_lossy().into()
+    unsafe {
+        assert!(!s.is_null(), "Null string from SoapySDR");
+        CStr::from_ptr(s).to_string_lossy().into()
+    }
 }
 
 unsafe fn optional_string(s: *mut c_char) -> Option<String> {
-    if !s.is_null() {
-        Some(CStr::from_ptr(s).to_string_lossy().into())
-    } else {
-        None
+    unsafe {
+        if !s.is_null() {
+            Some(CStr::from_ptr(s).to_string_lossy().into())
+        } else {
+            None
+        }
     }
 }
 
 pub unsafe fn arg_info_from_c(c: &SoapySDRArgInfo) -> ArgInfo {
-    ArgInfo {
-        key: required_string(c.key),
-        value: required_string(c.value),
-        name: optional_string(c.name),
-        description: optional_string(c.description),
-        units: optional_string(c.units),
-        data_type: c.type_.into(),
-        options: {
-            let option_vals = slice::from_raw_parts(c.options, c.numOptions);
-            let option_names = slice::from_raw_parts(c.optionNames, c.numOptions);
-            option_vals
-                .iter()
-                .zip(option_names.iter())
-                .map(|(&name, &val)| (required_string(name), optional_string(val)))
-                .collect()
-        },
+    unsafe {
+        ArgInfo {
+            key: required_string(c.key),
+            value: required_string(c.value),
+            name: optional_string(c.name),
+            description: optional_string(c.description),
+            units: optional_string(c.units),
+            data_type: c.type_.into(),
+            options: {
+                let option_vals = slice::from_raw_parts(c.options, c.numOptions);
+                let option_names = slice::from_raw_parts(c.optionNames, c.numOptions);
+                option_vals
+                    .iter()
+                    .zip(option_names.iter())
+                    .map(|(&name, &val)| (required_string(name), optional_string(val)))
+                    .collect()
+            },
+        }
     }
 }

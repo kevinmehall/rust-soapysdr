@@ -178,7 +178,7 @@ fn read_cfile<R: Read>(mut src_file: R, dest_buf: &mut [Complex<f32>]) -> io::Re
                     return Err(io::Error::new(
                         ErrorKind::UnexpectedEof,
                         "file ended unexpectedly",
-                    ))
+                    ));
                 }
                 Ok(n) => tmp_pos += n,
                 Err(ref e) if e.kind() == ErrorKind::Interrupted => {}
