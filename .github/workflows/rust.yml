@@ -11,11 +11,11 @@ env:
 
 jobs:
   format:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v3
-        - name: Cargo Fmt
-          run: cargo fmt --all -- --check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cargo Fmt
+        run: cargo fmt --all -- --check
 
   test-ubuntu:
     runs-on: ${{ matrix.platform }}
@@ -44,6 +44,24 @@ jobs:
           7z x -opothos -y pothossdr.exe
           echo "${{github.workspace}}/pothos/bin" >> $GITHUB_PATH
           echo "C:\\msys64\\mingw64\\bin" >> $GITHUB_PATH
+      - name: Build
+        shell: bash
+        run: cargo build --all-features
+      - name: Run tests
+        shell: bash
+        run: cargo test
+
+  test-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install deps
+        shell: bash
+        run: |
+          brew install pkg-config
+          brew tap pothosware/homebrew-pothos
+          brew update
+          brew install soapysdr
       - name: Build
         shell: bash
         run: cargo build --all-features
