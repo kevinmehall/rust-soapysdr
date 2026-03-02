@@ -56,13 +56,13 @@ pub struct SoapySDRKwargs {
     pub keys: *mut *mut ::std::os::raw::c_char,
     pub vals: *mut *mut ::std::os::raw::c_char,
 }
-extern "C" {
+unsafe extern "C" {
     /// Convert a markup string to a key-value map.
     ///
     /// The markup format is: "key0=value0, key1=value1"
     pub fn SoapySDRKwargs_fromString(markup: *const ::std::os::raw::c_char) -> SoapySDRKwargs;
 }
-extern "C" {
+unsafe extern "C" {
     /// Convert a key-value map to a markup string.
     ///
     /// The markup format is: "key0=value0, key1=value1"
@@ -109,19 +109,19 @@ pub struct SoapySDRArgInfo {
     /// When not specified, the option value itself can be used as a display name.
     pub optionNames: *mut *mut ::std::os::raw::c_char,
 }
-extern "C" {
+unsafe extern "C" {
     /// Free a pointer allocated by SoapySDR.
     ///
     /// For most platforms this is a simple call around free()
     pub fn SoapySDR_free(ptr: *mut ::std::os::raw::c_void);
 }
-extern "C" {
+unsafe extern "C" {
     /// Clear the contents of a list of string
     ///
     /// Convenience call to deal with results that return a string list.
     pub fn SoapySDRStrings_clear(elems: *mut *mut *mut ::std::os::raw::c_char, length: usize);
 }
-extern "C" {
+unsafe extern "C" {
     /// Set a key/value pair in a kwargs structure.
     ///
     /// If the key exists, the existing entry will be modified;
@@ -135,7 +135,7 @@ extern "C" {
         val: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get a value given a key in a kwargs structure.
     ///
     /// \return the string or NULL if not found
@@ -144,31 +144,31 @@ extern "C" {
         key: *const ::std::os::raw::c_char,
     ) -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Clear the contents of a kwargs structure.
     ///
     /// This frees all the underlying memory and clears the members.
     pub fn SoapySDRKwargs_clear(args: *mut SoapySDRKwargs);
 }
-extern "C" {
+unsafe extern "C" {
     /// Clear a list of kwargs structures.
     ///
     /// This frees all the underlying memory and clears the members.
     pub fn SoapySDRKwargsList_clear(args: *mut SoapySDRKwargs, length: usize);
 }
-extern "C" {
+unsafe extern "C" {
     /// Clear the contents of a argument info structure.
     ///
     /// This frees all the underlying memory and clears the members.
     pub fn SoapySDRArgInfo_clear(info: *mut SoapySDRArgInfo);
 }
-extern "C" {
+unsafe extern "C" {
     /// Clear a list of argument info structures.
     ///
     /// This frees all the underlying memory and clears the members.
     pub fn SoapySDRArgInfoList_clear(info: *mut SoapySDRArgInfo, length: usize);
 }
-extern "C" {
+unsafe extern "C" {
     /// Convert a error code to a string for printing purposes.
     ///
     /// If the error code is unrecognized, errToStr returns "UNKNOWN".
@@ -186,7 +186,7 @@ pub struct SoapySDRDevice {
 pub struct SoapySDRStream {
     _unused: [u8; 0],
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the last status code after a Device API call.
     ///
     /// The status code is cleared on entry to each Device call.
@@ -196,7 +196,7 @@ extern "C" {
     /// Device calls without integer status return codes.
     pub fn SoapySDRDevice_lastStatus() -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the last error message after a device call fails.
     ///
     /// When an device API call throws, the C bindings catch
@@ -205,7 +205,7 @@ extern "C" {
     /// Use lastError() to access the exception's error message.
     pub fn SoapySDRDevice_lastError() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Enumerate a list of available devices on the system.
     ///
     /// \param args device construction key/value argument filters
@@ -216,7 +216,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRKwargs;
 }
-extern "C" {
+unsafe extern "C" {
     /// Enumerate a list of available devices on the system.
     ///
     /// Markup format for args: "keyA=valA, keyB=valB".
@@ -228,7 +228,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRKwargs;
 }
-extern "C" {
+unsafe extern "C" {
     /// Make a new Device object given device construction args.
     ///
     /// The device pointer will be stored in a table so subsequent calls
@@ -238,7 +238,7 @@ extern "C" {
     /// \return a pointer to a new Device object
     pub fn SoapySDRDevice_make(args: *const SoapySDRKwargs) -> *mut SoapySDRDevice;
 }
-extern "C" {
+unsafe extern "C" {
     /// Make a new Device object given device construction args.
     ///
     /// The device pointer will be stored in a table so subsequent calls
@@ -248,14 +248,14 @@ extern "C" {
     /// \return a pointer to a new Device object or null for error
     pub fn SoapySDRDevice_makeStrArgs(args: *const ::std::os::raw::c_char) -> *mut SoapySDRDevice;
 }
-extern "C" {
+unsafe extern "C" {
     /// Unmake or release a device object handle.
     ///
     /// \param device a pointer to a device object
     /// \return 0 for success or error code on failure
     pub fn SoapySDRDevice_unmake(device: *mut SoapySDRDevice) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Create a list of devices from a list of construction arguments.
     ///
     /// This is a convenience call to parallelize device construction,
@@ -268,7 +268,7 @@ extern "C" {
         length: usize,
     ) -> *mut *mut SoapySDRDevice;
 }
-extern "C" {
+unsafe extern "C" {
     /// Create a list of devices from a list of construction arguments.
     ///
     /// This is a convenience call to parallelize device construction,
@@ -281,7 +281,7 @@ extern "C" {
         length: usize,
     ) -> *mut *mut SoapySDRDevice;
 }
-extern "C" {
+unsafe extern "C" {
     /// Unmake or release a list of device handles
     ///
     /// and free the devices array memory as well.
@@ -295,7 +295,7 @@ extern "C" {
         length: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// A key that uniquely identifies the device driver.
     ///
     /// This key identifies the underlying implementation.
@@ -305,7 +305,7 @@ extern "C" {
         device: *const SoapySDRDevice,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// A key that uniquely identifies the hardware.
     ///
     /// This key should be meaningful to the user
@@ -315,7 +315,7 @@ extern "C" {
         device: *const SoapySDRDevice,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Query a dictionary of available device information.
     ///
     /// This dictionary can any number of values like
@@ -325,7 +325,7 @@ extern "C" {
     /// \param device a pointer to a device instance
     pub fn SoapySDRDevice_getHardwareInfo(device: *const SoapySDRDevice) -> SoapySDRKwargs;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the frontend mapping of available DSP units to RF frontends.
     ///
     /// This mapping controls channel mapping and channel availability.
@@ -339,7 +339,7 @@ extern "C" {
         mapping: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the mapping configuration string.
     ///
     /// \param device a pointer to a device instance
@@ -350,7 +350,7 @@ extern "C" {
         direction: ::std::os::raw::c_int,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get a number of channels given the streaming direction
     ///
     /// \param device a pointer to a device instance
@@ -361,7 +361,7 @@ extern "C" {
         direction: ::std::os::raw::c_int,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get channel info given the streaming direction
     ///
     /// \param device a pointer to a device instance
@@ -374,7 +374,7 @@ extern "C" {
         channel: usize,
     ) -> SoapySDRKwargs;
 }
-extern "C" {
+unsafe extern "C" {
     /// Find out if the specified channel is full or half duplex.
     ///
     /// \param device a pointer to a device instance
@@ -387,7 +387,7 @@ extern "C" {
         channel: usize,
     ) -> bool;
 }
-extern "C" {
+unsafe extern "C" {
     /// Query a list of the available stream formats.
     ///
     /// \param device a pointer to a device instance
@@ -403,7 +403,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the hardware's native stream format for this channel.
     ///
     /// This is the format used by the underlying transport layer,
@@ -420,7 +420,7 @@ extern "C" {
         fullScale: *mut f64,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Query the argument info description for stream args.
     ///
     /// \param device a pointer to a device instance
@@ -436,7 +436,7 @@ extern "C" {
     ) -> *mut SoapySDRArgInfo;
 }
 
-extern "C" {
+unsafe extern "C" {
     /// Initialize a stream given a list of channels and stream arguments.
     ///
     /// The implementation may change switches or power-up components.
@@ -491,7 +491,7 @@ extern "C" {
         args: *const SoapySDRKwargs,
     ) -> *mut SoapySDRStream;
 }
-extern "C" {
+unsafe extern "C" {
     /// Close an open stream created by setupStream
     ///
     /// \param device a pointer to a device instance
@@ -502,7 +502,7 @@ extern "C" {
         stream: *mut SoapySDRStream,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the stream's maximum transmission unit (MTU) in number of elements.
     ///
     /// The MTU specifies the maximum payload transfer in a stream operation.
@@ -517,7 +517,7 @@ extern "C" {
         stream: *mut SoapySDRStream,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     /// Activate a stream.
     ///
     /// Call activate to prepare a stream before using read/write().
@@ -542,7 +542,7 @@ extern "C" {
         numElems: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Deactivate a stream.
     ///
     /// Call deactivate when not using using read/write().
@@ -563,7 +563,7 @@ extern "C" {
         timeNs: ::std::os::raw::c_longlong,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Read elements from a stream for reception.
     ///
     /// This is a multi-channel call, and buffs should be an array of void *,
@@ -593,7 +593,7 @@ extern "C" {
         timeoutUs: ::std::os::raw::c_long,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write elements to a stream for transmission.
     ///
     /// This is a multi-channel call, and buffs should be an array of void *,
@@ -623,7 +623,7 @@ extern "C" {
         timeoutUs: ::std::os::raw::c_long,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Readback status information about a stream.
     ///
     /// This call is typically used on a transmit stream
@@ -651,7 +651,7 @@ extern "C" {
         timeoutUs: ::std::os::raw::c_long,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// How many direct access buffers can the stream provide?
     ///
     /// This is the number of times the user can call acquire()
@@ -665,7 +665,7 @@ extern "C" {
         stream: *mut SoapySDRStream,
     ) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the buffer addresses for a scatter/gather table entry.
     ///
     /// When the underlying DMA implementation uses scatter/gather
@@ -684,7 +684,7 @@ extern "C" {
         buffs: *mut *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Acquire direct buffers from a receive stream.
     ///
     /// This call is part of the direct buffer access API.
@@ -712,7 +712,7 @@ extern "C" {
         timeoutUs: ::std::os::raw::c_long,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Release an acquired buffer back to the receive stream.
     ///
     /// This call is part of the direct buffer access API.
@@ -725,7 +725,7 @@ extern "C" {
         handle: usize,
     );
 }
-extern "C" {
+unsafe extern "C" {
     /// Acquire direct buffers from a transmit stream.
     ///
     /// This call is part of the direct buffer access API.
@@ -749,7 +749,7 @@ extern "C" {
         timeoutUs: ::std::os::raw::c_long,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Release an acquired buffer back to the transmit stream.
     ///
     /// This call is part of the direct buffer access API.
@@ -772,7 +772,7 @@ extern "C" {
         timeNs: ::std::os::raw::c_longlong,
     );
 }
-extern "C" {
+unsafe extern "C" {
     /// Get a list of available antennas to select on a given chain.
     ///
     /// \param device a pointer to a device instance
@@ -787,7 +787,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the selected antenna on a chain.
     ///
     /// \param device a pointer to a device instance
@@ -802,7 +802,7 @@ extern "C" {
         name: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the selected antenna on a chain.
     ///
     /// \param device a pointer to a device instance
@@ -815,7 +815,7 @@ extern "C" {
         channel: usize,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Does the device support automatic DC offset corrections?
     ///
     /// \param device a pointer to a device instance
@@ -828,7 +828,7 @@ extern "C" {
         channel: usize,
     ) -> bool;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the automatic DC offset corrections mode.
     ///
     /// \param device a pointer to a device instance
@@ -843,7 +843,7 @@ extern "C" {
         automatic: bool,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the automatic DC offset corrections mode.
     ///
     /// \param device a pointer to a device instance
@@ -856,7 +856,7 @@ extern "C" {
         channel: usize,
     ) -> bool;
 }
-extern "C" {
+unsafe extern "C" {
     /// Does the device support frontend DC offset correction?
     ///
     /// \param device a pointer to a device instance
@@ -869,7 +869,7 @@ extern "C" {
         channel: usize,
     ) -> bool;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the frontend DC offset correction.
     ///
     /// \param device a pointer to a device instance
@@ -886,7 +886,7 @@ extern "C" {
         offsetQ: f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the frontend DC offset correction.
     ///
     /// \param device a pointer to a device instance
@@ -903,7 +903,7 @@ extern "C" {
         offsetQ: *mut f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Does the device support frontend IQ balance correction?
     ///
     /// \param device a pointer to a device instance
@@ -916,7 +916,7 @@ extern "C" {
         channel: usize,
     ) -> bool;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the frontend IQ balance correction.
     ///
     /// \param device a pointer to a device instance
@@ -933,7 +933,7 @@ extern "C" {
         balanceQ: f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the frontend IQ balance correction.
     ///
     /// \param device a pointer to a device instance
@@ -950,7 +950,7 @@ extern "C" {
         balanceQ: *mut f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Does the device support automatic frontend IQ balance correction?
     ///
     /// \param device a pointer to a device instance
@@ -963,7 +963,7 @@ extern "C" {
         channel: usize,
     ) -> bool;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the automatic frontend IQ balance correction.
     ///
     /// \param device a pointer to a device instance
@@ -978,7 +978,7 @@ extern "C" {
         automatic: bool,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the automatic frontend IQ balance corrections mode.
     ///
     /// \param device a pointer to a device instance
@@ -991,7 +991,7 @@ extern "C" {
         channel: usize,
     ) -> bool;
 }
-extern "C" {
+unsafe extern "C" {
     /// Does the device support frontend frequency correction?
     ///
     /// \param device a pointer to a device instance
@@ -1004,7 +1004,7 @@ extern "C" {
         channel: usize,
     ) -> bool;
 }
-extern "C" {
+unsafe extern "C" {
     /// Fine tune the frontend frequency correction.
     ///
     /// \param device a pointer to a device instance
@@ -1019,7 +1019,7 @@ extern "C" {
         value: f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the frontend frequency correction value.
     ///
     /// \param device a pointer to a device instance
@@ -1032,7 +1032,7 @@ extern "C" {
         channel: usize,
     ) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     /// List available amplification elements.
     ///
     /// Elements should be in order RF to baseband.
@@ -1048,7 +1048,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Does the device support automatic gain control?
     ///
     /// \param device a pointer to a device instance
@@ -1061,7 +1061,7 @@ extern "C" {
         channel: usize,
     ) -> bool;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the automatic gain mode on the chain.
     ///
     /// \param device a pointer to a device instance
@@ -1076,7 +1076,7 @@ extern "C" {
         automatic: bool,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the automatic gain mode on the chain.
     ///
     /// \param device a pointer to a device instance
@@ -1089,7 +1089,7 @@ extern "C" {
         channel: usize,
     ) -> bool;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the overall amplification in a chain.
     ///
     /// The gain will be distributed automatically across available element.
@@ -1105,7 +1105,7 @@ extern "C" {
         value: f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the value of a amplification element in a chain.
     ///
     /// \param device a pointer to a device instance
@@ -1122,7 +1122,7 @@ extern "C" {
         value: f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the overall value of the gain elements in a chain.
     ///
     /// \param device a pointer to a device instance
@@ -1135,7 +1135,7 @@ extern "C" {
         channel: usize,
     ) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the value of an individual amplification element in a chain.
     ///
     /// \param device a pointer to a device instance
@@ -1150,7 +1150,7 @@ extern "C" {
         name: *const ::std::os::raw::c_char,
     ) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the overall range of possible gain values.
     ///
     /// \param device a pointer to a device instance
@@ -1163,7 +1163,7 @@ extern "C" {
         channel: usize,
     ) -> SoapySDRRange;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the range of possible gain values for a specific element.
     ///
     /// \param device a pointer to a device instance
@@ -1178,7 +1178,7 @@ extern "C" {
         name: *const ::std::os::raw::c_char,
     ) -> SoapySDRRange;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the center frequency of the chain.
     ///
     ///  - For RX, this specifies the down-conversion frequency.
@@ -1213,7 +1213,7 @@ extern "C" {
         args: *const SoapySDRKwargs,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Tune the center frequency of the specified element.
     ///
     ///  - For RX, this specifies the down-conversion frequency.
@@ -1238,7 +1238,7 @@ extern "C" {
         args: *const SoapySDRKwargs,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the overall center frequency of the chain.
     ///
     ///  - For RX, this specifies the down-conversion frequency.
@@ -1253,7 +1253,7 @@ extern "C" {
         channel: usize,
     ) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the frequency of a tunable element in the chain.
     ///
     /// \param device a pointer to a device instance
@@ -1268,7 +1268,7 @@ extern "C" {
         name: *const ::std::os::raw::c_char,
     ) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     /// List available tunable elements in the chain.
     ///
     /// Elements should be in order RF to baseband.
@@ -1284,7 +1284,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the range of overall frequency values.
     ///
     /// \param device a pointer to a device instance
@@ -1299,7 +1299,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRRange;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the range of tunable values for the specified element.
     ///
     /// \param device a pointer to a device instance
@@ -1316,7 +1316,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRRange;
 }
-extern "C" {
+unsafe extern "C" {
     /// Query the argument info description for tune args.
     ///
     /// \param device a pointer to a device instance
@@ -1331,7 +1331,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRArgInfo;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the baseband sample rate of the chain.
     ///
     /// \param device a pointer to a device instance
@@ -1346,7 +1346,7 @@ extern "C" {
         rate: f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the baseband sample rate of the chain.
     ///
     /// \param device a pointer to a device instance
@@ -1359,7 +1359,7 @@ extern "C" {
         channel: usize,
     ) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the range of possible baseband sample rates.
     ///
     /// \deprecated replaced by getSampleRateRange()
@@ -1375,7 +1375,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut f64;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the range of possible baseband sample rates.
     ///
     /// \param device a pointer to a device instance
@@ -1390,7 +1390,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRRange;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the baseband filter width of the chain.
     ///
     /// \param device a pointer to a device instance
@@ -1405,7 +1405,7 @@ extern "C" {
         bw: f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the baseband filter width of the chain.
     ///
     /// \param device a pointer to a device instance
@@ -1418,7 +1418,7 @@ extern "C" {
         channel: usize,
     ) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the range of possible baseband filter widths.
     ///
     /// \deprecated replaced by getBandwidthRange()
@@ -1434,7 +1434,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut f64;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the range of possible baseband filter widths.
     ///
     /// \param device a pointer to a device instance
@@ -1449,7 +1449,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRRange;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the master clock rate of the device.
     ///
     /// \param device a pointer to a device instance
@@ -1460,14 +1460,14 @@ extern "C" {
         rate: f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the master clock rate of the device.
     ///
     /// \param device a pointer to a device instance
     /// \return the clock rate in Hz
     pub fn SoapySDRDevice_getMasterClockRate(device: *const SoapySDRDevice) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the range of available master clock rates.
     ///
     /// \param device a pointer to a device instance
@@ -1478,7 +1478,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRRange;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the reference clock rate of the device.
     ///
     /// \param device a pointer to a device instance
@@ -1489,14 +1489,14 @@ extern "C" {
         rate: f64,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the reference clock rate of the device.
     ///
     /// \param device a pointer to a device instance
     /// \return the clock rate in Hz
     pub fn SoapySDRDevice_getReferenceClockRate(device: *const SoapySDRDevice) -> f64;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the range of available reference clock rates.
     ///
     /// \param device a pointer to a device instance
@@ -1507,7 +1507,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRRange;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the list of available clock sources.
     ///
     /// \param device a pointer to a device instance
@@ -1518,7 +1518,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the clock source on the device
     ///
     /// \param device a pointer to a device instance
@@ -1529,7 +1529,7 @@ extern "C" {
         source: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the clock source of the device
     ///
     /// \param device a pointer to a device instance
@@ -1538,7 +1538,7 @@ extern "C" {
         device: *const SoapySDRDevice,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the list of available time sources.
     ///
     /// \param device a pointer to a device instance
@@ -1549,7 +1549,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the time source on the device
     ///
     /// \param device a pointer to a device instance
@@ -1560,7 +1560,7 @@ extern "C" {
         source: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the time source of the device
     ///
     /// \param device a pointer to a device instance
@@ -1569,7 +1569,7 @@ extern "C" {
         device: *const SoapySDRDevice,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Does this device have a hardware clock?
     ///
     /// \param device a pointer to a device instance
@@ -1580,7 +1580,7 @@ extern "C" {
         what: *const ::std::os::raw::c_char,
     ) -> bool;
 }
-extern "C" {
+unsafe extern "C" {
     /// Read the time from the hardware clock on the device.
     ///
     /// The what argument can refer to a specific time counter.
@@ -1592,7 +1592,7 @@ extern "C" {
         what: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write the time to the hardware clock on the device.
     ///
     /// The what argument can refer to a specific time counter.
@@ -1606,7 +1606,7 @@ extern "C" {
         what: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the time of subsequent configuration calls.
     ///
     /// The what argument can refer to a specific command queue.
@@ -1622,7 +1622,7 @@ extern "C" {
         what: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// List the available global readback sensors.
     ///
     /// A sensor can represent a reference lock, RSSI, temperature.
@@ -1634,7 +1634,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get meta-information about a sensor.
     ///
     /// Example: displayable name, type, range.
@@ -1646,7 +1646,7 @@ extern "C" {
         key: *const ::std::os::raw::c_char,
     ) -> SoapySDRArgInfo;
 }
-extern "C" {
+unsafe extern "C" {
     /// Readback a global sensor given the name.
     ///
     /// The value returned is a string which can represent
@@ -1659,7 +1659,7 @@ extern "C" {
         key: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// List the available channel readback sensors.
     ///
     /// A sensor can represent a reference lock, RSSI, temperature.
@@ -1675,7 +1675,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get meta-information about a channel sensor.
     ///
     /// Example: displayable name, type, range.
@@ -1691,7 +1691,7 @@ extern "C" {
         key: *const ::std::os::raw::c_char,
     ) -> SoapySDRArgInfo;
 }
-extern "C" {
+unsafe extern "C" {
     /// Readback a channel sensor given the name.
     ///
     /// The value returned is a string which can represent
@@ -1708,7 +1708,7 @@ extern "C" {
         key: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get a list of available register interfaces by name.
     ///
     /// \param device a pointer to a device instance
@@ -1719,7 +1719,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write a register on the device given the interface name.
     ///
     /// This can represent a register on a soft CPU, FPGA, IC;
@@ -1736,7 +1736,7 @@ extern "C" {
         value: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Read a register on the device given the interface name.
     ///
     /// \param device a pointer to a device instance
@@ -1749,7 +1749,7 @@ extern "C" {
         addr: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write a memory block on the device given the interface name.
     ///
     /// This can represent a memory block on a soft CPU, FPGA, IC;
@@ -1768,7 +1768,7 @@ extern "C" {
         length: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Read a memory block on the device given the interface name.
     ///
     /// Pass the number of words to be read in via length;
@@ -1785,7 +1785,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     /// Describe the allowed keys and values used for settings.
     ///
     /// \param device a pointer to a device instance
@@ -1796,7 +1796,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRArgInfo;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write an arbitrary setting on the device.
     ///
     /// The interpretation is up the implementation.
@@ -1810,7 +1810,7 @@ extern "C" {
         value: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Read an arbitrary setting on the device.
     ///
     /// \param device a pointer to a device instance
@@ -1821,7 +1821,7 @@ extern "C" {
         key: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Describe the allowed keys and values used for channel settings.
     ///
     /// \param device a pointer to a device instance
@@ -1836,7 +1836,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut SoapySDRArgInfo;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write an arbitrary channel setting on the device.
     ///
     /// The interpretation is up the implementation. \param device a pointer to a device instance
@@ -1853,7 +1853,7 @@ extern "C" {
         value: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Read an arbitrary channel setting on the device.
     ///
     /// \param device a pointer to a device instance
@@ -1868,7 +1868,7 @@ extern "C" {
         key: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get a list of available GPIO banks by name.
     ///
     /// \param [out] length the number of GPIO banks
@@ -1878,7 +1878,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write the value of a GPIO bank.
     ///
     /// \param device a pointer to a device instance
@@ -1891,7 +1891,7 @@ extern "C" {
         value: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write the value of a GPIO bank with modification mask.
     ///
     /// \param device a pointer to a device instance
@@ -1906,7 +1906,7 @@ extern "C" {
         mask: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Readback the value of a GPIO bank.
     ///
     /// \param device a pointer to a device instance
@@ -1917,7 +1917,7 @@ extern "C" {
         bank: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write the data direction of a GPIO bank.
     ///
     /// 1 bits represent outputs, 0 bits represent inputs.
@@ -1931,7 +1931,7 @@ extern "C" {
         dir: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write the data direction of a GPIO bank with modification mask.
     ///
     /// 1 bits represent outputs, 0 bits represent inputs.
@@ -1947,7 +1947,7 @@ extern "C" {
         mask: ::std::os::raw::c_uint,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Read the data direction of a GPIO bank.
     ///
     /// \param device a pointer to a device instance
@@ -1959,7 +1959,7 @@ extern "C" {
         bank: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write to an available I2C slave.
     ///
     /// If the device contains multiple I2C masters,
@@ -1976,7 +1976,7 @@ extern "C" {
         numBytes: usize,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Read from an available I2C slave.
     ///
     /// If the device contains multiple I2C masters,
@@ -1993,7 +1993,7 @@ extern "C" {
         numBytes: *mut usize,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Perform a SPI transaction and return the result.
     ///
     /// Its up to the implementation to set the clock rate,
@@ -2013,7 +2013,7 @@ extern "C" {
         numBits: usize,
     ) -> ::std::os::raw::c_uint;
 }
-extern "C" {
+unsafe extern "C" {
     /// Enumerate the available UART devices.
     ///
     /// \param device a pointer to a device instance
@@ -2024,7 +2024,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Write data to a UART device.
     ///
     /// Its up to the implementation to set the baud rate,
@@ -2039,7 +2039,7 @@ extern "C" {
         data: *const ::std::os::raw::c_char,
     ) -> ::std::os::raw::c_int;
 }
-extern "C" {
+unsafe extern "C" {
     /// Read bytes from a UART until timeout or newline.
     ///
     /// Its up to the implementation to set the baud rate,
@@ -2054,7 +2054,7 @@ extern "C" {
         timeoutUs: ::std::os::raw::c_long,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// A handle to the native device used by the driver.
     ///
     /// The implementation may return a null value if it does not support
@@ -2096,7 +2096,7 @@ pub const SOAPY_SDR_TRACE: SoapySDRLogLevel = 8;
 /// Streaming status indicators such as "U" (underflow) and "O" (overflow).
 pub const SOAPY_SDR_SSI: SoapySDRLogLevel = 9;
 
-extern "C" {
+unsafe extern "C" {
     /// Send a message to the registered logger.
     ///
     /// \param logLevel a possible logging level
@@ -2107,38 +2107,38 @@ extern "C" {
 pub type SoapySDRLogHandler = ::std::option::Option<
     unsafe extern "C" fn(logLevel: SoapySDRLogLevel, message: *const ::std::os::raw::c_char),
 >;
-extern "C" {
+unsafe extern "C" {
     /// Register a new system log handler.
     ///
     /// Platforms should call this to replace the default stdio handler.
     /// Passing `NULL` restores the default.
     pub fn SoapySDR_registerLogHandler(handler: SoapySDRLogHandler);
 }
-extern "C" {
+unsafe extern "C" {
     /// Set the log level threshold.
     ///
     /// Log messages with lower priority are dropped.
     pub fn SoapySDR_setLogLevel(logLevel: SoapySDRLogLevel);
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the size of a single element in the specified format.
     ///
     /// \param format a supported format string
     /// \return the size of an element in bytes
     pub fn SoapySDR_formatToSize(format: *const ::std::os::raw::c_char) -> usize;
 }
-extern "C" {
+unsafe extern "C" {
     ///  Query the root installation path
     pub fn SoapySDR_getRootPath() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// The list of paths automatically searched by loadModules().
     ///
     /// \param [out] length the number of elements in the result.
     /// \return a list of automatically searched file paths
     pub fn SoapySDR_listSearchPaths(length: *mut usize) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// List all modules found in default path.
     ///
     /// The result is an array of strings owned by the caller.
@@ -2146,7 +2146,7 @@ extern "C" {
     /// \return a list of file paths to loadable modules
     pub fn SoapySDR_listModules(length: *mut usize) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// List all modules found in the given path.
     ///
     /// The result is an array of strings owned by the caller.
@@ -2158,7 +2158,7 @@ extern "C" {
         length: *mut usize,
     ) -> *mut *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Load a single module given its file system path.
     ///
     /// The caller must free the result error string.
@@ -2166,7 +2166,7 @@ extern "C" {
     /// \return an error message, empty on success
     pub fn SoapySDR_loadModule(path: *const ::std::os::raw::c_char) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// List all registration loader errors for a given module path.
     ///
     /// The resulting dictionary contains all registry entry names
@@ -2176,7 +2176,7 @@ extern "C" {
     /// \return a dictionary of registry names to error messages
     pub fn SoapySDR_getLoaderResult(path: *const ::std::os::raw::c_char) -> SoapySDRKwargs;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get a version string for the specified module.
     ///
     /// Modules may optionally provide version strings.
@@ -2186,7 +2186,7 @@ extern "C" {
         path: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Unload a module that was loaded with loadModule().
     ///
     /// The caller must free the result error string.
@@ -2196,18 +2196,18 @@ extern "C" {
         path: *const ::std::os::raw::c_char,
     ) -> *mut ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Load the support modules installed on this system.
     ///
     /// This call will only actually perform the load once.
     /// Subsequent calls are a NOP.
     pub fn SoapySDR_loadModules();
 }
-extern "C" {
+unsafe extern "C" {
     /// Unload all currently loaded support modules.
     pub fn SoapySDR_unloadModules();
 }
-extern "C" {
+unsafe extern "C" {
     /// Convert a tick count into a time in nanoseconds using the tick rate.
     ///
     /// \param ticks a integer tick count
@@ -2218,7 +2218,7 @@ extern "C" {
         rate: f64,
     ) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     /// Convert a time in nanoseconds into a tick count using the tick rate.
     ///
     /// \param timeNs time in nanoseconds
@@ -2229,14 +2229,14 @@ extern "C" {
         rate: f64,
     ) -> ::std::os::raw::c_longlong;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the SoapySDR library API version as a string.
     ///
     /// The format of the version string is <b>major.minor.increment</b>,
     /// where the digits are taken directly from <b>SOAPY_SDR_API_VERSION</b>.
     pub fn SoapySDR_getAPIVersion() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the ABI version string that the library was built against.
     ///
     /// A client can compare <b>SOAPY_SDR_ABI_VERSION</b> to getABIVersion()
@@ -2245,7 +2245,7 @@ extern "C" {
     /// compiled against a different ABI than the library.
     pub fn SoapySDR_getABIVersion() -> *const ::std::os::raw::c_char;
 }
-extern "C" {
+unsafe extern "C" {
     /// Get the library version and build information string.
     ///
     /// The format of the version string is <b>major.minor.patch-buildInfo</b>.
