@@ -10,6 +10,11 @@ pub const SOAPY_SDR_END_ABRUPT: u32 = 8;
 pub const SOAPY_SDR_ONE_PACKET: u32 = 16;
 pub const SOAPY_SDR_MORE_FRAGMENTS: u32 = 32;
 pub const SOAPY_SDR_WAIT_TRIGGER: u32 = 64;
+pub const SOAPY_SDR_USER_FLAG0: u32 = 65536;
+pub const SOAPY_SDR_USER_FLAG1: u32 = 131072;
+pub const SOAPY_SDR_USER_FLAG2: u32 = 262144;
+pub const SOAPY_SDR_USER_FLAG3: u32 = 524288;
+pub const SOAPY_SDR_USER_FLAG4: u32 = 1048576;
 pub const SOAPY_SDR_TIMEOUT: i32 = -1;
 pub const SOAPY_SDR_STREAM_ERROR: i32 = -2;
 pub const SOAPY_SDR_CORRUPTION: i32 = -3;
@@ -37,8 +42,6 @@ pub const SOAPY_SDR_S16: &[u8; 4] = b"S16\0";
 pub const SOAPY_SDR_U16: &[u8; 4] = b"U16\0";
 pub const SOAPY_SDR_S8: &[u8; 3] = b"S8\0";
 pub const SOAPY_SDR_U8: &[u8; 3] = b"U8\0";
-pub const SOAPY_SDR_API_VERSION: u32 = 524288;
-pub const SOAPY_SDR_ABI_VERSION: &[u8; 4] = b"0.8\0";
 
 ///  Definition for a min/max numeric range
 #[repr(C)]
@@ -1797,6 +1800,17 @@ unsafe extern "C" {
     ) -> *mut SoapySDRArgInfo;
 }
 unsafe extern "C" {
+    /// Get information on a specific setting.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param key the setting identifier
+    /// \return a list of argument info structures
+    pub fn SoapySDRDevice_getSettingInfoWithKey(
+        device: *const SoapySDRDevice,
+        key: *const ::std::os::raw::c_char,
+    ) -> SoapySDRArgInfo;
+}
+unsafe extern "C" {
     /// Write an arbitrary setting on the device.
     ///
     /// The interpretation is up the implementation.
@@ -1835,6 +1849,21 @@ unsafe extern "C" {
         channel: usize,
         length: *mut usize,
     ) -> *mut SoapySDRArgInfo;
+}
+unsafe extern "C" {
+    /// Get information on a specific channel setting.
+    ///
+    /// \param device a pointer to a device instance
+    /// \param direction the channel direction RX or TX
+    /// \param channel an available channel on the device
+    /// \param key the setting identifier
+    /// \return a list of argument info structures
+    pub fn SoapySDRDevice_getChannelSettingInfoWithKey(
+        device: *const SoapySDRDevice,
+        direction: ::std::os::raw::c_int,
+        channel: usize,
+        key: *const ::std::os::raw::c_char,
+    ) -> SoapySDRArgInfo;
 }
 unsafe extern "C" {
     /// Write an arbitrary channel setting on the device.
@@ -2119,6 +2148,10 @@ unsafe extern "C" {
     ///
     /// Log messages with lower priority are dropped.
     pub fn SoapySDR_setLogLevel(logLevel: SoapySDRLogLevel);
+}
+unsafe extern "C" {
+    /// Get the log level threshold.
+    pub fn SoapySDR_getLogLevel() -> SoapySDRLogLevel;
 }
 unsafe extern "C" {
     /// Get the size of a single element in the specified format.

@@ -57,8 +57,8 @@ brew install soapybladerf
 The bindings were originally generated with bindgen, but subsequently hand-edited. To run bindgen again, use
 
 ```
-rust-bindgen wrapper.h > /tmp/bindings.rs
-diff -u /tmp/bindings.rs src/bindings.rs
+rust-bindgen --rust-edition 2021 --distrust-clang-mangling --no-prepend-enum-name wrapper.h > /tmp/bindings.rs
+diff -u /tmp/bindings.rs src/bindings.rs | egrep -v '^\+\s*///' | less
 ```
 
 and copy over any new functions or changes.
