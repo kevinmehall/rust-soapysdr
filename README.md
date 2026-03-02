@@ -58,7 +58,7 @@ core API contract, but if SoapySDR loads modules that violate this contract and 
 things with them, you may encounter unexpected behavior. For details, see
 [this SoapySDR issue](https://github.com/pothosware/SoapySDR/issues/111).
 
-## Utilities
+## Examples
 
 This crate comes with two small utilities that serve as example code.
 
@@ -67,7 +67,7 @@ This crate comes with two small utilities that serve as example code.
 Displays device details like `SoapySDRUtil`.
 
 ```
-cargo run --release --features=binaries --bin soapy-sdr-info
+cargo run --release --example soapy-sdr-info
 ```
 
 ### soapy-sdr-stream
@@ -77,7 +77,7 @@ Records data from a device.
 e.g. capture 15 seconds of data from the FM band:
 
 ```
-cargo run --release --features=binaries --bin soapy-sdr-stream -- -d driver=rtlsdr -r out.cfile -f 96M -s 1M -n 15M
+cargo run --release --example soapy-sdr-stream -- -d driver=rtlsdr -r out.cfile -f 96M -s 1M -n 15M
 ```
 
 The resulting file contains 32-bit little-endian complex float samples, and can be opened with
