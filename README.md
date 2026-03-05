@@ -8,16 +8,15 @@
 
 This library requires dependencies not handled by Cargo:
 
-  * libsoapysdr 0.6, 0.7, or 0.8
-  * libclang 5.0+ (for bindgen)
-  * pkg-config
+- libsoapysdr 0.8.x
+- pkg-config (Linux and macOS only)
 
 ### Ubuntu
 
-(Tested on Ubuntu 22.04)
+(Tested on Ubuntu 24.04)
 
 ```console
-sudo apt install libsoapysdr-dev libclang-dev llvm-dev pkg-config
+sudo apt install libsoapysdr-dev pkg-config
 
 # Choose the appropriate drivers for your hardware:
 sudo apt install soapysdr-module-rtlsdr soapysdr-module-hackrf soapysdr-module-uhd soapysdr-module-lms7
@@ -25,18 +24,31 @@ sudo apt install soapysdr-module-rtlsdr soapysdr-module-hackrf soapysdr-module-u
 
 ### Nix
 
-```
-nix-shell
-```
+`soapysdr-with-plugins` and `pkg-config`
 
-(see [shell.nix](./shell.nix))
+(see [shell.nix](https://github.com/kevinmehall/rust-soapysdr/blob/master/shell.nix))
 
 ### Windows
 
-Install pre-built PothosSDR and LLVM, then
+Install [pre-built PothosSDR] and add PothosSDR bin directory to system `PATH`.
 
-  - Set `LIBCLANG_PATH` environment variable to LLVM bin directory for rust-bindgen
-  - Add PothosSDR bin directory to system `PATH`
+[pre-built PothosSDR]: https://github.com/pothosware/PothosSDR/wiki/Tutorial
+
+### MacOS
+
+Install SoapySDR with Homebrew:
+
+```
+brew install pkg-config
+brew tap pothosware/homebrew-pothos
+brew update
+
+# Then install the appropriate packages for your hardwar:
+brew install soapyrtlsdr
+brew install soapyhackrf
+brew install soapybladerf
+# ...
+```
 
 ## Warning
 
@@ -75,8 +87,8 @@ The resulting file contains 32-bit little-endian complex float samples, and can 
 
 Licensed under either of
 
-  - Apache License, Version 2.0, (LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
-  - Boost Software License 1.0, (Same as SoapySDR itself, LICENSE-BSL or http://opensource.org/licenses/BSL-1.0)
+- Apache License, Version 2.0, (LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
+- Boost Software License 1.0, (Same as SoapySDR itself, LICENSE-BSL or http://opensource.org/licenses/BSL-1.0)
 
 ### Contribution
 

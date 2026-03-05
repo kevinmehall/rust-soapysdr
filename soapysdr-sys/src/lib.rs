@@ -6,7 +6,4 @@
 //! C API. See its [header file](https://github.com/pothosware/SoapySDR/blob/master/include/SoapySDR/Device.h)
 //! for API documentation.
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
-
-// Compatibility for 0.7 -> 0.8 breaking change
-pub use _rust_wrapper_SoapySDRDevice_setupStream as SoapySDRDevice_setupStream;
+include!("bindings.rs");

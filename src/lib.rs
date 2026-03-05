@@ -29,15 +29,15 @@ pub fn configure_logging() {
     extern "C" fn soapy_log(level: SoapySDRLogLevel, message: *const c_char) {
         #![allow(non_upper_case_globals)]
         let level = match level {
-            SoapySDRLogLevel_SOAPY_SDR_FATAL => Level::Error,
-            SoapySDRLogLevel_SOAPY_SDR_CRITICAL => Level::Error,
-            SoapySDRLogLevel_SOAPY_SDR_ERROR => Level::Error,
-            SoapySDRLogLevel_SOAPY_SDR_WARNING => Level::Warn,
-            SoapySDRLogLevel_SOAPY_SDR_NOTICE => Level::Info,
-            SoapySDRLogLevel_SOAPY_SDR_INFO => Level::Info,
-            SoapySDRLogLevel_SOAPY_SDR_DEBUG => Level::Debug,
-            SoapySDRLogLevel_SOAPY_SDR_TRACE => Level::Trace,
-            SoapySDRLogLevel_SOAPY_SDR_SSI => Level::Info, // Streaming status indicators such as "U" (underflow) and "O" (overflow).
+            soapysdr_sys::SOAPY_SDR_FATAL => Level::Error,
+            soapysdr_sys::SOAPY_SDR_CRITICAL => Level::Error,
+            soapysdr_sys::SOAPY_SDR_ERROR => Level::Error,
+            soapysdr_sys::SOAPY_SDR_WARNING => Level::Warn,
+            soapysdr_sys::SOAPY_SDR_NOTICE => Level::Info,
+            soapysdr_sys::SOAPY_SDR_INFO => Level::Info,
+            soapysdr_sys::SOAPY_SDR_DEBUG => Level::Debug,
+            soapysdr_sys::SOAPY_SDR_TRACE => Level::Trace,
+            soapysdr_sys::SOAPY_SDR_SSI => Level::Info, // Streaming status indicators such as "U" (underflow) and "O" (overflow).
             _ => Level::Error,
         };
 
