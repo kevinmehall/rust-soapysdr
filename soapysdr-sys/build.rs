@@ -129,7 +129,9 @@ fn panic_help_message_soapysdr() -> ! {
 }
 
 fn main() {
-    if !(probe_env_var() || probe_pkg_config() || probe_pothos_sdr()) {
+    if !(probe_env_var() || probe_pkg_config() || probe_pothos_sdr())
+        && !std::env::var("DOCS_RS").is_ok()
+    {
         panic_help_message_soapysdr();
     }
 }
