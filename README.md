@@ -2,7 +2,7 @@
 
 [SoapySDR](https://github.com/pothosware/SoapySDR/wiki) provides a hardware abstraction layer for many software defined radio devices.
 
-**[API Documentation](https://kevinmehall.net/rustdoc/soapysdr/soapysdr/)** | **[Changelog](https://github.com/kevinmehall/rust-soapysdr/releases)**
+**[API Documentation](https://docs.rs/soapysdr)** | **[crates.io](https://crates.io/crates/soapysdr)** | **[Changelog](https://github.com/kevinmehall/rust-soapysdr/releases)**
 
 ## Dependencies
 
