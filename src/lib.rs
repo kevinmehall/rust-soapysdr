@@ -7,7 +7,7 @@ mod args;
 pub use args::{Args, ArgsIterator};
 
 mod arginfo;
-pub use arginfo::ArgInfo;
+pub use arginfo::{ArgInfo, ArgType};
 
 mod device;
 pub use device::{Device, Direction, Error, ErrorCode, Range, RxStream, TxStream, enumerate};
